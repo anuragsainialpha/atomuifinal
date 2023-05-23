@@ -1,0 +1,196 @@
+/* create plan template styles */
+.create-plan{
+   
+    position: relative;
+    .uploadfile{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,50%);
+        width: 500px;
+        margin: 0 auto;
+        text-align: center;
+        img{
+            width: 200px;
+            margin-bottom: 20px;
+        }
+        h5{
+            u{
+                color:$theme-purple-color;
+                cursor: pointer;
+            }
+        }
+        p{
+            text-decoration: underline;
+            color: $theme-blue-color;
+            cursor: pointer;
+            margin-top: 30px;
+            font-size: 18px;
+        }
+        input#plan-file{
+            opacity: 0;
+            width: 0px;
+            position: absolute;
+        }
+        .error-log{
+            .mat-list-item-content{
+                display: inherit !important;
+                color: red;
+            }
+        }
+    }
+}
+
+
+
+/* plan with erros styles */
+.example-card {
+    max-width: 400px;
+  }
+  
+  .example-header-image {
+    background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
+    background-size: cover;
+  }
+  .plan-with-errors{
+      padding: 10px 15px;
+      h4.plan-text{
+          margin-bottom: 20px;
+          padding-top: 20px;
+      }
+      .left-card,.right-card{
+          .row{
+            text-align: center;
+            // box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
+            box-shadow: 0 0px 0px 0px #b381f9, 0 2px 3px 0 #dad5e1, 0 1px 6px 0 #b381f9;
+            margin: 0px 0px;
+            padding: 15px 0px;
+            h4.error{
+                color: #f3840b;
+            }
+            h4.no-error{
+                color: $theme-purple-color;
+            }
+          }
+          p{
+              font-size: .8rem;
+              color: #aaa;
+              margin-bottom: 0.2rem;
+          }
+          .theme-color{
+            color: $theme-purple-color;
+        }
+      }
+      .mat-tab-body-content{
+          padding: 20px 0px;
+      }
+      .tabs-section{
+          margin-top: 20px;
+      }
+  }
+  .planwith-success{
+    h4{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        span{
+            color: $theme-purple-color;
+            text-decoration: underline;
+        }
+    }   
+  }
+
+
+  /* Manual plan styles*/
+  .manualplan-fields{
+    //   border:1px solid $theme-opactity-border;
+      padding: 20px;
+      border-radius: 4px;
+    //   background-color: $theme-searchbox-background-color;
+        background-color: #eee;
+        box-shadow: 0px 0px 6px 0px #2d2c2e;
+      .col-md-3{
+          padding: 0px 40px ;
+      }
+      label{
+          margin-bottom: 0px;
+      }
+      .mat-form-field-appearance-legacy .mat-form-field-wrapper {
+        padding-bottom: 0.5em;
+    }
+  } 
+  .manulal-plan-header{
+    padding: 5px 0px;
+    margin-bottom: 0px;
+    font-weight: 400;
+    font-size: 16px;
+    // span{
+    //     color: $dark-color-theme;
+    //     margin-right: 15px;
+    //     font-size: 12px;
+    //     font-weight: 300;
+    // }
+    span.refresh-span{
+        margin-right: -4px !important;
+    }
+  }
+  .manual-plan-table{
+      margin-top: 30px;
+  }
+  
+
+  /* pending plans list styles */
+  .pendingplans-content{
+      padding: 5px 0px;
+      h4{
+          margin-bottom: 0px;
+          font-weight: 600;
+          font-size: 16px;
+      }
+  }
+
+  /* modify plan styles */
+  .datatable{
+    //   margin-top: 20px;
+      margin-bottom: 20px;
+  }
+  .plan-created-success{
+     span{
+        color: $theme-purple-color;
+     }
+  }
+  .padding-right-40{
+    padding-right: 40px;
+  }
+  .search-fileds{
+    position: absolute;
+    right: 0px;
+    margin: 10px -19px;
+
+  }
+  .mat-row, .mat-header-row {
+    width: 75vw; //PERSONALLY I HAD 45 COLUMNS
+  }
+  .mat-header-row { //THIS MAKES THE HEADER STICKY
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 1;
+    background-color: inherit;
+  }
+  .table { //OR WHATEVER YOU CALL THE mat-table
+    overflow: scroll;
+  }
+  .mat-table th{
+      text-align: center !important;
+      padding: 5px !important;
+  }
+  td.mat-cell:first-of-type, td.mat-footer-cell:first-of-type, th.mat-header-cell:first-of-type{
+      padding-left: 0px !important;
+  }
+  .mat-checkbox{
+      padding: 5px !important;
+  }
+  

@@ -1,0 +1,307 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+    <b> SAP Master &gt; MT Customer </b>
+    <span class="pull-right refresh-span">
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+  <div class="mt-item-fields">
+    <div class="col-md-12 row">
+      <div class="col-md-12 padding-right-40">
+        <div class="row">
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="Cust Id" placeholder="Cust Id"
+                  (keyup)="getfilterDestination($event, 'CUST_ID')" autocomplete="off"
+                  [matAutocomplete]="destinationAutocomplete" [(ngModel)]="custLoc" name="custLoc"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #destinationAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of custLocList" [value]="list.value">
+                    <!-- (click)="setDestDescription(list.description)"
+                  (onSelectionChange)="setDestDescription(list.valdescriptionue)" -->
+                    <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- Cust Mane -->
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="Cust Name" placeholder="Cust Name"
+                  (keyup)="getfilterDestination($event, 'CUST_NAME')" autocomplete="off"
+                  [matAutocomplete]="custNameAutocomplete" [(ngModel)]="custName" name="custName"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #custNameAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let value of custNameList" [value]="value">
+                    <!-- (click)="setDestDescription(list.description)"
+                    (onSelectionChange)="setDestDescription(list.valdescriptionue)" -->
+                    <span matTooltip={{value}}>{{value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- Cust Acct Grp -->
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="Cust Acct Grp" placeholder="Cust Acct Grp"
+                  (keyup)="getfilterDestination($event, 'CUST_ACCT_GRP')" autocomplete="off"
+                  [matAutocomplete]="custAcctGrpAutocomplete" [(ngModel)]="custAcctGrp" name="custAcctGrp"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #custAcctGrpAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let value of custAcctGrpList" [value]="value">
+                    <!-- (click)="setDestDescription(list.description)"
+                      (onSelectionChange)="setDestDescription(list.valdescriptionue)" -->
+                    <span matTooltip={{value}}>{{value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- City -->
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="City" placeholder="City"
+                  (keyup)="getfilterDestination($event, 'CITY')" autocomplete="off"
+                  [matAutocomplete]="cityAutocomplete" [(ngModel)]="city" name="city"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #cityAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let value of cityList" [value]="value">
+                    <!-- (click)="setDestDescription(list.description)"
+                        (onSelectionChange)="setDestDescription(list.valdescriptionue)" -->
+                    <span matTooltip={{value}}>{{value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- State -->
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="State" placeholder="State"
+                  (keyup)="getfilterDestination($event, 'STATE')" autocomplete="off"
+                  [matAutocomplete]="stateAutocomplete" [(ngModel)]="state" name="state"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #stateAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let value of stateList" [value]="value">
+                    <!-- (click)="setDestDescription(list.description)"
+                          (onSelectionChange)="setDestDescription(list.valdescriptionue)" -->
+                    <span matTooltip={{value}}>{{value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- State Code -->
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="State Code" [(ngModel)]="selectedStateCodes" name="selectedStateCodes" multiple >
+                  <mat-option *ngFor="let stateCode of stateCodeList" [value]="stateCode">{{stateCode}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- Cust Types -->
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Cust Type" [(ngModel)]="selectedCustTypes" name="selectedCustTypes" multiple >
+                  <mat-option *ngFor="let custType of custTypeList" [value]="custType">{{custType}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="formPicker" placeholder="From Insert Date"
+                  [(ngModel)]="fromInsertDate" name="fromInsertDate" (dateChange)="addEvent('fromInsertDate', $event)">
+                <mat-datepicker-toggle matSuffix [for]="formPicker"></mat-datepicker-toggle>
+                <mat-datepicker #formPicker disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="toPicker" [min]="fromInsertDate" placeholder="To Insert Date"
+                  [(ngModel)]="toInsertDate" name="toInsertDate">
+                <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toPicker [disabled]="!fromInsertDate"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="pull-right">
+        <div class="search-fileds">
+          <button class="theme-small-button" (click)="doSearch()" matTooltip="Search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </button>
+          <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-item-table">
+    <div>
+      <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [columnMode]="'force'"
+        [rows]='mtCustomerList' [externalPaging]="true" (page)="datatablePageData($event)" [scrollbarH]="true"
+        [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count"
+        [offset]="page.offset">
+
+        <ngx-datatable-column name="Cust Id" [width]="100" [resizeable]="false" prop="custId" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.id}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Cust Name" [width]="200" [resizeable]="false" prop="custName" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.customerName}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Cust Acct GRP" [width]="100" [resizeable]="false" prop="custAcctGRP"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.custAcctGRP}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Customer Type" [width]="100" [resizeable]="false" prop="customerType"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.customerType}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Delivery Terms" [width]="100" [resizeable]="false" prop="deliveryTerms"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.deliveryTerms}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="PAN Num" [width]="100" [resizeable]="false" prop="panNum" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.panNum}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="GST Num" [width]="100" [resizeable]="false" prop="gstNum" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.gstNum}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="GST Code" [width]="100" [resizeable]="false" prop="gstCode" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <!-- {{row.expiryDate ? (row.expiryDate | customDateFormat | date:'dd-MMM-yyyy') : '--'}} -->
+            {{row.gstCode}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Address" [width]="300" [resizeable]="false" prop="address" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.address}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="city" [width]="100" [resizeable]="false" prop="city" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.city}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="State" [width]="100" [resizeable]="false" prop="state" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.state}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="State Code" [width]="100" [resizeable]="false" prop="stateCode" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.stateCode }}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Country" [width]="100" [resizeable]="false" prop="country" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.country}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Postal Code" [width]="100" [resizeable]="false" prop="gstpostalCode"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <!-- {{row.expiryDate ? (row.expiryDate | customDateFormat | date:'dd-MMM-yyyy') : '--'}} -->
+            {{row.postalCode}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Latitude" [width]="200" [resizeable]="false" prop="latitude" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.latitude}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Longitude" [width]="200" [resizeable]="false" prop="longitude" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.longitude}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Is Active" [width]="150" [resizeable]="false" prop="isActive" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.isActive}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Insert User" [width]="150" [resizeable]="false" prop="insertUser" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.insertUser}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Insert Date" [width]="150" [resizeable]="false" prop="insertDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.insertDate ? (row.insertDate | customDateFormat | date:'dd-MMM-yyyy HH:mm') : '--'}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Update User" [width]="150" [resizeable]="false" prop="upadteUser" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.updateUser}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Update Date" [width]="100" [resizeable]="false" prop="updateDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.updateDate ? (row.updateDate | customDateFormat | date:'dd-MMM-yyyy HH:mm') : '--'}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- Footer Template starts -->
+        <ngx-datatable-footer>
+          <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+            let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+            <div class="page-count">
+              <span *ngIf="selectedCount">
+                {{selectedCount.toLocaleString()}} Selected |
+              </span>
+              Showing {{(offset * pageSize)+1}} to {{(rowCount>
+            (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+              {{(rowCount)}} records.
+            </div>
+            <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+              [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage"
+              [size]="pageSize" [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)"
+              (change)="table.onFooterPage($event)">
+            </datatable-pager>
+          </ng-template>
+        </ngx-datatable-footer>
+        <!-- Footer Template Ends -->
+      </ngx-datatable>
+    </div>
+  </div>
+</div>

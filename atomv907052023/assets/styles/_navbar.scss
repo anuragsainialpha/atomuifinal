@@ -1,0 +1,19 @@
+.navbar-expand-lg{
+    .logo{
+        width: 100px;
+    }
+    .mr-auto{
+        margin: 0 auto !important;
+    }
+    .fa-user-circle{
+        font-size: 1.4rem;
+    }
+}
+.navbar{
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+}
+.nav-link{
+    padding-right: 0rem !important;
+    padding-left: 0rem !important;
+    margin: 0rem 1.1rem;
+}

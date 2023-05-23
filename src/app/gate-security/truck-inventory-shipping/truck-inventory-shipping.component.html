@@ -1,0 +1,828 @@
+<app-loader *ngIf="isLoading">
+</app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header"><b>Truck status > Truck Inventory > Shipping</b>
+    <span class="pull-right refresh-span">
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="Filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+  <div class="clearfix"></div>
+  <div class="manualplan-fields" *ngIf="isShow">
+      <form (submit)="truckstatusIndetsFilter()">
+    <div class="col-md-12 row">
+      <div class="col-md-12 padding-right-40">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="row">
+              <div class="col-md-2 pr-0 pl-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput aria-label="Source" placeholder="Source"
+                      (keyup)="getfilterDestination($event,'source', isIntransitTruck)" autocomplete="off"
+                      [matAutocomplete]="sourceAutocomplete" [(ngModel)]="source" name="source" oninput="this.value = this.value.toUpperCase()">
+                    <mat-autocomplete #sourceAutocomplete="matAutocomplete">
+                      <mat-option *ngFor="let list of sourceList" [value]="list.value">
+                        <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+              </div>
+              <!-- <div class="col-md-3 pr-0">
+                    <div class="form-group">
+                      <mat-form-field>
+                        <input matInput aria-label="Destination" placeholder="Destination" (keyup)="getfilterDestination($event,'destination')" autocomplete="off"
+                          [matAutocomplete]="destinationAutocomplete" [(ngModel)]="destination" name="destination">
+                        <mat-autocomplete #destinationAutocomplete="matAutocomplete">
+                          <mat-option *ngFor="let list of destinationList" [value]="list.value">
+                            <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                          </mat-option>
+                        </mat-autocomplete>
+                      </mat-form-field>
+                    </div>
+                  </div> -->
+
+              <div class="col-md-2 pr-0">
+                <div class="form-group">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Destination" aria-label="Destination" [matAutocomplete]="statesAutocomplete"
+                      [(ngModel)]="destination" name="destination" (keyup)="getfilterDestination($event,'destination', !isIntransitTruck)"  oninput="this.value = this.value.toUpperCase()">
+                    <mat-autocomplete #statesAutocomplete="matAutocomplete">
+                      <mat-option *ngFor="let list of destinationList" [value]="list.value"
+                        (click)="setDestDescription(list.description)"
+                        (onSelectionChange)="setDestDescription(list.description)">
+                        <span>{{list.value}}</span>
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-4 pr-0">
+                <div class="form-group">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Destination Description" aria-label="Destination Description"
+                      [matAutocomplete]="destDisAutocomplete" [(ngModel)]="destinationDesc" name="destinationDesc"
+                      (keyup)="getUserDestinationList($event)" oninput="this.value = this.value.toUpperCase()">
+                    <mat-autocomplete #destDisAutocomplete="matAutocomplete">
+                      <mat-option *ngFor="let list of descriptionList" [value]="list.description"
+                        (click)="setDestination(list.value)" (onSelectionChange)="setDestination(list.value)">
+                        <span>({{list.description}})</span>
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="col-md-4 pr-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <mat-select placeholder="Truck/Container Type" [(ngModel)]="truckType" name="truckType" multiple>
+                      <!-- <mat-option [value]="">None</mat-option> -->
+                      <mat-option *ngFor="let truck of truckList" [value]="truck.value"> {{truck.value}} </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+
+
+
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="row">
+              <div class="col-md-3 pr-0">
+                <mat-form-field>
+                  <input matInput aria-label="Country of Destination" placeholder="Country of Destination"
+                    (keyup)="countryOfDestinationFilter($event,'destCountrySearch')" autocomplete="off"
+                    [matAutocomplete]="dischargeAutocomplete" [(ngModel)]="destCountryName" name="destCountryName" oninput="this.value = this.value.toUpperCase()">
+                  <mat-autocomplete #dischargeAutocomplete="matAutocomplete">
+                    <mat-option *ngFor="let country of countryList" [value]="country.description">
+                      <span matTooltip={{country.description}}>{{country.value}} - ({{country.description}})</span>
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3 pr-0">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="trckNumber" name="truck number" autocomplete="off"
+                    placeholder="Truck Number" oninput="this.value = this.value.toUpperCase()">
+                </mat-form-field>
+              </div>
+              <div class="col-md-3 pr-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput aria-label="transporter" placeholder="Transporter"
+                      (keyup)="getfilterTransporter($event)" autocomplete="off"
+                      [matAutocomplete]="transporterAutocomplete" [(ngModel)]="transporter" name="transporter" oninput="this.value = this.value.toUpperCase()">
+                    <mat-autocomplete #transporterAutocomplete="matAutocomplete">
+                      <mat-option *ngFor="let list of transporterList" [value]="list.value">
+                        <span>{{list.value}}</span>
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <mat-form-field>
+                  <input matInput [(ngModel)]="shipmentId" name="shipment" autocomplete="off" placeholder="Shipment Id" oninput="this.value = this.value.toUpperCase()">
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="row">
+              <div class="col-md-3 pl-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput [(ngModel)]="indentId" name="indentid" placeholder="Indent Id" autocomplete="off" oninput="this.value = this.value.toUpperCase()">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-3 pr-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput [min]="minDate" placeholder="Gate In From Date" disabled
+                      [matDatepicker]="gateInFromDatePicker" autocomplete="off" [(ngModel)]="gateInFromDate"
+                      (dateChange)="addEvent('gateInDate', $event)" name="gateInToDate">
+                    <mat-datepicker-toggle matSuffix [for]="gateInFromDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #gateInFromDatePicker disabled="false"></mat-datepicker>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-3 pr-0">
+                <mat-form-field>
+                  <input matInput [min]="gateInFromDate" placeholder="Gate In To Date" disabled
+                    [matDatepicker]="gateInToDatePicker" autocomplete="off" [(ngModel)]="gateInToDate"
+                    name="gateInToDate">
+                  <mat-datepicker-toggle matSuffix [for]="gateInToDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #gateInToDatePicker [disabled]="!gateInFromDate"></mat-datepicker>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3 pr-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput [min]="minDate" placeholder="Rep From Date" disabled
+                      [matDatepicker]="reportFromDatePicker" autocomplete="off" [(ngModel)]="reportFromDate"
+                      (dateChange)="addEvent('repFromDate', $event)" name="reportfromDate">
+                    <mat-datepicker-toggle matSuffix [for]="reportFromDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #reportFromDatePicker disabled="false"></mat-datepicker>
+                  </mat-form-field>
+                </div>
+              </div>
+
+
+              <!-- <div class="col-md-3 pr-0">
+                    <div class="form-group">
+                      <mat-form-field>
+                        <input matInput [min]="minDate" placeholder="Gate Out From Date" disabled [matDatepicker]="gateOutFromDatePicker"
+                          autocomplete="off" [(ngModel)]="gateOutFromDate" (dateChange)="addEvent('gateOutDate', $event)"
+                          name="gateoutFromDate">
+                        <mat-datepicker-toggle matSuffix [for]="gateOutFromDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #gateOutFromDatePicker disabled="false"></mat-datepicker>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="col-md-3 pr-0">
+                    <mat-form-field>
+                      <input matInput [min]="gateOutFromDate" placeholder="Gate Out To Date" disabled [matDatepicker]="gateOutToDatePicker"
+                        autocomplete="off" [(ngModel)]="gateOutToDate" name="gateoutToDate">
+                      <mat-datepicker-toggle matSuffix [for]="gateOutToDatePicker"></mat-datepicker-toggle>
+                      <mat-datepicker #gateOutToDatePicker [disabled]="!gateOutFromDate"></mat-datepicker>
+                    </mat-form-field>
+                  </div> -->
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="row">
+              <div class="col-md-3 pr-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput [min]="reportFromDate" placeholder="Rep To Date" disabled
+                      [matDatepicker]="reportToDatePicker" autocomplete="off" [(ngModel)]="reportToDate"
+                      name="reportToDate">
+                    <mat-datepicker-toggle matSuffix [for]="reportToDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #reportToDatePicker [disabled]="!reportFromDate"></mat-datepicker>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-2 pr-0">
+                <mat-form-field>
+                  <mat-select placeholder="Bay Status" [(ngModel)]="bayStatus" name="bayStatus" multiple>
+                    <!-- <mat-option [value]="">None</mat-option> -->
+                    <mat-option *ngFor="let item of baystatusList" [value]="item"> {{item}} </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-3 pr-0">
+                <mat-form-field>
+                  <mat-select placeholder="Select Status" name="status" autocomplete="off" [(ngModel)]="statusType" multiple>
+                    <!-- <mat-option [value]="">None</mat-option> -->
+                    <mat-option *ngFor="let status of reportTruckStatusList" [value]="status.value">
+                      {{status.key}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 pr-0">
+                <mat-form-field>
+                  <mat-select placeholder="Rejection" [(ngModel)]="rejection" name="rejection" multiple>
+                    <!-- <mat-option [value]="">None</mat-option> -->
+                    <mat-option *ngFor="let item of rejectionList" [value]="item"> {{item}} </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <mat-form-field>
+                    <mat-select placeholder="Ind Cat" [(ngModel)]="materialGrp" name="materialGrp" multiple>
+                      <mat-option *ngFor="let category of categoryList" [value]="category">{{category}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pull-right">
+        <div class="search-fileds">
+          <button class="theme-small-button" type="submit" matTooltip="Search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </button>
+          <button class="theme-delete-button" type="button" (click)="clearData()" matTooltip="Clear All">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+      </form>
+
+    <!-- For FGS operations Table -->
+    <ngx-datatable #table class='material  ngx-table-custom-scroll ngx-table-tr-custom-scroll'
+      [rows]='fgsReportedTrucksIndents' [columnMode]="'force'" [headerHeight]="50" [selected]="selected"
+      [selectionType]="'single'" [footerHeight]="30" [rowHeight]="'auto'" [limit]="fgPage.limit" [scrollbarH]="true"
+      [count]="fgPage.count" [offset]="fgPage.offset" (page)="FgsDatatablePageData($event)" [externalPaging]="true">
+      <ngx-datatable-column [frozenLeft]="true" name="Indent Id" [width]="170" [resizeable]="false" [sortable]="true"
+        prop="indentId">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.indentId}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column [frozenLeft]="true" name="Truck Number" [width]="120" [resizeable]="false" [sortable]="true"
+        prop="truckNumber">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+          {{row.truckNumber | uppercase}}
+          <!-- <ng-container *ngIf="row.status === 'GATED_IN' || row.status == 'REPORTED'">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-truckNumber'] = true" *ngIf="!editing[rowIndex + '-truckNumber']">
+                <span class="edit-label">{{row.truckNumber | uppercase}}
+                </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <mat-form-field *ngIf="editing[rowIndex+ '-truckNumber']">
+                <input matInput [value]="row.truckNumber" (blur)="updateValue($event, 'truckNumber', rowIndex)">
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngIf="row.status !== 'GATED_IN' && row.status !== 'REPORTED'">
+                {{row.truckNumber | uppercase}}
+            </ng-container> -->
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column [frozenLeft]="true" name="Transporter" [width]="130" [resizeable]="false" [sortable]="true"
+        prop="transporter">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.transporter | uppercase}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column [frozenLeft]="true" name="Dest" [width]="90" [resizeable]="false" [sortable]="true"
+        prop="destination">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.destination | uppercase}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Dest Description" [width]="130" [resizeable]="false" [sortable]="true" prop="destDis">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.destDis}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Truck Type" [width]="130" [resizeable]="false" [sortable]="true" prop="truckType">
+        <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+          {{row.truckType | uppercase}}
+
+          <!-- <ng-container *ngIf="row.status === 'GATED_IN' || row.status == 'REPORTED'">
+  
+          <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-truckType'] = true" *ngIf="!editing[rowIndex + '-truckType']">
+            <span class="edit-label">{{row.truckType}}
+            </span>
+            <i class="fa fa-pencil" aria-hidden="true"></i>
+          </div>
+          <mat-form-field *ngIf="editing[rowIndex+ '-truckType']">
+              <mat-select autofocus placeholder="Truck Type" 
+              [ngModel]="row.truckType" name="Truck Type" 
+              (ngModelChange)="updateValue($event,'marketSegment',rowIndex)">
+                <mat-option [value]="">None</mat-option>
+                <mat-option *ngFor="let truck of truckList" [value]="truck.value">
+                  {{truck.value}}
+                </mat-option>
+              </mat-select>
+          </mat-form-field>
+          </ng-container>
+          <ng-container *ngIf="row.status !== 'GATED_IN' && row.status !== 'REPORTED'">
+              {{row.truckType | uppercase}}
+          </ng-container> -->
+        </ng-template>
+        <!-- <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.truckType | uppercase}}
+        </ng-template> -->
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Report Date" [width]="120" [resizeable]="false" [sortable]="true" prop="reportedDate">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.reportedDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Truck Status" [width]="90" [resizeable]="false" [sortable]="true" prop="status">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.status}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Bay Status" [width]="100" [resizeable]="false" [sortable]="true" prop="callStatus">
+        <ng-template let-row="row" ngx-datatable-cell-template let-row="row">
+          <!--  DR_REP role user only view data can't edit data -->
+          <!-- DP_REP ROLE -->
+          <ng-container *ngIf="(isDPREPRole());else otherUsersBAYSTATUS">
+            <span [ngClass]="{'btn btn-sm lightgreen-button':row.bayStatus == 'CALL'}">{{row.bayStatus == 'CALL' ?
+              'Called':row.bayStatus}}</span>
+          </ng-container>
+          <ng-template #otherUsersBAYSTATUS>
+            <!--  for other user other than DP_REP -->
+            <ng-container *ngIf="row.bayStatus == '' || row.bayStatus == null">
+              <button mat-raised-button color="primary" class="table-btn" (click)="callGateSecurity(row)">Call</button>
+            </ng-container>
+            <ng-container *ngIf="row.bayStatus != ''">
+              <span [ngClass]="{'btn btn-sm lightgreen-button':row.bayStatus == 'CALL'}">{{row.bayStatus == 'CALL' ?
+                'Called':row.bayStatus}}</span>
+            </ng-container>
+          </ng-template>
+          <!-- <ng-container *ngIf="(row.bayStatus != 'RELEASE')">
+            <button class="btn btn-sm lightgreen-button" *ngIf="(row.callStatus) != null">{{row.callStatus}}</button>
+            <button
+              *ngIf="(row.callStatus == null && row.inWeight == null) || (row.callStatus == '' && row.inWeight == '')"
+              mat-raised-button color="primary" class="table-btn" (click)="callGateSecurity(row)">Call</button>
+          </ng-container>
+          <ng-container *ngIf="(row.bayStatus == 'RELEASE')">
+            {{row.bayStatus}}
+          </ng-container> -->
+
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="In weight (Kg)" [width]="80" [resizeable]="false" [sortable]="true" prop="inWeight">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+          <span>{{row.inWeight}}</span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Gate In" [width]="120" [resizeable]="false" [sortable]="true" prop="gateInDate">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+          {{row.gateInDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Out Weight (Kg)" [width]="80" [resizeable]="false" [sortable]="true" prop="outWeight">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+          <span>{{row.outWeight}}</span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Net Weight (Kg)" [width]="80" [resizeable]="false" [sortable]="true" prop="netWeight">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.netWeight}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="SAP invoice weight(Kg)" [width]="100" [resizeable]="false" prop="dropSeq"
+        [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.sapInvWeight}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Weight Diff (Kg)" [width]="80" [resizeable]="false" [sortable]="true"
+        prop="netWeight">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <span [ngClass]="(row.weightDiffStatus)?'text-danger':''">{{row.diffInvWeight}}</span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Gate Out" [width]="120" [resizeable]="false" [sortable]="true" prop="gateOutDate">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+          <span>{{row.gateOutDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm' || '--'}}</span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Loadslip Comments" [width]="100" [resizeable]="false" [sortable]="true"
+        prop="loadslipComments">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <div [title]="row.loadslipComments" [ngClass]="{'cursor-pointer':row.loadslipComments?.length>12}"
+            (click)="ShowComments(row.loadslipComments,'loadslip')" *ngIf="(row.loadslipComments)">
+            {{(row.loadslipComments?.length>12) ? (row.loadslipComments | slice:0:12)+'..':(row.loadslipComments)}}
+          </div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Gate Comments" [width]="100" [resizeable]="false" [sortable]="true" prop="comments">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <!-- <button class="theme-small-button" matTooltip="Comments" (click)="ShowComments(row.comments,'comments')" *ngIf="(row.comments)">
+            <i class="fa fa-commenting-o" aria-hidden="true"></i>
+          </button> -->
+          <div [title]="row.comments" [ngClass]="{'cursor-pointer':row.comments?.length>8}"
+            (click)="ShowComments(row.comments,'comments')" *ngIf="(row.comments)">
+            {{(row.comments?.length>8) ? (row.comments | slice:0:8)+'..':(row.comments)}}
+          </div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Rejection" [width]="80" [resizeable]="false" [sortable]="true" prop="rejectionStatus">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.rejectionStatus}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Rejection Desc" [width]="120" [resizeable]="false" [sortable]="true"
+        prop="rejectionDesc">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.rejectionDesc}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!--  DR_REP role user only view data can't edit data -->
+      <ng-container *ngIf="(!isDPREPRole())">
+        <!--  for other user other than DP_REP -->
+        <ngx-datatable-column name="Action" [width]="440" [resizeable]="false" [sortable]="false" prop="netWeight">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <button mat-raised-button color="primary" class="table-btn mr-10" *ngIf="(row.status=='GATED_IN')"
+              (click)="openTruckModel(row,rowIndex)" [disabled]="(row.rejectionStatus) == 'REJECTED'">
+              Reject Truck
+            </button>
+            <!-- <button mat-raised-button color="primary" class="table-btn" (click)="saveTruck(row)" [disabled]="(row.rejectionStatus) == 'REJECTED'">
+                  Save Truck
+                </button> -->
+
+            <ng-container>
+              <button mat-raised-button color="primary" (click)="viewLoadslip(row.shipmentId,'loadslipView')"
+                [disabled]="!row.shipmentId" class="table-btn mr-10">View
+                Loadslips
+              </button>
+              <button mat-raised-button color="primary" (click)="viewLoadslip(row.shipmentId,'invoiceView')"
+                [disabled]="!row.shipmentId" class="table-btn">LoadSlip
+                Invoice
+              </button>
+            </ng-container>
+          </ng-template>
+        </ngx-datatable-column>
+      </ng-container>
+      <ngx-datatable-column name="Driver Name" [width]="100" [resizeable]="false" [sortable]="true" prop="driverName">
+        <!-- <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-driverName'] = true" *ngIf="!editing[rowIndex + '-driverName']">
+                <span class="edit-label">{{row.driverName}}
+                </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <mat-form-field *ngIf="editing[rowIndex+ '-driverName']">
+                <input matInput [value]="row.driverName" (blur)="updateValue($event, 'driverName', rowIndex)">
+              </mat-form-field>
+            </ng-template> -->
+        <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+          {{row.driverName}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Driver Number" [width]="100" [resizeable]="false" [sortable]="true"
+        prop="driverContact">
+        <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+          {{row.driverContact}}
+          <!-- <ng-container *ngIf="row.status === 'GATED_IN' || row.status == 'REPORTED'">
+            <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-driverContact'] = true" 
+             *ngIf="!editing[rowIndex + '-driverContact']">
+              <span class="edit-label">{{row.driverContact}}</span>
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+            </div>
+            <mat-form-field *ngIf="editing[rowIndex+ '-driverContact']">
+              <input matInput [value]="row.driverContact" (keypress)="service.numberOnly($event)" (blur)="updateValue($event, 'driverContact', rowIndex)">
+            </mat-form-field>
+          </ng-container>
+          <ng-container *ngIf="row.status !== 'GATED_IN' && row.status !== 'REPORTED'">
+            {{row.driverContact}}
+          </ng-container> -->
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Driver Licence" [width]="100" [resizeable]="false" [sortable]="true"
+        prop="driverLicense">
+        <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+          {{row.driverLicense}}
+          <!-- <ng-container *ngIf="row.status === 'GATED_IN' || row.status == 'REPORTED'">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-driverLicense'] = true" 
+               *ngIf="!editing[rowIndex + '-driverLicense']">
+                <span class="edit-label">{{row.driverLicense}}</span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <mat-form-field *ngIf="editing[rowIndex+ '-driverLicense']">
+                <input matInput [value]="row.driverLicense" (blur)="updateValue($event, 'driverLicense', rowIndex)">
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngIf="row.status !== 'GATED_IN' && row.status !== 'REPORTED'">
+              {{row.driverLicense}}
+            </ng-container> -->
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="ShipmentId" [width]="130" [resizeable]="true" [sortable]="false" prop="shipmentId">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.shipmentId | uppercase}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Container" [width]="90" [resizeable]="false" [sortable]="true" prop="containerNum">
+        <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+          {{row.containerNum | uppercase}}
+          <!-- <ng-container *ngIf="row.status === 'GATED_IN' || row.status == 'REPORTED'">
+            <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-containerNum'] = true" *ngIf="!editing[rowIndex + '-containerNum']">
+              <span class="edit-label">{{row.containerNum | uppercase}}
+              </span>
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+            </div>
+            <mat-form-field *ngIf="editing[rowIndex+ '-containerNum']">
+              <input matInput [value]="row.containerNum" (blur)="updateValue($event, 'containerNum', rowIndex)">
+            </mat-form-field>
+          </ng-container>
+          <ng-container *ngIf="row.status !== 'GATED_IN' && row.status !== 'REPORTED'">
+            {{row.containerNum | uppercase}}
+          </ng-container> -->
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Bay" [width]="70" [resizeable]="false" [sortable]="true" prop="bayAssigned">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+          <!--  DR_REP role user only view data can't edit data -->
+          <!-- DP_REP ROLE -->
+          <ng-container *ngIf="(isDPREPRole());else otherUsersBAY">
+            {{row.bayAssigned}}
+          </ng-container>
+          <ng-template #otherUsersBAY>
+            <!--  for other user other than DP_REP -->
+            <div class="edit-field" title="Double click to edit"
+              (click)="editingFgs[rowIndex + '-bayAssigned'] = true" *ngIf="!editingFgs[rowIndex + '-bayAssigned']">
+              <span class="edit-label">{{row.bayAssigned?row.bayAssigned:'None'}}</span>
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+            </div>
+            <mat-form-field *ngIf="editingFgs[rowIndex+ '-bayAssigned']">
+              <mat-select (selectionChange)="updateValueFgs($event, 'bayAssigned', rowIndex,row)">
+                <mat-option value="">None</mat-option>
+                <mat-option *ngFor="let data of plantBayList" [value]="data">
+                  {{data}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ng-template>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="SAP invoice value(INR)" [width]="100" [resizeable]="false" prop="dropSeq"
+        [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.sapInvValue}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Eway bill No" [width]="100" [resizeable]="false" prop="dropSeq" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ewayBillNo}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Source" [width]="70" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.source | uppercase}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="LR Num" [width]="120" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.lrNum}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="LR Date" [width]="150" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.lrDate ? (row.lrDate | customDateFormat | date:'dd-MMM-yyyy') : '--'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Indent Cat" [width]="120" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.indentCategory}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="SAP Invoice" [width]="120" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.sapInvoice}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tot Tyre" [width]="70" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totTyre}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tot Tube" [width]="70" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totTube}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tot Flap" [width]="70" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totFlap }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tot Valve" [width]="70" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totValve}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tot PCTR" [width]="70" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totPctr}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Other Qty" [width]="70" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.otherQty}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tot Qty" [width]="70" [resizeable]="false" [sortable]="true" prop="source">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totQty}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Country of Destination" [width]="200" [resizeable]="false" [sortable]="true"
+        prop="destCountryName">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.destCountryName}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Gate Serial No" [width]="200" [resizeable]="false" [sortable]="true"
+        prop="gateControlCode">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.gateControlCode}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="PUC" [width]="100" [resizeable]="false" [sortable]="true" prop="puc">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{(row.puc)?'Yes':'No'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Insurance" [width]="100" [resizeable]="false" [sortable]="true" prop="insurance">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{(row.insurance)?'Yes':'No'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Seat Belt" [width]="100" [resizeable]="false" [sortable]="true" prop="seatBelt">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{(row.seatBelt)?'Yes':'No'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="First Aid" [width]="100" [resizeable]="false" [sortable]="true" prop="firstAid">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{(row.firstAid)?'Yes':'No'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Fire Extenguisher" [width]="100" [resizeable]="false" [sortable]="true"
+        prop="fireExtenguisher">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{(row.fireExtenguisher)?'Yes':'No'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Emergency Card" [width]="100" [resizeable]="false" [sortable]="true"
+        prop="emergencyCard">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{(row.emergencyCard)?'Yes':'No'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Spark Arrestor" [width]="100" [resizeable]="false" [sortable]="true"
+        prop="sparKArrestor">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{(row.sparKArrestor)?'Yes':'No'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Fitness Certificate" [width]="100" [resizeable]="false" [sortable]="true"
+        prop="fitnessCert">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{(row.fitnessCert)?'Yes':'No'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Insert User" [width]="80" [resizeable]="false" [sortable]="true" prop="insertUser">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.insertUser}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Update User" [width]="80" [resizeable]="false" [sortable]="true" prop="updateUser">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.updateUser}}
+        </ng-template>
+      </ngx-datatable-column>
+      <!-- Footer Template starts -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+          let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+          <div class="page-count">
+            <span *ngIf="selectedCount">
+              {{selectedCount.toLocaleString()}} Selected |
+            </span>
+            Showing {{(offset * pageSize)+1}} to {{(rowCount>
+            (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+            {{(rowCount)}} records.
+          </div>
+          <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+            [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage"
+            [size]="pageSize" [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)"
+            (change)="table.onFooterPage($event)">
+          </datatable-pager>
+        </ng-template>
+      </ngx-datatable-footer>
+      <!-- Footer Template Ends -->
+
+    </ngx-datatable>
+  </div>
+
+
+
+  <!-- View Loadslips  for coorsponding shipment -->
+  <div class="modal" id="loadslipsModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Loadslip List</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <ul>
+            <li *ngFor="let item of loadslipList;let i=index">
+              <span>
+                {{i+1}})
+                <span class="link" style="margin-left: 10px;margin-right: 50px"
+                  (click)="viewLoadslipnavigation(item)">{{item.loadlipId}}
+                </span>
+                <span>
+                  {{item.type}}
+                </span>
+              </span>
+            </li>
+          </ul>
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- truck Reject Modal -->
+  <div class="modal" id="rejectionModel">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Reject Reason</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div class="form-group">
+            <mat-form-field class="example-full-width">
+              <mat-select placeholder="Reject reasons" [(ngModel)]="rejectReason" name="rejectReason">
+                <mat-option *ngFor="let reason of rejectRasonList" [value]="reason.rejectionCode">
+                  {{reason.rejectionCode}}-{{reason.rejectionDesc}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" mat-raised-button color="primary" class="table-btn"
+            (click)="rejectTruck(rejectReason)">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- View Loadslips  for coorsponding shipment -->
+  <div class="modal" id="commentModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">{{commentHeader}}</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <p>{{commentMsg}}</p>
+        </div>
+        <!-- Modal footer -->
+      </div>
+    </div>
+  </div>

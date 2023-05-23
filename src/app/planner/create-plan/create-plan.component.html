@@ -1,0 +1,34 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header">
+    <b>Create Plan > Upload Plan</b>
+  </h6>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="create-plan">
+        <div class="uploadfile">
+          <img src="./assets/images/Upload.png" alt="upload image" class="img-fluid" />
+          <h5>
+            <label for="plan-file">
+              <u>Click here</u> to Upload Files</label>
+          </h5>
+          <input type="file" (change)="onFileChange($event)" value="" id="plan-file" accept=".xls,.xlsx" (click)="itemsImportInput.value = null"
+            #itemsImportInput/>
+          <a download href="./assets/excel/Plan_template.xlsx">
+            <p>Download Dispatch Plan Template</p>
+          </a>
+          <div class="error-log" *ngIf="IsErrorLog">
+            <mat-card>
+              <mat-list role="list">
+                <mat-list-item *ngFor="let data of ErrorData">{{data}}</mat-list-item>
+              </mat-list>
+            </mat-card>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

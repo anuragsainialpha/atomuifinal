@@ -1,0 +1,45 @@
+<mat-dialog-content class="mat-typography">
+  <h4 class="plan-created-success" > {{data.planId.message}} !!
+    
+    <!-- Plan With Out errors -->
+    <ng-container *ngIf="data.planId.status != 'PLAN_PENDING'">
+    <!-- FGS PLANNER, DP_REP, L1_MGR AND L2_MGR -->
+    <a [routerLink]="['/dispatch-plan/approve-plans',data.planId.planId]" *ngIf="(service.checkRole() == userRoles.planner1) || (service.checkRole() == userRoles.planner2) 
+      || (service.checkRole() == userRoles.planner3) || (service.checkRole() == userRoles.L1MGR) || (service.checkRole() == userRoles.L2MGR)">
+      <span (click)="onNoClick()">{{data.planId.planId}}</span>
+    </a>
+    <!-- FGS OPERATION -->
+    <a [routerLink]="['/fgs/approve-plans',data.planId.planId]" *ngIf="(service.checkRole() == userRoles.fgsOperations1) || (service.checkRole() == userRoles.fgsOperations2) || 
+      (service.checkRole() == userRoles.fgsOperations3) || (service.checkRole() == userRoles.fgsOperations4)">
+      <span (click)="onNoClick()">{{data.planId.planId}}</span>
+    </a>
+    <!-- RDC PLAN / OPERATION -->
+    <a [routerLink]="['/rdc/approve-plans',data.planId.planId]" *ngIf="(service.checkRole() == userRoles.rdc_PLN)">
+      <span (click)="onNoClick()">{{data.planId.planId}}</span>
+    </a>
+      </ng-container>
+
+    <!-- Plan with errors -->
+    <ng-container *ngIf="data.planId.status === 'PLAN_PENDING'">
+    <!-- FGS PLANNER, DP_REP, L1_MGR AND L2_MGR -->
+    <a [routerLink]="['/plan/pending-plans/view-plan',data.planId.planId]" *ngIf="(service.checkRole() == userRoles.planner1) || (service.checkRole() == userRoles.planner2) 
+      || (service.checkRole() == userRoles.planner3) || (service.checkRole() == userRoles.L1MGR) || (service.checkRole() == userRoles.L2MGR)">
+      <span (click)="onNoClick()">{{data.planId.planId}}</span>
+    </a>
+    <!-- FGS OPERATION -->
+    <a [routerLink]="['/fgs/pending-plans/view-plan/',data.planId.planId]" *ngIf="(service.checkRole() == userRoles.fgsOperations1) || (service.checkRole() == userRoles.fgsOperations2) || 
+      (service.checkRole() == userRoles.fgsOperations3) || (service.checkRole() == userRoles.fgsOperations4)">
+      <span (click)="onNoClick()">{{data.planId.planId}}</span>
+    </a>
+    <!-- RDC PLAN / OPERATION -->
+    <a [routerLink]="['/rdc/pending-plans/view-plan',data.planId.planId]" *ngIf="(service.checkRole() == userRoles.rdc_PLN)">
+      <span (click)="onNoClick()">{{data.planId.planId}}</span>
+    </a>
+    </ng-container>
+   
+  </h4>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+
+  <button mat-stroked-button color="primary" [mat-dialog-close]="false" cdkFocusInitial>Close</button>
+</mat-dialog-actions>

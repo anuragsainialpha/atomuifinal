@@ -1,0 +1,7 @@
+<mat-dialog-content class="mat-typography">
+  <p *ngFor ="let error of data.errorMsgs" class="text-danger text-center">{{error}}</p>
+ </mat-dialog-content>
+ <mat-dialog-actions align="center">
+     <button mat-stroked-button color="primary" [mat-dialog-close]="false" cdkFocusInitial>Close</button>
+ </mat-dialog-actions>
+ 

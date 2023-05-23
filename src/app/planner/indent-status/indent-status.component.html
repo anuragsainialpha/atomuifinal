@@ -1,0 +1,149 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h4 class="manulal-plan-header">
+    Indent Status
+  </h4>
+  <!-- Create Plan by Manual Fields 1st row-->
+  <div class="manualplan-fields">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <mat-form-field appearance="standard">
+            <mat-label>Date</mat-label>
+            <input matInput [min]="minDate" [matDatepicker]="searchIndentDate" [(ngModel)]="indentDate" name="indentDate">
+            <mat-datepicker-toggle matSuffix [for]="searchIndentDate"></mat-datepicker-toggle>
+            <mat-datepicker #searchIndentDate></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <mat-form-field appearance="standard">
+            <mat-select placeholder="Source Location" [(ngModel)]="source" name="source">
+              <mat-option *ngFor="let state of states" [value]="state.value">
+                {{state.viewValue}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <mat-form-field appearance="standard">
+            <mat-select placeholder="Destination Location" [(ngModel)]="destination" name="destination">
+              <mat-option *ngFor="let state of states" [value]="state.value">
+                {{state.viewValue}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <mat-form-field appearance="standard">
+            <mat-label>Truck Type</mat-label>
+            <input matInput [(ngModel)]="truckType" name="truckType">
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <mat-form-field appearance="standard">
+            <mat-label>Transporter</mat-label>
+            <input matInput [(ngModel)]="transporter" name="transporter">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <mat-form-field appearance="standard">
+            <mat-label>Category</mat-label>
+            <input matInput [(ngModel)]="materialGrp" name="materialGrp">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+          <mat-form-field appearance="standard">
+            <mat-label>Count</mat-label>
+            <input matInput [(ngModel)]="count" name="count">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label>&nbsp;</label>
+        <button mat-raised-button color="primary" (click)="searchIndent()" class="full-width">Search Indent</button>
+      </div>
+    </div>
+  </div>
+  <div style="overflow-x:auto;width:100%;overflow:hidden">
+    <div class="datatable">
+      <ngx-datatable class='material indent-status' [rows]='indentData' [columnMode]="'force'" [headerHeight]="50"
+        [limit]="5" [footerHeight]="30" [rowHeight]="'auto'" [scrollbarH]="true">
+        <ngx-datatable-column name="Dispatch Date" [width]="200" [sortable]="true" prop="dispatchDate" [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.dispatchDate | customDateFormat | date:'dd-MMM-yyyy'}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="IndentID" [width]="250" [sortable]="true" prop="indentId" [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.indentId}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Destination" [width]="200" [sortable]="true" prop="destination" [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.destination}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Truck Type" [width]="200" [sortable]="true" prop="truckType" [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.truckType}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Transporter" [width]="200" [sortable]="true" prop="transporter" [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.transporter}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Category" [width]="200" [sortable]="true" prop="materialGrp" [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.materialGrp}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Trucks Requested" [width]="200" [sortable]="true" prop="trucksRequested"
+          [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.trucksRequested}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Trucks Cancelled" [width]="200" [sortable]="true" prop="trucksCancelled"
+          [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.trucksCancelled}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Trucks Reported" [width]="200" [sortable]="true" prop="trucksReported" [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.trucksReported}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Trucks Rejected" [width]="200" [sortable]="true" prop="trucksRejected" [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.trucksRejected}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Balance Trucks" [width]="200" [sortable]="true" prop="balanceTrucks" [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.balanceTrucks}}
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+  <div align="center">
+    <button mat-stroked-button color="primary" class="mr-3">Generate Indent PDF</button>
+    <button mat-raised-button color="primary" class="btm-action-btn">Export to Excel</button>
+  </div>
+</div>

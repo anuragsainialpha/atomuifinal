@@ -1,0 +1,62 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header">
+    <b>Create Indent > Upload Indent</b>
+  </h6>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="create-plan">
+        <div class="uploadfile">
+          <img src="./assets/images/Upload.png" alt="upload image" class="img-fluid" />
+          <h5>
+            <label for="plan-file">
+              <u>Click here</u> to Upload Files</label>
+          </h5>
+          <input type="file" (change)="onFileChange($event)" value="" id="plan-file" accept=".xls,.xlsx" (click)="itemsImportInput.value = null"
+            #itemsImportInput />
+          <a download href="./assets/excel/Indent_template.xlsx">
+            <p>Download Indent Template</p>
+          </a>
+          <div class="error-log" *ngIf="IsErrorLog">
+            <mat-card>
+              <mat-list role="list">
+                <mat-list-item *ngFor="let data of ErrorData">{{data}}</mat-list-item>
+
+              </mat-list>
+            </mat-card>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!--  Freight Availble or Not Show Modal After creation of Indent -->
+<!-- The Modal -->
+<div class="modal" id="freightModal" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title text-center">Message !!</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+  
+        <!-- Modal body -->
+        <div class="modal-body">
+          <p class="text-primary text-center ">{{responseData}}</p>
+        </div>
+  
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+  

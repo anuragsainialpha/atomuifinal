@@ -1,0 +1,315 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+      <b> User Management > Users </b>
+    <span class="pull-right refresh-span">
+        <button class="theme-small-button" [routerLink]="['/admin/user-management/create-user']"  matTooltip="Create User">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button>
+      <!-- <button class="theme-small-button" (click)="upload()" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+
+
+
+  <div class="mt-item-fields" *ngIf="isShow">
+      <div class="col-md-12 row">
+        <div class="col-md-12 padding-right-40">
+          <div class="row">
+    
+                <div class="col-md2">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput placeholder="User Id" [(ngModel)]="userId" name="userId">
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                      <mat-form-field>
+                        <!-- <input matInput placeholder="Status" [(ngModel)]="status" name="status"> -->
+                        <mat-select placeholder="Status" [(ngModel)]="status" name="status">
+                            <mat-option *ngFor="let food of foods" [value]="food">
+                              {{food}}
+                            </mat-option>
+                          </mat-select>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                      <div class="form-group">
+                        <mat-form-field>
+                          <input matInput placeholder="User Role Id" [(ngModel)]="roleId" name="roleId">
+                        </mat-form-field>
+                      </div>
+                    </div>
+                
+                <!-- <div class="col-md-2">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput placeholder="Password" [(ngModel)]="servprov" name="servprov">
+                    </mat-form-field>
+                  </div>
+                </div> -->
+                <div class="col-md-1">
+                    <div class="form-group">
+                      <mat-form-field>
+                        <input matInput placeholder="Plant Code" [(ngModel)]="plantCode" name="plantCode">
+                      </mat-form-field>
+                    </div>
+                  </div>
+
+                  <div class="col-md-2">
+                      <div class="form-group">
+                        <mat-form-field>
+                          <input matInput placeholder="First Name" [(ngModel)]="firstName" name="firstName">
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                          <mat-form-field>
+                            <input matInput placeholder="Last Name" [(ngModel)]="lastName" name="lastName">
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                          <mat-form-field>
+                            <input matInput placeholder="Email Id" [(ngModel)]="emailId" name="emailId">
+                          </mat-form-field>
+                        </div>
+                      </div>
+    
+          </div>
+        </div>
+       
+        <div class="pull-right">
+          <div class="search-fileds">
+            <button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+              <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+            </button>
+            <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+              <i class="fa fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+    
+
+
+    <div class="mt-item-table">
+        <div>
+          <!-- <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [rows]='responseItemsList' 
+          [scrollbarH]="false" [externalPaging]="true"
+            (page)="datatablePageData($event)" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit"
+            [count]="page.count" [offset]="page.offset"> -->
+            <ngx-datatable class='material' #table [rows]='responseItemsList' [columnMode]="'force'" [headerHeight]="50"
+      [scrollbarH]="false" [footerHeight]="30" [rowHeight]="'auto'" [externalPaging]="true" [limit]="page.limit"
+      [count]="page.count" [offset]="page.offset" (page)="datatablePageData($event)">
+            <ngx-datatable-column name="User Id" [width]="125" [resizeable]="false" prop="userId" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.userId}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Status" [width]="70" [resizeable]="false" prop="status" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.status}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="User Role Id" [width]="95" [resizeable]="false" prop="roleId" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.userRoleId}}
+              </ng-template>
+            </ngx-datatable-column>
+            <!-- <ngx-datatable-column name="Password" [width]="145" [resizeable]="false" prop="elrFlag" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.elrFlag}}
+              </ng-template>
+            </ngx-datatable-column> -->
+            <ngx-datatable-column name="Plant Code" [width]="75" [resizeable]="false" prop="plantCode" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.plantCode}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="First Name" [width]="110" [resizeable]="false" prop="firstName" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.firstName}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Last Name" [width]="110" [resizeable]="false" prop="lastName" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.lastName}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Last Login Date" [width]="100" [resizeable]="false" prop="lastLoginDate" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{trimDate(row.lastLoginDate)}}
+              </ng-template>
+            </ngx-datatable-column>
+      
+  
+            <ngx-datatable-column name="Email Id" [width]="210" [resizeable]="false" prop="emailId" [sortable]="true">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  {{row.emailId}}
+                </ng-template>
+              </ngx-datatable-column>
+             
+  
+              <ngx-datatable-column name="Insert User" [width]="85" [resizeable]="false" prop="insertUser" [sortable]="true">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{row.insertUser}}
+                  </ng-template>
+                </ngx-datatable-column>
+        
+              <ngx-datatable-column name="Insert Date" [width]="90" [resizeable]="false" prop="insertDate" [sortable]="true">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  {{trimDate(row.insertDate)}}
+                </ng-template>
+              </ngx-datatable-column>
+      
+              <ngx-datatable-column name="Update User" [width]="85" [resizeable]="false" prop="updateUser" [sortable]="true">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    {{row.updateUser}}
+                  </ng-template>
+                </ngx-datatable-column>
+        
+        
+              <ngx-datatable-column name="Update Date" [width]="90" [resizeable]="false" prop="updateDate" [sortable]="true">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  {{trimDate(row.updateDate)}}
+                </ng-template>
+              </ngx-datatable-column>
+        
+              <ngx-datatable-column name="Action" [width]="90" [resizeable]="false" [sortable]="false">
+                <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+                  <button class="theme-small-button btn" matTooltip="Modify" (click)="showUpdateModel(row)" [disabled]="(row.isError)">
+                    <i class="fa fa-edit fa-2x" aria-hidden="true"></i>
+                  </button>
+                </ng-template>
+              </ngx-datatable-column>
+                 <!-- Footer Template starts -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+          let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+          <div class="page-count">
+            <span *ngIf="selectedCount">
+              {{selectedCount.toLocaleString()}} Selected |
+            </span>
+            Showing {{(offset * pageSize)+1}} to {{(rowCount>
+            (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+            {{(rowCount)}} records.
+          </div>
+          <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+            [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+            [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+          </datatable-pager>
+        </ng-template>
+      </ngx-datatable-footer>
+      <!-- Footer Template Ends -->
+  
+  
+          </ngx-datatable>
+        </div>
+      </div>
+
+  </div>
+
+
+
+
+
+  <!--  -->
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+          <!-- <form #createUserForm="ngForm" (ngSubmit)="createUserForm.form.valid">  -->
+         <form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && updateForm(f))"> 
+          <div class="modal-header">
+            <h4 class="modal-title text-primary">Update User</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <mat-form-field>
+                  <mat-select placeholder="User Role Id" [(ngModel)]="roleIdu" name="roleIdu" #qty="ngModel" required>
+                      <mat-option *ngFor="let loc of userRoleIds" [value]="loc">
+                        {{loc}}
+                      </mat-option>
+                    </mat-select>
+                    <p class="mtop6">User Role Id</p>
+              </mat-form-field>
+            </div>
+            <div class="form-group">
+              <mat-form-field>
+                  <mat-select placeholder="Plant Code" [(ngModel)]="plantCodeu" name="plantCodeu" #qty="ngModel" required>
+                      <mat-option *ngFor="let loc of locationIds" [value]="loc">
+                        {{loc}}
+                      </mat-option>
+                    </mat-select>
+                    <p class="mtop6">Plant Code</p>
+              </mat-form-field>
+
+            </div>
+            <div class="form-group">
+              <mat-form-field appearance="standard" class="example-full-width">
+                <input matInput placeholder="First Name" aria-label="State" [(ngModel)]="firstNameu" name="firstNameu"
+                  required autocomplete="off" oninput="this.value = this.value.toUpperCase()">
+                <mat-error *ngIf="(f.submitted && firstNameu.invalid)">
+                  <p *ngIf="firstNameu.errors.required">first Name is <strong>required</strong>
+                  </p>
+                </mat-error>
+                <p class="mtop6">First Name</p>
+              </mat-form-field>
+            </div>
+            <div class="form-group">
+              <mat-form-field appearance="standard" class="example-full-width">
+                <input matInput placeholder="Last Name" aria-label="State" [(ngModel)]="lastNameu" name="lastNameu"
+                  required autocomplete="off" oninput="this.value = this.value.toUpperCase()">
+                  
+                <mat-error *ngIf="(f.submitted && lastNameu.invalid)">
+                  <p *ngIf="lastNameu.errors.required">Last Name is <strong>required</strong>
+                  </p>
+                </mat-error>
+                  <p class="mtop6">Last Name</p>
+              </mat-form-field>
+            </div>
+            <div class="form-group">
+              <mat-form-field appearance="standard" class="example-full-width">
+                <input matInput placeholder="Email" aria-label="State" [(ngModel)]="emailIdu" name="emailIdu"
+                  required autocomplete="off">
+                <mat-error *ngIf="(f.submitted && emailIdu.invalid)">
+                  <p *ngIf="emailIdu.errors.required">Email is <strong>required</strong>
+                  </p>
+                </mat-error>
+                <p class="mtop6">Email</p>
+              </mat-form-field>
+            </div>
+  
+          </div>
+          <div class="modal-footer">
+            <button type="submit" mat-raised-button color="primary" class="btm-action-btn">Update</button>
+            <button type="button" mat-raised-button class="mat-default" color="default" data-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  

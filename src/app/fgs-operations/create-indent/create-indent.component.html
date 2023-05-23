@@ -1,0 +1,393 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h4 class="manulal-plan-header">
+    <b> Indents > Create Indent</b>
+  </h4>
+  <!-- Create Plan by Manual Fields 1st row-->
+  <div class="manualplan-fields">
+    <form name="form" #indentForm="ngForm" (ngSubmit)="(indentForm.form.valid && addIndent(indentForm))">
+      <div class="col-md-12 row">
+        <div class="col-md-12 padding-right-40">
+          <div class="row tab-loadslip-fields">
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-md-3 pr-0 pl-0">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput [min]="minDate" disabled [matDatepicker]="createIndentDate"
+                        [(ngModel)]="indentDate" name="indentDate" placeholder="Date">
+                      <mat-datepicker-toggle matSuffix [for]="createIndentDate"></mat-datepicker-toggle>
+                      <mat-datepicker #createIndentDate disabled="false"></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-3 pr-0">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput [(ngModel)]="source" name="sourceLocation" placeholder="Source" disabled>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-3 pr-0">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput aria-label="Destination" placeholder="Destination" required
+                        (keyup)="getfilterDestination($event,'destination')" autocomplete="off"
+                        [matAutocomplete]="destinationAutocomplete" [(ngModel)]="destination" name="destination"
+                        #destinationLocation="ngModel" oninput="this.value = this.value.toUpperCase()" required>
+                      <mat-autocomplete #destinationAutocomplete="matAutocomplete">
+                        <mat-option *ngFor="let list of destinationList" [value]="list.value"
+                          (click)="setDestinationDescription(list.description)"
+                          (onSelectionChange)="setDestinationDescription(list.description)">
+                          <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                        </mat-option>
+                      </mat-autocomplete>
+                      <mat-error *ngIf="(indentForm.submitted && destinationLocation.invalid)">
+                        <p *ngIf="destinationLocation.errors.required">Destination is
+                          <strong>required</strong>
+                        </p>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Destination Description" aria-label="State"
+                        [matAutocomplete]="destDisAutocomplete" [(ngModel)]="destinationDesc" name="destinationDesc"
+                        (keyup)="getUserDestinationList($event)" oninput="this.value = this.value.toUpperCase()">
+                      <mat-autocomplete #destDisAutocomplete="matAutocomplete">
+                        <mat-option *ngFor="let list of descriptionList" [value]="list.description"
+                          (click)="setDestination(list.value)" (onSelectionChange)="setDestination(list.value)">
+                          <span>({{list.description}})</span>
+                        </mat-option>
+                      </mat-autocomplete>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <!-- <mat-form-field>
+                      <mat-select placeholder="Truck/Container Type" [(ngModel)]="truckType" name="TruckType"
+                        (selectionChange)="getListOfTransporterCombination(truckType); openOtherTypesModal()"
+                        #truck="ngModel" required>
+                        <mat-option *ngFor="let list of truckTypeList" [value]="list.value" [disabled]="list.value === selectedTruckTypeFromSubList">
+                          <span>{{list.value}}</span>
+                        </mat-option>
+                        <mat-option [value]="'OTHER'">Other</mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="(indentForm.submitted && truck.invalid)">
+                        <p *ngIf="truck.errors.required">Truck Type is
+                          <strong>required</strong>
+                        </p>
+                      </mat-error>
+                    </mat-form-field> -->
+                    <mat-form-field>
+                      <mat-select placeholder="Truck/Container Type" [(ngModel)]="truckType" name="TruckType"
+                        (selectionChange)="getListOfTransporterCombination(truckType)" #truck="ngModel" required>
+                        <mat-optgroup *ngFor="let group of truckTypeClass" [label]="group.name"
+                          [disabled]="group.disabled" >
+                          <mat-option *ngFor="let type of group.mtTruckTypeInfos" [value]="type.value" style="font-weight: normal">
+                            {{type.value}}
+                          </mat-option>
+                        </mat-optgroup>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-3 pr-0">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput aria-label="Transporter" placeholder="Transporter" required
+                        (keyup)="getfilterTransporter($event)" autocomplete="off"
+                        [matAutocomplete]="transporterAutocomplete" [(ngModel)]="transporterName" name="transporter"
+                        #transporter="ngModel" oninput="this.value = this.value.toUpperCase()" required>
+                      <mat-autocomplete #transporterAutocomplete="matAutocomplete">
+                        <mat-option *ngFor="let list of transporterList" [value]="list.value">
+                          <span>{{list.value}}</span>
+                        </mat-option>
+                      </mat-autocomplete>
+                      <mat-error *ngIf="(indentForm.submitted && transporter.invalid)">
+                        <p *ngIf="transporter.errors.required">Transporter is
+                          <strong>required</strong>
+                        </p>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-3 pr-0">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <mat-select placeholder="Category" [(ngModel)]="materialGrp" name="materialGrp">
+                        <mat-option [value]="">None</mat-option>
+                        <mat-option *ngFor="let category of categoryList" [value]="category">{{category}}</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput [(ngModel)]="count" name="count" placeholder="Count" autocomplete="off"
+                        (keypress)="service.numberOnly($event)" #Count="ngModel" required>
+                      <mat-error *ngIf="(indentForm.submitted && Count.invalid)">
+                        <p *ngIf="Count.errors.required">Count is
+                          <strong>required</strong>
+                        </p>
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pull-right">
+          <div class="search-fileds">
+            <button class="theme-small-button" type="submit" matTooltip="Add Indent">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-12 padding-right-40">
+          <div class="row tab-loadslip-fields">
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-md-4 pr-0 pl-0">
+                  <div class="form-group comments">
+                    <mat-form-field>
+                      <textarea matInput class="commentsTextArea" [(ngModel)]="comments" name="comments"
+                        autocomplete="off" placeholder="Comments"></textarea>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-3 pr-0">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput aria-label="Port of Discharge" placeholder="Port of Discharge"
+                        (keyup)="getfilterDestination($event,'podSearch')" autocomplete="off"
+                        [matAutocomplete]="podAutocomplete" [(ngModel)]="pod" name="dischPort" oninput="this.value = this.value.toUpperCase()">
+                      <mat-autocomplete #podAutocomplete="matAutocomplete">
+                        <mat-option *ngFor="let list of portList" [value]="list.value">
+                          <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                        </mat-option>
+                      </mat-autocomplete>
+                      <!-- <mat-error *ngIf="(indentForm.submitted && destinationLocation.invalid)">
+                        <p *ngIf="destinationLocation.errors.required">Destination is
+                          <strong>required</strong>
+                        </p>
+                      </mat-error> -->
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-3 pr-0">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput aria-label="Country of Destination" placeholder="Country of Destination"
+                        (keyup)="getfilterDestination($event,'destCountrySearch')" autocomplete="off"
+                        [matAutocomplete]="dischargeAutocomplete" [(ngModel)]="destCountryName" oninput="this.value = this.value.toUpperCase()" name="destCountryName">
+                      <mat-autocomplete #dischargeAutocomplete="matAutocomplete" >
+                        <mat-option *ngFor="let country of countryList" [value]="country.description">
+                          <span matTooltip={{country.description}}>{{country.value}} - ({{country.description}})</span>
+                        </mat-option>
+                      </mat-autocomplete>
+                      <!-- <mat-select placeholder="Country of Destination" [(ngModel)]="destCountry" name="destCountry">
+                        <mat-option [value]="">None</mat-option>
+                        <mat-option *ngFor="let country of countryList" [value]="country">{{country}}</mat-option>
+                      </mat-select> -->
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6"></div>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="col-md-12 row">
+        
+      </div> -->
+    </form>
+  </div>
+  <div class="datatable">
+    <ngx-datatable class='material' [rows]='indentData' [columnMode]="'force'" [headerHeight]="50" [limit]="100"
+      [footerHeight]="30" [rowHeight]="'auto'" [scrollbarH]="true">
+      <ngx-datatable-column name="Dispatch Date" [width]="200" [resizeable]="false" [sortable]="true"
+        prop="dispatchDate">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.dispatchDate | customDateFormat | date:'dd-MMM-yyyy'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Destination" [width]="200" [resizeable]="false" [sortable]="true" prop="destination">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.destination}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Dest Description" [width]="200" [resizeable]="false" [sortable]="true" prop="destDis">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.destDis}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Truck/Container Type" [width]="200" [resizeable]="false" [sortable]="true"
+        prop="truckType">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.truckType}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Transporter" [width]="200" [resizeable]="false" [sortable]="true" prop="transporter">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.transporter}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Category" [width]="200" [resizeable]="false" [sortable]="true" prop="materailGrp">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.materailGrp}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Port Of Discharge" [width]="200" [resizeable]="false" [sortable]="true" prop="pod">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.pod}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Country Of Destination" [width]="200" [resizeable]="false" [sortable]="true"
+        prop="destCountryName">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.destCountryName}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Trucks Required" [width]="200" [resizeable]="false" [sortable]="true" prop="indented">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.indented}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="TTE Capacity" [width]="200" [resizeable]="false" [sortable]="true" prop="tte">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.tte}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Comments" [width]="200" [resizeable]="false" [sortable]="true" prop="comments">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.comments}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Actions" prop="id" [width]="200" [resizeable]="false" [sortable]="false">
+        <ng-template let-row="row" ngx-datatable-cell-template let-id="value">
+          <button class="theme-delete-button" (click)="deleteIndent(row)">
+            <i class="fa fa-trash-o fa-2x" aria-hidden="true"></i>
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+  <div align="center" *ngIf="(indentData.length > 0)">
+    <button mat-raised-button color="primary" class="btm-action-btn" (click)="createIndent()">Create Indent</button>
+  </div>
+
+</div>
+
+
+
+<!--  Freight Availble or Not Show Modal After creation of Indent -->
+<!-- The Modal -->
+<div class="modal" id="freightModal" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title text-center">Message !!</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <p class="text-primary text-center">{{isFrightAvailble_or_not_for_indent}}</p>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<!-- The Modal -->
+<div class="modal" id="TransporterListModal" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title text-center">Transporters !!</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <mat-form-field>
+          <mat-select placeholder="Select Transporter" [(ngModel)]="modalTransporterList" name="modalTransporterList">
+            <mat-option *ngFor="let list of modalTransporterListvalues;let i=index" [value]="list.trasporter">
+              <span>Transporter : <b>{{list.trasporter}}</b> <b class="margin-left-30"> {{list.label}} </b></span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success"
+          (click)="setTransporterValue(modalTransporterList)">Confirm</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+ <!-- Other Truck Type
+Here we will fetch ALL the Master truck types 
+<div class="modal" id="otherTruckTypesModal" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+       Modal Header 
+      <div class="modal-header">
+        <h4 class="modal-title text-center">Select Truck Type</h4>
+        <button type="button" class="close" (click)="closeOtherTruckTypeModal()">&times;</button>
+      </div> 
+      Modal body
+      <div class="modal-body">
+        <mat-form-field>
+          <mat-select placeholder="Truck/Container Type" [(ngModel)]="truckType" name="TruckType"
+            (selectionChange)=" setSelectedTruckType();getListOfTransporterCombination(truckType)" #truck="ngModel"
+            required>
+            <mat-option *ngFor="let list of truckTypeList" [value]="list.value">
+              <span>{{list.value}}</span>
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="(indentForm.submitted && truck.invalid)">
+            <p *ngIf="truck.errors.required">Truck Type is
+              <strong>required</strong>
+            </p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      Modal footer
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" (click)="closeOtherTruckTypeModal()">OK</button>
+        <button type="button" class="btn btn-default" (click)="closeOtherTruckTypeModal()">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div> -->

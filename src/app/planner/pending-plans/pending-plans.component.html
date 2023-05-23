@@ -1,0 +1,43 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+
+  <div class="pendingplans-content">
+    <h6>
+      <b> Create Plan > Error Lines</b>
+    </h6>
+  </div>
+  <div class="datatable">
+    <ngx-datatable class='material' [rows]='pendingPlansData' [columnMode]="'force'" [count]="page.count" [limit]="page.limit"
+      [externalPaging]="true" [offset]="page.offset" [headerHeight]="50" [footerHeight]="30" [rowHeight]="'auto'"
+      (page)="datatablePageData($event)">
+
+      <ngx-datatable-column name="Plan Id" [resizeable]="false" [sortable]="true" prop="planId">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.planId}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Total Quantity" [resizeable]="false" [sortable]="true" prop="totalQuantity">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totalQuantity}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Status" [resizeable]="false" [sortable]="true" prop="status">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.status}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Created Date" [resizeable]="false" [sortable]="true" prop="createdDate">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.createdDate | customDateFormat | date:'dd-MMM-yyyy'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Action" [resizeable]="false" [sortable]="false">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <button class="theme-small-button" (click)="navigation(row.planId)" matTooltip="view">
+            <i class="fa fa-eye" aria-hidden="true"></i>
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+</div>

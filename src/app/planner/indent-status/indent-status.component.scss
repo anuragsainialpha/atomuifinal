@@ -1,0 +1,47 @@
+@import '../../../assets/styles/variables';
+@import '../../../assets/styles/mixins';
+
+.ngx-datatable.indent-status {
+    .datatable-header{
+        height:100% !important;
+    }
+    .datatable-body{
+      .datatable-row-wrapper:last-child{
+        .datatable-body-row{
+          margin-top:5px;
+          div{
+            border-bottom: none;
+          }
+          .datatable-body-cell{
+            font-weight: 600;
+            padding: 0.5rem !important;
+            color: $dark-color-theme;
+          }
+          .datatable-body-cell:nth-child(5){
+            border-right: 1px solid $theme-grey;
+          }
+          .datatable-body-cell:nth-child(6),
+          .datatable-body-cell:nth-child(7),
+          .datatable-body-cell:nth-child(8),
+          .datatable-body-cell:nth-child(9),
+          .datatable-body-cell:nth-child(10),
+          .datatable-body-cell:nth-child(11){
+            border: 1px solid $theme-grey;
+            border-left: none;
+            background-color: $medium-color-theme;
+            color: $theme-white;
+          }
+        }
+      }
+      .datatable-row-wrapper{
+        .datatable-body-row{
+          .datatable-body-cell{
+            padding: 0rem 0.5rem !important;
+            white-space: normal !important;
+            word-break: break-all;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  } 

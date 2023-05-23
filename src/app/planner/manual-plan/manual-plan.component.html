@@ -1,0 +1,319 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header">
+    <b>Create Plan > Manual Plan</b>
+  </h6>
+  <!-- Create Plan by Manual Fields 1st row-->
+
+  <div class="manualplan-fields">
+    <form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && checkIfMaterialCodeIsTyre(f))">
+      <div class="col-md-12 row">
+        <div class="col-md-12 padding-right-40">
+            <div class="row tab-loadslip-fields">
+        <div class="col-md-1 pr-0">
+          <div class="form-group">
+            <mat-form-field>
+              <input matInput placeholder="Dispatch Date" [min]="minDate" disabled [matDatepicker]="createplanDate"
+                autocomplete="off" [(ngModel)]="planDate" name="plandate" required #dispatachbleDate="ngModel">
+              <mat-datepicker-toggle matSuffix [for]="createplanDate"></mat-datepicker-toggle>
+              <mat-datepicker #createplanDate disabled="false"></mat-datepicker>
+              <mat-error *ngIf="(f.submitted && dispatachbleDate.invalid)">
+                <p *ngIf="dispatachbleDate.errors.required"> Dispatch Date is
+                  <strong>required</strong>
+                </p>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-1 pr-0">
+          <div class="form-group">
+            <ng-container *ngIf="(check_DP_REP_Role == roles.planner3 || check_DP_REP_Role == roles.L1MGR || check_DP_REP_Role == roles.L2MGR);else otherUsers">
+              <mat-form-field>
+                <input matInput placeholder="Source" (keyup)="getfilterSource($event)" autocomplete="off"
+                  [matAutocomplete]="sourceAutocomplete" [(ngModel)]="plant" name="source" #sourceLoc="ngModel" oninput="this.value = this.value.toUpperCase()"
+                  required>
+                <mat-autocomplete #sourceAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of sourceList" [value]="list.value">
+                    <span matTooltip={{list.value}}>{{list.value}} - ({{list.description}})</span>
+                  </mat-option>
+                </mat-autocomplete>
+                <mat-error *ngIf="(f.submitted && sourceLoc.invalid)">
+                  <p *ngIf="sourceLoc.errors.required">Source is
+                    <strong>required</strong>
+                  </p>
+                </mat-error>
+              </mat-form-field>
+            </ng-container>
+            <ng-template #otherUsers>
+              <mat-form-field>
+                <input matInput placeholder="Source" name="plant" [(ngModel)]="plant" disabled #sourceLocation="ngModel"
+                  required autocomplete="off">
+                <mat-error *ngIf="(f.submitted && sourceLocation.invalid)">
+                  <p *ngIf="sourceLocation.errors.required">Source is
+                    <strong>required</strong>
+                  </p>
+                </mat-error>
+              </mat-form-field>
+            </ng-template>
+          </div>
+        </div>
+        <div class="col-md-1 pr-0">
+          <div class="form-group">
+            <mat-form-field>
+              <input matInput placeholder="Destination" (keyup)="getfilterDestination($event)" autocomplete="off"
+                [matAutocomplete]="statesAutocomplete" [(ngModel)]="destination" name="destination"
+                #destinationLocation="ngModel" oninput="this.value = this.value.toUpperCase()" required>
+              <mat-autocomplete #statesAutocomplete="matAutocomplete">
+                <mat-option *ngFor="let list of destinationList" [value]="list.value" (click)="setDestinationDescription(list.description)"
+                  (onSelectionChange)="setDestinationDescription(list.description)">
+                  <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                </mat-option>
+              </mat-autocomplete>
+              <mat-error *ngIf="(f.submitted && destinationLocation.invalid)">
+                <p *ngIf="destinationLocation.errors.required">Destination is
+                  <strong>required</strong>
+                </p>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-2 pr-0">
+          <mat-form-field class="example-full-width">
+            <input matInput placeholder="Destination Description" aria-label="State" [matAutocomplete]="destDisAutocomplete"
+              [(ngModel)]="destinationDesc" name="destinationDesc" (keyup)="getUserDestinationList($event)" oninput="this.value = this.value.toUpperCase()">
+            <mat-autocomplete #destDisAutocomplete="matAutocomplete">
+              <mat-option *ngFor="let list of descriptionList" [value]="list.description" (click)="setDestination(list.value)"
+                (onSelectionChange)="setDestination(list.value)">
+                <span>({{list.description}})</span>
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+        <div class="col-md-2 pr-0">
+          <div class="form-group">
+            <mat-form-field>
+              <input matInput placeholder="Material code" [matAutocomplete]="materilalcodeAutocomplete" autocomplete="off"
+                [(ngModel)]="materialCode" name="materilaCode" (keyup)="getUserSearchMaterial($event)" #materialcode="ngModel"
+                oninput="this.value = this.value.toUpperCase()" required>
+              <mat-autocomplete #materilalcodeAutocomplete="matAutocomplete">
+                <mat-option *ngFor="let list of materilcodelist" [value]="list.value" (click)="setMaterialDescription(list.description)"
+                  (onSelectionChange)="setMaterialDescription(list.description)">
+                  <span>{{list.value}}</span>
+                </mat-option>
+              </mat-autocomplete>
+              <mat-error *ngIf="(f.submitted && materialcode.invalid)">
+                <p *ngIf="materialcode.errors.required">Material Code is
+                  <strong>required</strong>
+                </p>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-2 pr-0">
+          <div class="form-group">
+            <!-- <mat-form-field >
+            <mat-label>Material Description</mat-label>
+            <input matInput [(ngModel)]="MaterialDescription" name="description" disabled required #materialDesc="ngModel">
+            <mat-error *ngIf="(f.submitted && materialDesc.invalid)">
+              <p *ngIf="materialDesc.errors.required">Material Description is
+                <strong>required</strong>
+              </p>
+            </mat-error>
+          </mat-form-field> -->
+            <mat-form-field>
+              <input matInput placeholder="Material description" [matAutocomplete]="materilalDespAutocomplete"
+                autocomplete="off" [(ngModel)]="MaterialDescription" name="description" (keyup)="filterMaterialDescription($event)"
+                #materialDesc="ngModel" oninput="this.value = this.value.toUpperCase()" required>
+              <mat-autocomplete #materilalDespAutocomplete="matAutocomplete">
+                <mat-option *ngFor="let list of materialDescriptionList" [value]="list.description" (click)="setMaterialCode(list.value)"
+                  (onSelectionChange)="setMaterialCode(list.value)">
+                  <span>{{list.description}}</span>
+                </mat-option>
+              </mat-autocomplete>
+              <mat-error *ngIf="(f.submitted && materialDesc.invalid)">
+                <p *ngIf="materialDesc.errors.required">Material Description is
+                  <strong>required</strong>
+                </p>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-2 pr-0">
+          <div class="form-group">
+            <mat-form-field>
+              <mat-select placeholder="Batch Code" [(ngModel)]="batchCode" name="batchCode" #batchcode="ngModel"
+                required>
+                <mat-option [value]="">None</mat-option>
+                <mat-option *ngFor="let batchCode of batchCodeList" [value]="batchCode">
+                  {{batchCode}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="(f.submitted && batchcode.invalid)">
+                <p *ngIf="batchcode.errors.required">Batch code is
+                  <strong>required</strong>
+                </p>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-1">
+          <div class="form-group">
+            <mat-form-field>
+              <input matInput placeholder="Quantity" [(ngModel)]="quanitity" name="quanitity" type="number"
+                autocomplete="off" required #qty="ngModel" (keypress)="service.numberOnly($event)">
+              <mat-error *ngIf="(f.submitted && qty.invalid)">
+                <p *ngIf="qty.errors.required">Quantity is
+                  <strong>required</strong>
+                </p>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-1 pr-0">
+          <div class="form-group">
+            <mat-form-field>
+              <mat-select placeholder="Priority" [(ngModel)]="priority" name="priority" #prior="ngModel">
+                <mat-option [value]="">None</mat-option>
+                <mat-option *ngFor="let priority of priorityList" [value]="priority">
+                  {{priority}}
+                </mat-option>
+              </mat-select>
+              <!-- <mat-error *ngIf="(f.submitted && prior.invalid)">
+                <p *ngIf="prior.errors.required">Priority is
+                  <strong>required</strong>
+                </p>
+              </mat-error> -->
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-2 pr-0">
+          <div class="form-group comments">
+            <mat-form-field>
+              <textarea matInput class="commentsTextArea" [(ngModel)]="comments" name="comments" autocomplete="off"
+                placeholder="Comments"></textarea>
+            </mat-form-field>
+          </div>
+        </div>
+        
+        </div>
+        
+        </div>
+        <div class="pull-right">
+            <div class="search-fileds">
+              <button class="theme-small-button" type="submit" matTooltip="Add Plan">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+              </button>
+              <!-- <button class="theme-delete-button" (click)="clearAll(f)" matTooltip="Clear All">
+              <i class="fa fa-times" aria-hidden="true"></i>
+            </button> -->
+            </div>
+          </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="clearfix"></div>
+  <!-- manual plan Details Table -->
+  <div class="datatable ngx-table-custom-scroll ngx-table-tr-custom-scroll">
+    <ngx-datatable class='material' [rows]='planData' [columnMode]="'force'" [headerHeight]="50" [limit]="100"
+      [footerHeight]="30" [rowHeight]="'auto'">
+      <ngx-datatable-column name="Dispatch Date" [resizeable]="false" [sortable]="true" prop="dispatchDate">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.dispatchDate | customDateFormat | date:'dd-MMM-yyyy'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Source" [resizeable]="false" [sortable]="true" prop="sourceLocation">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.sourceLocation}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Destination" [resizeable]="false" [sortable]="true" prop="destinationLocation">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.destinationLocation}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Dest Description" [resizeable]="false" [sortable]="true" prop="destinationLocation">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.destDis}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Material Code" [resizeable]="false" [sortable]="true" prop="materialCode">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.materialCode}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Material Description" [resizeable]="false" [sortable]="true" prop="materialDescription">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.materialDescription}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Batch Code" [resizeable]="false" [sortable]="true" prop="batchCode">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.batchCode}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Quantity" [resizeable]="false" [sortable]="true" prop="quantity">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.quantity}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Priority" [resizeable]="false" [sortable]="true" prop="priority">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.priority}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Comments" [resizeable]="false" [sortable]="true" prop="comments">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.comments}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Action" prop="id" [resizeable]="false" [sortable]="false">
+        <ng-template let-row="row" ngx-datatable-cell-template let-id="value">
+          <button class="theme-delete-button" (click)="deletePlan(row)">
+            <i class="fa fa-trash-o fa-2x" aria-hidden="true"></i>
+          </button>
+
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+  <div class="clearfix"></div>
+  <div align="center">
+    <button mat-raised-button color="primary" class="btm-action-btn" (click)="createManualPlan()" *ngIf="(planData.length>0)">Create
+      plan</button>
+  </div>
+  <div class="error-log" *ngIf="IsErrorLog">
+    <mat-card>
+      <mat-list role="list">
+        <mat-list-item *ngFor="let data of ErrorData">{{data}}</mat-list-item>
+      </mat-list>
+    </mat-card>
+  </div>
+</div>
+
+<!--  Freight Availble or Not Show Modal After creation of Indent -->
+<!-- The Modal -->
+<div class="modal" id="errorModal" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title text-center">Errors !!</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body error-log">
+        <!-- <p class="text-primary text-center ">{{responseData}}</p> -->
+        <!-- <mat-card class="no">
+          <mat-list role="list">
+            <mat-list-item *ngFor="let data of ErrorData">{{data}}</mat-list-item>
+          </mat-list>
+        </mat-card> -->
+        <ul>
+          <li *ngFor="let data of ErrorData">{{data}}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

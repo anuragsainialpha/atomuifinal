@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>
+  <p>{{titleName}}</p>
+  
+</h2>
+<mat-dialog-content class="mat-typography">
+    <mat-form-field class="example-full-width">
+        <textarea matInput placeholder="Reason" [(ngModel)]="data.comments"></textarea>
+      </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="center">
+  <button mat-raised-button  color="primary" [mat-dialog-close]="data.comments">Yes</button> &nbsp;
+  <button mat-stroked-button color="primary" [mat-dialog-close]="false" cdkFocusInitial>No</button>
+</mat-dialog-actions>
+
+

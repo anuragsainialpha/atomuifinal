@@ -1,0 +1,13 @@
+<mat-dialog-content class="mat-typography">
+    <h4 class="plan-created-success">
+        <span>{{title}}</span>
+        <a [routerLink]="['/fgs/drafted-load-slip',data.loadslipId]" *ngIf="isDraft"><span (click)="onNoClick()"> <u>{{data.loadslipId}}</u></span></a>
+        <a [routerLink]="['/fgs/drafted-load-slip',data.loadslipId]" *ngIf="isPrint"> <span (click)="onNoClick()"> <u>{{data.loadslipId}}</u></span></a>
+        <a [routerLink]="['/jit/drafted-load-slip',data.loadslipId]" *ngIf="isJITDraft"><span (click)="onNoClick()"> <u>{{data.loadslipId}}</u></span></a>
+        <a [routerLink]="['/jit/drafted-load-slip',data.loadslipId]" *ngIf="isJITPrint"> <span (click)="onNoClick()"><u>{{data.loadslipId}}</u></span></a>
+    </h4>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-stroked-button color="primary" [mat-dialog-close]="false" cdkFocusInitial (click)="loadslipFullviewNavigation(data)" *ngIf="!update_event">Close</button>
+    <button mat-stroked-button color="primary" [mat-dialog-close]="false" cdkFocusInitial  *ngIf="update_event">Close</button>
+</mat-dialog-actions>

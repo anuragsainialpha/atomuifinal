@@ -1,0 +1,97 @@
+@import '../../../assets/styles/variables';
+@import '../../../assets/styles/mixins';
+
+.box{
+    margin: 15px 0px;
+    padding: 15px;
+    box-shadow: 0px 0px 8px 1px  $table-border-color;
+    background-color: $theme-white;
+    border-radius: 6px;
+}
+// .table{
+//     margin-top:40px;
+// }
+.rounded-box{
+    width: 100%;
+    margin: auto;
+    margin-top: 40px;
+    border: 1px solid  $table-border-color;
+    border-radius: 6px;
+    height: auto;
+    margin-top: 0px;
+    .col-md-3.truckstatus-card{
+        border-right:1px solid  $table-border-color;
+        padding:0px;
+        max-width: 20% !important;
+    }
+    .col-md-1.truckstatus-card{
+        border-right:0.5px solid  $table-border-color;
+        padding:0px;
+        max-width: 8.33% !important;
+
+    }
+    .col-md-2.truckstatus-card{
+        border-right:1px solid  $table-border-color;
+        padding:0px;
+        max-width: 20% !important;
+        p{
+            padding-bottom: 1rem;
+        }
+    }
+    .col-md-6.truckstatus-card{
+        border-right:1px solid  $table-border-color;
+        padding:0px;
+        max-width: 50% !important;
+        p{
+            padding-bottom: 1rem;
+        }
+    }
+    div:last-child.col-md-3{
+        border-right: 0px;
+    }
+    p{
+        text-align: center;
+    }
+    h5{
+        font-size: 1.3rem;
+    }
+    // h6{
+    //     font-size: 0.85rem !important;
+    //     font-weight: bolder !important;
+    // }
+
+.form-group {
+     margin-bottom: 0rem;
+}
+}
+.cust-box{
+    padding: 12px;
+}
+.cust-row{
+    height: 3.5rem;
+}
+.cust-form-group{
+    margin-bottom: 4px;
+}
+.cust-table{
+    margin-bottom: 0px;
+}
+
+.content {
+    width: 60%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.cust-input{
+    width: 25px;
+    border: 0px;
+    border-bottom: 1px solid black !important;
+}
+
+// .ngx-datatable.material {
+//     margin-top: 0px !important; 
+//     margin-left: 30px;
+// }

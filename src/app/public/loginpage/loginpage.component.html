@@ -1,0 +1,47 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid" *ngIf="isShow">
+  <div class="row">
+    <div class="col-lg-7 col-md-6 left-side-login tab-hide">
+      <img src="./assets/images/logo.png" alt="apollo" class="img-fluid" />
+    </div>
+    <div class="col-lg-1 col-md-1 right-side-login tab-hide"></div>
+    <div class="col-lg-3 col-md-4 right-side-login">
+      <form name ="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
+        <div class="atom-logo text-left">
+          <img src="./assets/images/atom.png" alt="atom logo" class="img-fluid" />
+        </div>
+        <h1>Sign In</h1>
+        <h5>Welcome back to ATOM ({{environment}})</h5>
+        <div>
+          <mat-form-field appearance="outline" class="example-full-width login-page">
+            <mat-label>Login Id</mat-label>
+            <input type="text" matInput name="userId" #emailAddress="ngModel" required [(ngModel)]="userId" autocomplete="off" appAutofocus>
+            <mat-error *ngIf="(f.submitted && emailAddress.invalid) || (emailAddress.invalid)">
+              <p *ngIf="emailAddress.errors.required"> Login Id is
+                <strong>required</strong>
+              </p>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field appearance="outline" class="example-full-width login-page">
+            <mat-label>Password</mat-label>
+            <input matInput name="password" #passwordText="ngModel" required [(ngModel)]="password" type="password" autocomplete="off">
+            <mat-error *ngIf="(f.submitted && passwordText.invalid) || (passwordText.invalid)">
+              <p *ngIf="passwordText.errors.required"> Password is
+                <strong>required</strong>
+              </p>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div>
+        </div>
+        <div>
+          <button mat-raised-button color="primary" class="sign-in-btn btn-primary full-width btm-action-btn">Sign
+            In</button>
+        </div>
+      </form>
+    </div>
+    <div class="col-lg-1 col-md-1 right-side-login tab-hide"></div>
+  </div>
+</div>

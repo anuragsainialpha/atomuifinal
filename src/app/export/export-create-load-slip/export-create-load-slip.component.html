@@ -1,0 +1,596 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header"> Loadslip >
+    <span>{{title}}
+      <span class="pull-right refresh-span" *ngIf="(this.loadslipID && !this.viewType)">
+        <button class="theme-small-button" (click)="export()" matTooltip="Export Download">
+          <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+        </button>
+      </span>
+    </span>
+  </h6>
+  <div class="clearfix"></div>
+  <div class="loadslip-fields tab-loadslip-fields">
+    <div class="row margin-bottom-5">
+      <div class="col-md-7">
+        <div class="row">
+          <div class="col-md-2">
+            <div class='inputbordered'>
+              <div>Source</div>
+              <div>
+                <b>{{userSource}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 pd-0">
+            <div class="form-group inputbordered">
+              <mat-form-field appearance="standard" *ngIf="!checkMultiStop()">
+                <mat-select placeholder="Container" [(ngModel)]="containerNum" name="containerNum"
+                  (ngModelChange)="getLoadSlipUtilazations($event)">
+                  <mat-option *ngFor="let truckType of truckTypes;let i=index" [value]="truckType.CONTAINER_NUM">
+                    {{truckType.CONTAINER_NUM | uppercase}} <span *ngIf="truckType.ITEM_CATEGORY">&nbsp; - &nbsp;
+                      ({{truckType.ITEM_CATEGORY}})</span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="checkMultiStop()">
+                <div>Container</div>
+                <div>
+                  <b>{{containerNum || '--'}}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group inputbordered">
+              <div>Container Type</div>
+              <div>
+                <b>{{truckT?truckT:'--' }}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2  pd-0">
+            <div class="form-group inputbordered">
+              <div>Transporter</div>
+              <div>
+                <b>{{transporter?transporter:'--' }}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group inputbordered">
+              <div>Destination</div>
+              <div>
+                <b>{{destination?destination:'--' | uppercase}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 pl-0">
+            <div class="inputbordered">
+              <div>LS Category</div>
+              <div>
+                <b>{{loadslipCategory || '--'}}</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="row">
+          <div class="col-md-2 pd-0">
+            <div class="form-group inputbordered">
+              <div>Dest Desc</div>
+              <div [title]="description" [ngClass]="{'cursor-pointer':description?.length>8}">
+                <b>{{description ? (description?.length>8) ? (description | slice:0:8)+'..':(description) : '--'}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group inputbordered">
+              <mat-form-field appearance="standard">
+                <mat-select placeholder="Ship To" [(ngModel)]="ShipTo" name="shito">
+                  <mat-option *ngFor="let shipPlace of shiptoPlaceList;let i=index" [value]="shipPlace">
+                    {{shipPlace}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-3 pl-0">
+            <div class="form-group inputbordered">
+              <mat-form-field appearance="standard" *ngIf="!checkMultiStop()">
+                <!-- <mat-select [(ngModel)]="actualTruckType" name="actualTruckType" placeholder="Actual Truck Type"
+                  (selectionChange)="getLoadSlipUtilazations(containerNum)">
+                  <mat-option selected>None</mat-option>
+                  <mat-option *ngFor="let list of actualTruckTypeList" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-select> -->
+                <mat-select placeholder="Actual Truck Type" [(ngModel)]="actualTruckType" name="actualTruckType"
+                  (selectionChange)="getLoadSlipUtilazations(containerNum)">
+                  <mat-option selected>None</mat-option>
+                  <mat-optgroup *ngFor="let group of truckTypeClass" [label]="group.name" [disabled]="group.disabled">
+                    <mat-option *ngFor="let type of group.mtTruckTypeInfos" [value]="type.value"
+                      style="font-weight: normal">
+                      {{type.value}}
+                    </mat-option>
+                  </mat-optgroup>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="checkMultiStop()">
+                <div>Actual Truck Type</div>
+                <div>
+                  <b>{{actualTruckType || '--'}}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 pl-0">
+            <div class="form-group inputbordered">
+              <mat-form-field appearance="standard" *ngIf="!checkMultiStop()">
+                <mat-select placeholder="Variant 1" [(ngModel)]="variant_ONE" name="variant_ONE"
+                  (selectionChange)="getLoadSlipUtilazations(containerNum)">
+                  <mat-option selected>None</mat-option>
+                  <mat-option *ngFor="let item of variant_one_List" [value]="item">
+                    {{item | uppercase}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="checkMultiStop()">
+                <div>Variant 1</div>
+                <div>
+                  <b>{{variant_ONE || '--'}}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 pl-0">
+            <div class="form-group inputbordered">
+              <div>Frt Avail</div>
+              <div>
+                <b>{{ freightAvailableflag || '--'}}</b>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="row margin-bottom-5">
+      <div class="col-md-2">
+        <div class="row">
+          <div class="col-md-7 pr-0">
+            <div class="bordered">
+              <div>Truck No</div>
+              <div>
+                <b>{{truckType || '--'}}
+                  <!-- <span *ngIf="indentCategory">&nbsp; - &nbsp;({{indentCategory}})</span> -->
+                </b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class='bordered'>
+              <div>TTE Qty </div>
+              <div><b>{{totalTTE ? (totalTTE | number : '1.2-2') : '--' }}</b></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="col-md-3 pd-0">
+        <div class="bordered-box">
+          <div class="row text-center" >
+              <div class="col-md-3  bordered-box-left-div">
+                  <div>
+                      Wt (Kg)
+                  </div>
+                  <div >
+                    <b>{{totalWeight?(totalWeight | number : '1.2-2'):0}}</b>
+                  </div>
+                </div>
+            <div class="col-md-3 text-center bordered-box-left-div">
+              <div>
+                TTE Util
+              </div>
+              <div [ngClass]="(totalTTESeletecd > 100)?'text-danger':'color-green'">
+                <b>{{totalTTESeletecd?(totalTTESeletecd | number : '1.2-2'):0 }}%</b>
+              </div>
+            </div>
+            
+            <div class="col-md-3  bordered-box-left-div">
+              <div>
+                Wt Util
+              </div>
+              <div [ngClass]="(totalMaterialWeight > 100)?'text-danger':'color-green'">
+                <b>{{totalMaterialWeight?(totalMaterialWeight | number : '1.2-2'):0}}%</b>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div>
+                Vol Util
+              </div>
+              <div [ngClass]="(totalTruckVolume > 100)?'text-danger':'color-green'">
+                <b>{{totalTruckVolume?(totalTruckVolume | number : '1.2-2'):0}}%</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <!-- <div class="row bg-theme">
+          <div class="col-md-2 col-wid-20p">
+            <div>Tyres</div>
+            <div>
+              {{totalTyres?totalTyres:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-20p">
+            <div>Tubes</div>
+            <div>
+              {{totalTubes?totalTubes:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-20p">
+            <div>Flaps</div>
+            <div>
+              {{totalFlaps?totalFlaps:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-20p">
+            <div> Valves</div>
+            <div>
+              {{totalValves?totalValves:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-20p">
+            <div>Pctr</div>
+            <div>{{totalPctr?totalPctr:0}} </div>
+          </div>
+        </div> -->
+        <div class="row bg-theme export-padding h-100">
+          <div class="col-md-2 col-wid-16p">
+            <div>Tyres</div>
+            <div>
+              {{totalTyres?totalTyres:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Tubes</div>
+            <div>
+              {{totalTubes?totalTubes:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Flaps</div>
+            <div>
+              {{totalFlaps?totalFlaps:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div> Valves</div>
+            <div>
+              {{totalValves?totalValves:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Pctr</div>
+            <div>{{totalPctr?totalPctr:0}} </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Others</div>
+            <div>{{totalOthersCount?totalOthersCount:0}} </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Tot Qty</div>
+            <div>{{totalQuantity?totalQuantity:0}} </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 flow-btns font-11 MD-MP">
+        <button mat-raised-button mat-raised-button color="primary" class="btm-action-btn tab-mb-10" (click)="onOpenModal()"
+          data-target="#myModal">{{invoiceBtn}} </button>
+        <button mat-raised-button color="primary" [disabled]="!isDraftMode" (click)="shareTruckDestinationList()">Share
+          Truck(MP)</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-6 ">
+            <div class='bordered'>
+              <div>Shipment No</div>
+              <div>
+                <b>{{shipmentNumber || '--'}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 pd-0">
+            <div class='bordered'>
+              <div>Load Slip No </div>
+              <div><b>{{loadslipID || '--'}}</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-1 pr-0">
+        <div class="form-group bordered">
+          <div>Cntry of Dest</div>
+          <div>
+            <!-- <b class="font-11">{{countryOfDestination?countryOfDestination:'--' }}</b> -->
+            <div [title]="countryOfDestination" [ngClass]="{'cursor-pointer':countryOfDestination?.length>8}">
+              <b>{{countryOfDestination ? (((countryOfDestination?.length>8)? (countryOfDestination | slice:0:8)+'..':(countryOfDestination)) | uppercase) : '--'}}</b>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4 pr-0">
+            <div class='bordered'>
+              <div>Indt Cat </div>
+              <div [title]="indentCategory" [ngClass]="{'cursor-pointer':indentCategory?.length>11}">
+                <b>{{indentCategory ? (((indentCategory?.length>11)? (indentCategory | slice:0:11)+'..':(indentCategory)) | uppercase) : '--'}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 pr-0">
+            <div class='bordered'>
+              <div>City</div>
+              <div>
+                <!-- <b>{{city?city:'--'}}</b> -->
+                <div [title]="city" [ngClass]="{'cursor-pointer':city?.length>8}">
+                  <b>{{city ? (((city?.length>8)? (city | slice:0:8)+'..':(city)) | uppercase) : '--'}}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 ">
+            <div class="form-group inputbordered dropdownSeq">
+              <mat-form-field appearance="standard">
+                <mat-select placeholder="Drop Seq" [(ngModel)]="dropSeq" name="dropSeq">
+                  <mat-option *ngFor="let item of dropSeqList;let i=index" [value]="item">
+                    {{item}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="col-md-1 pl-0 flow-btns tab-flow-btns exportLoadBtns">
+        <!-- [disabled]="releasedDate != null" -->
+        <button *ngIf="(bayArrivedDate == null)" mat-raised-button (click)="eventCall(loadslipID,'ARRIVED_BAY')"
+          class="mat-default" >Arrived
+          Bay</button>
+        <button *ngIf="(bayArrivedDate != null)" class="greenButton">Arrived Bay <b>: {{bay}}</b> <span>{{bayArrivedDate
+            | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+      <div class="col-md-1 pl-0 flow-btns tab-flow-btns exportLoadBtns">
+        <button mat-raised-button color="default" (click)="saveAsDraft_Print_trigger('PRINT')" class="mat-default"
+          *ngIf="(lsPrintDate == null) && (releasedDate == null)">Print
+          LS</button>
+        <button (click)="saveAsDraft_Print_trigger('PRINT')" class="greenButton"
+          *ngIf="(lsPrintDate != null) && (releasedDate == null)">Print
+          LS<span> ({{(lsPrintDate) | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}})</span></button>
+        <button (click)="downloadLoadslip()" class="greenButton" *ngIf="(releasedDate != null)">Print
+          Pdf<span> ({{(lsPrintDate) | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}})</span></button>
+      </div>
+      <div class="col-md-1 flow-btns tab-flow-btns exportLoadBtns">
+        <button mat-raised-button color="default" *ngIf="(loadingStartDate == null)"
+          (click)="eventCall(loadslipID,'LOADING_START')" >Loading
+          Start</button>
+        <button *ngIf="(loadingStartDate != null)" class="greenButton">Loading Start <span>{{loadingStartDate |
+            customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+      <div class="col-md-1 flow-btns tab-flow-btns  tab-pl-15 exportLoadBtns">
+        <button mat-raised-button color="default" *ngIf="(loadingEndDate == null)"
+          (click)="eventCall(loadslipID,'LOADING_END')">Loading
+          End</button>
+        <button *ngIf="(loadingEndDate != null)" class="greenButton">Loading End <span>{{loadingEndDate |
+            customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+      <div class="col-md-1 flow-btns tab-flow-btns tab-pl-15 exportLoadBtns">
+        <button mat-raised-button color="default" [disabled]="(IS_RELEASE) || (loadSlipData.length == 0)"
+          *ngIf="(releasedDate == null)" (click)="eventCall(loadslipID,'RELEASED')">Release</button>
+        <button *ngIf="(releasedDate != null)" class="greenButton">Release <span>{{releasedDate | customDateFormat |
+            date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <ngx-datatable class='material' [rows]='loadSlipData' [columnMode]="'force'" [headerHeight]="50"
+       [footerHeight]="30" [rowHeight]="'auto'" [summaryRow]="true" [summaryHeight]="'auto'"
+      [summaryPosition]="'bottom'" [scrollbarH]="true">
+      <ngx-datatable-column name="Invoice Number" [width]="120" [resizeable]="false" [sortable]="false"
+        prop="INVOICE_NUMBER">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.INVOICE_NUMBER || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Material Code" [width]="120" [resizeable]="false" [sortable]="false" prop="ITEM_ID">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ITEM_ID || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Material Description" [width]="250" [resizeable]="false" [sortable]="false"
+        prop="ITEM_DESCRIPTION">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ITEM_DESCRIPTION || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Cat" [width]="100" [resizeable]="false" [sortable]="false" prop="ITEM_CATEGORY">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ITEM_CATEGORY || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Qty" [width]="40" [resizeable]="false" [sortable]="false" prop="QTY"
+        [summaryFunc]="qtySumm" [summaryTemplate]="qtSummaryCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.QTY || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Weight" [width]="120" [resizeable]="false" [sortable]="false" prop="WEIGHT"
+        [summaryFunc]="weightSumm" [summaryTemplate]="weSummaryCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.WEIGHT || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+    <ng-template #weSummaryCell let-row="row" let-value="value">
+      <div class="name-container">
+        <div class="chip" style="padding-left:0px !important">
+          <span class="chip-content">{{ weightSumm?(weightSumm | number :
+            '1.2-2'):0}} Kg/{{metricTon?(metricTon | number :'1.2-2'):0}} MT</span>
+          <!-- <span class="chip-content">Total Qty : {{ qtySumm }}</span> -->
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #qtSummaryCell let-row="row" let-value="value">
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">{{ qtySumm?qtySumm:0}}</span>
+          <!-- <span class="chip-content">Total Qty : {{ qtySumm }}</span> -->
+        </div>
+      </div>
+    </ng-template>
+    <!-- <ng-template>
+      <div style="padding: 5px 10px">
+        <div class="pull-right">
+          <strong>Total Qty</strong>: {{totalTyres?totalTyres:0}}
+        </div>
+      </div>
+    </ng-template> -->
+  </div>
+
+  <div align="center" *ngIf="truckType">
+    <button mat-stroked-button color="primary" class="mr-3" (click)="cancelLoadslipCreation()"
+      *ngIf="!(loadslipID)">Cancel</button>
+    <button mat-raised-button color="primary" class="btm-action-btn" (click)="saveAsDraft_Print_trigger('DRAFT')"
+      *ngIf="isDraftMode">Save
+      as Draft</button>
+    <!-- <button (click)="show(12345,'DRAFT')"> show</button> -->
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog">
+  <div class="modal-dialog modal-lg">
+
+    <!-- Modal content-->
+    <div class="modal-content" style="width: 100%">
+      <div class="modal-header ">
+        <h4 class="modal-title" style="font-size: 16px">Invoice
+          <button type="button" class="close pull-right" data-dismiss="modal">&times;</button>
+        </h4>
+      </div>
+      <div class="modal-body" style="height: 250px;overflow-y: auto">
+        <div class="table-responsive">
+          <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table">
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                  [checked]="selection.hasValue() && isAllSelected()"
+                  [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+                  [checked]="selection.isSelected(row)">
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="invoiceNumber">
+              <th mat-header-cell *matHeaderCellDef> Invoice No </th>
+              <td mat-cell *matCellDef="let element"> {{element.invoiceNumber}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="deliveryNumber">
+              <th mat-header-cell *matHeaderCellDef> Delivery No </th>
+              <td mat-cell *matCellDef="let element"> {{element.deliveryNumber}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="containerNum">
+              <th mat-header-cell *matHeaderCellDef> Container No </th>
+              <td mat-cell *matCellDef="let element"> {{element.containerNum}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="destLoc">
+              <th mat-header-cell *matHeaderCellDef> Destination </th>
+              <td mat-cell *matCellDef="let element"> {{element.destLoc}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="invoiceDate">
+              <th mat-header-cell *matHeaderCellDef> Invoice Date </th>
+              <td mat-cell *matCellDef="let element"> {{element.invoiceDate}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="billTo">
+              <th mat-header-cell *matHeaderCellDef> Bill To </th>
+              <td mat-cell *matCellDef="let element"> {{element.billTo}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="billToName">
+              <th mat-header-cell *matHeaderCellDef> Bill To Name </th>
+              <td mat-cell *matCellDef="let element"> {{element.billToName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="shipTo">
+              <th mat-header-cell *matHeaderCellDef> Ship To </th>
+              <td mat-cell *matCellDef="let element"> {{element.shipTo}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="shipToName">
+              <th mat-header-cell *matHeaderCellDef> Ship To Name </th>
+              <td mat-cell *matCellDef="let element"> {{element.shipToName}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer" *ngIf="isDraftMode">
+        <button mat-raised-button color="primary" (click)="confirmInvoiceForExport()"
+          data-dismiss="modal">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- modal for share truck -->
+<div class="modal" id="shareTruckModal" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Select Pickup Location</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <mat-form-field appearance="standard">
+          <mat-select [(ngModel)]="shareTruckLocation" name="shareTruckLocation" placeholder="Select Pickup Location">
+            <mat-option *ngFor="let sharebledestination of shareTrcukDestinations" [value]="sharebledestination">
+              {{sharebledestination}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" (click)="shareTruck()">Confirm</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,685 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header">
+    <b> Dispatch Plan > View Plan</b>
+    <span class="pull-right refresh-span">
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="Filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+  <div class="manualplan-fields">
+    <div class="col-md-12 row" *ngIf="isShow">
+      <div class="col-md-12 padding-right-40">
+        <div class="row">
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="formPicker" placeholder="From Date" [(ngModel)]="fromDate"
+                  name="fromDate" (dateChange)="addEvent('change', $event)">
+                <mat-datepicker-toggle matSuffix [for]="formPicker"></mat-datepicker-toggle>
+                <mat-datepicker #formPicker disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="toPicker" [min]="fromDate" placeholder="To Date"
+                  [(ngModel)]="toDate" name="toDate">
+                <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toPicker [disabled]="!fromDate"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- Source Input editble for DP_REP role & for external wareHouses -->
+          <!-- Source With Drop doem for DPREP and disable input field for NORMAL USERs -->
+          <div class="col-md-1 pl-0" *ngIf = "isSoureDisable()">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Source" (keyup)="getfilterSource($event)" [disabled]="(isSoureDisable()) "
+                autocomplete="off" [matAutocomplete]="sourceAutocomplete" [(ngModel)]="sourceCode" name="source" oninput="this.value = this.value.toUpperCase()">
+              <mat-autocomplete #sourceAutocomplete="matAutocomplete" >
+                <mat-option *ngFor="let list of sourceList" [value]="list.value">
+                  <span matTooltip={{list.value}}>{{list.value}} - ({{list.description}})</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <div class="col-md-1 pr-0" *ngIf = "!isSoureDisable()">
+              <div class="form-group cust-form-group">
+                <mat-form-field class="example-full-width">
+                  <mat-select placeholder="Source" [(ngModel)]="sourceCodeList" name="sourceCodeList"
+                    multiple [disabled]="(isSoureDisable()) ">
+                    <mat-option *ngFor="let source of openPlanSourceList" [value]="source">{{source}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination" aria-label="State" [matAutocomplete]="statesAutocomplete"
+                  [(ngModel)]="destination" name="destination" (keyup)="getUserSearchData($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #statesAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationList" [value]="list.value"
+                    (click)="setDestDescription(list.description)"
+                    (onSelectionChange)="setDestDescription(list.description)">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pl-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination Description" aria-label="State"
+                  [matAutocomplete]="destDisAutocomplete" [(ngModel)]="destinationDesc" name="destination"
+                  (keyup)="getUserDestinationList($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #destDisAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of descriptionList" [value]="list.description"
+                    (click)="setDestination(list.value)" (onSelectionChange)="setDestination(list.value)">
+                    <span>({{list.description}})</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Material Code" aria-label="Material Code"
+                  [matAutocomplete]="materialCodeAutocomplete" [(ngModel)]="materialCode" name="materialCode"
+                  (keyup)="filterMaterialCode($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #materialCodeAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of materilcodelist" [value]="list.value"
+                    (click)="setMaterialDescription(list.description)"
+                    (onSelectionChange)="setMaterialDescription(list.description)">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Material Description" aria-label="Material Description"
+                  [matAutocomplete]="materialDescritionAutocomplete" [(ngModel)]="materialDescription"
+                  name="materialDescription" (keyup)="filterMaterialDescription($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #materialDescritionAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of materialDescriptionList" [value]="list.description"
+                    (click)="setMaterialCode(list.value)" (onSelectionChange)="setMaterialCode(list.value)">
+                    <span>{{list.description}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Category" [(ngModel)]="materialGroup" name="materialGroup" multiple>
+                  <mat-option *ngFor="let category of categoryList" [value]="category">{{category}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="MKT Segment" [(ngModel)]="mktsegment" name="mktsegment" multiple>
+                  <!-- <mat-option [value]="">None</mat-option> -->
+                  <mat-option *ngFor="let mktsegment of mktsegmentList" [value]="mktsegment">
+                    {{mktsegment}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput placeholder="Plan Id" [(ngModel)]="planId" name="planId" oninput="this.value = this.value.toUpperCase()">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="Plan Status" [(ngModel)]="planStatus" name="planStatus" multiple>
+                  <!-- <mat-option [value]="">None</mat-option> -->
+                  <mat-option *ngFor="let item of planStatusList" [value]="item.value">
+                    {{item.key}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="Status" [(ngModel)]="status" name="status" multiple>
+                  <!-- <mat-option [value]="">None</mat-option> -->
+                  <mat-option *ngFor="let data of statuses" [value]="data.value">{{data.key}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput placeholder="Insert User" [(ngModel)]="insertUser" name="insertUser" oninput="this.value = this.value.toUpperCase()">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput placeholder="Update User" [(ngModel)]="updateUser" name="updateUser" oninput="this.value = this.value.toUpperCase()">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pl-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Priority" [(ngModel)]="priority" name="priority" multiple>
+                  <mat-option value="ISNULL">ISNULL</mat-option>
+                  <mat-option *ngFor="let priority of priorityList" [value]="priority">{{priority}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pull-right">
+        <div class="search-fileds">
+          <button class="theme-small-button" (click)="plannerSearch()" matTooltip="Search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </button>
+          <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!--  This filter will visible other user insted of new due allignment -->
+    <!-- <div class="row" *ngIf="check_Role_DP_REP != roles.planner3">
+      <div class="col-md-12">
+        <div class="row">
+          <ng-container >
+           <div class="col-md-1 pr-0">
+             <div class="form-group">
+               <mat-form-field>
+                 <input matInput placeholder="Insert User" [(ngModel)]="insertUser" name="insertUser">
+               </mat-form-field>
+             </div>
+           </div>
+         </ng-container>
+        </div>
+      </div>
+    </div> -->
+  </div>
+  <div class="ngx-table-custom-scroll ngx-table-tr-custom-scroll">
+    <ngx-datatable class='material' #table [rows]='dispatchPlanList' [columnMode]="'force'" [headerHeight]="50"
+      [scrollbarH]="true" [footerHeight]="30" [rowHeight]="'auto'" [externalPaging]="true" [limit]="page.limit"
+      [count]="page.count" [offset]="page.offset" (page)="datatablePageData($event)" [summaryRow]="true"
+      [summaryHeight]="'auto'" [summaryPosition]="'bottom'" [selected]="selected" [selectionType]="'checkbox'"
+      [selectAllRowsOnPage]="false">
+      <ngx-datatable-column name="Plan Id" [width]="70" [resizeable]="false" [sortable]="true" prop="planId"
+        [summaryFunc]="emptySumm" [frozenLeft]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.planId}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Disp Date" [width]="90" [resizeable]="false" [sortable]="true" prop="dispatchDate"
+        [frozenLeft]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.dispatchDate | customDateFormat | date:'dd-MMM-yyyy'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Source" [width]="70" [resizeable]="false" [sortable]="true" prop="sourceLocation"
+        [frozenLeft]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.sourceLocation}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Dest" [width]="70" [resizeable]="false" [sortable]="true" prop="destinationLocation"
+        [frozenLeft]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.destinationLocation}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Material Code" [width]="120" [resizeable]="false" [sortable]="true" prop="itemId"
+        [frozenLeft]="freezeLeftValue">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.itemId}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Material Description" [width]="220" [resizeable]="false" [sortable]="true"
+        prop="itemDescription" [frozenLeft]="freezeLeftValue">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.itemDescription}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Dest Description" [width]="120" [resizeable]="false" [sortable]="true"
+        prop="destinationDescription">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.destinationDescription}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Cat" [width]="70" [resizeable]="false" [sortable]="true" prop="category">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.category}}
+        </ng-template>
+      </ngx-datatable-column>
+      <!-- <ngx-datatable-column name="User" [width]="70" [resizeable]="false" [sortable]="true" prop="category">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.insertUser}}
+        </ng-template>
+      </ngx-datatable-column> -->
+      <ngx-datatable-column name="TTE" [width]="60" [resizeable]="false" [sortable]="true" prop="tte"
+        [summaryTemplate]="tteCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.tte}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Batch" [width]="70" [resizeable]="false" [sortable]="true" prop="batchCode">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.batchCode}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Pr" [width]="50" [resizeable]="false" [sortable]="true" prop="priority"
+        [summaryFunc]="emptySumm">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.priority}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Mkt Seg" [width]="60" [resizeable]="false" [sortable]="true" prop="marketSegment">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.marketSegment}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Plan Qty" [width]="60" [resizeable]="false" [sortable]="true" prop="quantity"
+        [summaryTemplate]="planQtyCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.quantity?row.quantity:0}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="App Qty" [width]="60" [resizeable]="false" [sortable]="true" prop="approvedQuantity"
+        [summaryTemplate]="apprQtyCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.approvedQuantity?row.approvedQuantity:0}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Un Appr Qty" [width]="60" [resizeable]="false" [sortable]="true"
+        prop="deletedQuantity" [summaryTemplate]="unapprQtyCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.unapprovedQuantity?row.unapprovedQuantity:0}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Appr Del" [width]="70" [resizeable]="false" [sortable]="false"
+        prop="deletedApprQuantity" [summaryTemplate]="apprDeleteQtyCell">
+        <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+          <div>
+            {{row.deletedApprQuantity}}
+          </div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Un Appr Del" [width]="70" [resizeable]="false" [sortable]="false"
+        prop="deletedUnApprQuantity" [summaryTemplate]="unapprDeleteQtyCell">
+        <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+          <div>
+            {{row.deletedUnApprQuantity}}
+          </div>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Reserved" [width]="65" [resizeable]="false" [sortable]="true" prop="reservedQuantity"
+        [summaryTemplate]="reservedQtyCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.reservedQuantity?row.reservedQuantity:0}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Loaded" [width]="60" [resizeable]="false" [sortable]="true" prop="loaded"
+        [summaryTemplate]="loadedQtyCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.loaded?row.loaded:0}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Disp" [width]="60" [resizeable]="false" [sortable]="true" prop="dispatchedQuantity"
+        [summaryTemplate]="dispatchedQtyCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.dispatchedQuantity?row.dispatchedQuantity:0}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Avail Qty" [width]="65" [resizeable]="false" [sortable]="true"
+        prop="availableQuantity" [summaryTemplate]="availableQtyCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.availableQuantity?row.availableQuantity:0}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Total Avail Qty" [width]="65" [resizeable]="false" [sortable]="true"
+        prop="availableQuantity" [summaryTemplate]="totalAvailableQtyCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totalAvailableQuantity?row.totalAvailableQuantity:0}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Avail TTE" [width]="60" [resizeable]="false" [sortable]="true" prop="availbleTTE"
+        [summaryTemplate]="totalAvailableTTEPercentageCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.availbleTTE | number : '1.2-2' }}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Truck Count" [width]="60" [resizeable]="false" [sortable]="true" prop="truckCount"
+        [summaryTemplate]="truckPercentageCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.truckCount | number : '1.2-2'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Weight (Kg)" [width]='60' [resizeable]="false" [sortable]="false" prop="Weight"
+        [summaryTemplate]="weightCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.weight | number : '1.2-2'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Available Weight (Kg)" [width]='80' [resizeable]="false" [sortable]="false"
+        prop="totalWeight" [summaryTemplate]="totalWeightCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totalWeight | number : '1.2-2'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Weight Util (%) " [width]='60' [resizeable]="false" [sortable]="false"
+        prop="weightUtil" [summaryTemplate]="totalWeightUtilCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.weightUtil | number : '1.2-2'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Volume (CUMTR)" [width]='70' [resizeable]="false" [sortable]="false" prop="Volume"
+        [summaryTemplate]="volumeCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.volume | number : '1.2-2'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Available Volume (CUMTR)" [width]='110' [resizeable]="false" [sortable]="false"
+        prop="totalVolume" [summaryTemplate]="totalVolumeCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totalVolume | number : '1.2-2'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Volume Util (%)" [width]='80' [resizeable]="false" [sortable]="false" prop="volume"
+        [summaryTemplate]="totalVolumeUtilCell">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.volumeUtil | number : '1.2-2'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Plan Status" [width]='90' [resizeable]="false" [sortable]="false" prop="appStatus">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.status}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Insert User" [width]='145' [resizeable]="false" [sortable]="false" prop="insertUser">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.insertUser}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Update User" [width]='145' [resizeable]="false" [sortable]="false" prop="updateUser">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.updateUser}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Insert Date" [width]='130' [resizeable]="false" [sortable]="false" prop="insertDate">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.insertDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Update Date" [width]='130' [resizeable]="false" [sortable]="false" prop="updateDate">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.updateDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Plan Age (Days)" [width]='70' [resizeable]="false" [sortable]="false" prop="planAge">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.planAge}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Comments" [width]='100' [resizeable]="false" [sortable]="false" prop="comments">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <span [attr.title]="row.comments" (click)="showIntegrationMessage(row)">{{
+            (row.comments?.length>9)? (row.comments | slice:0:9)+'..':(row.comments)}}</span>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Status" [width]='150' [resizeable]="false" [sortable]="true" prop="appStatus">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <button class="btn btn-sm lightgreen-button"
+            [ngClass]="(row.appStatus=='APPROVED')?'lightgreen-button':'light-red-color'">
+            {{row.appStatus}}
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column [width]="50" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+        [resizeable]="false" [sortable]="false">
+        <ng-template ngx-datatable-header-template let-value="value" let-allRowsSelected="allRowsSelected"
+          let-selectFn="selectFn" let-row="row" let-rowIndex="rowIndex">
+          <input type="checkbox" [checked]="allRowsSelected"
+            (change)="selectFn(!allRowsSelected);onSelectAll($event)" />
+        </ng-template>
+        <ng-template ngx-datatable-cell-template let-value="value" let-isSelected="isSelected" let-row="row"
+          let-rowIndex="rowIndex" let-onCheckboxChangeFn="onCheckboxChangeFn">
+          <input type="checkbox" [checked]="isSelected" (change)="onCheckboxChangeFn($event);onSelect($event,row)" />
+        </ng-template>
+      </ngx-datatable-column>
+      <!-- Footer Template starts -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+          let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+          <div class="page-count">
+            <span *ngIf="selectedCount">
+              {{selectedCount.toLocaleString()}} Selected |
+            </span>
+            Showing {{(offset * pageSize)+1}} to {{(rowCount>
+            (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+            {{(rowCount)}} records.
+          </div>
+          <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+            [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+            [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+          </datatable-pager>
+        </ng-template>
+      </ngx-datatable-footer>
+      <!-- Footer Template Ends -->
+    </ngx-datatable>
+
+    <!-- Table bottom grid columns -->
+    <ng-template #tteCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{(tteSum)?(tteSum | number :'1.2-2'):0}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #planQtyCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{planQtySum}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #apprQtyCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{apprQtySum}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #unapprQtyCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{unapprQtySum }}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #apprDeleteQtyCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{apprDeleteQtySum}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #unapprDeleteQtyCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{unapprDeleteQtySum}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #reservedQtyCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{reservedQtySum}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #loadedQtyCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{loadedQtySum}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #dispatchedQtyCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{dispatchedQtySum}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #availableQtyCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{availableQtySum}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #totalAvailableQtyCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{totalAvailableQtySum}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #truckPercentageCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">
+            {{(TruckPercentageSum)?(TruckPercentageSum | number :'1.2-2'):0}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #totalAvailableTTEPercentageCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">{{(totalTTEPercentageSum)?(totalTTEPercentageSum | number :'1.2-2'):0}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #weightCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">{{(weightSum)?(weightSum | number :'1.2-2'):0}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #totalWeightCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">{{(totalWeightSum)?(totalWeightSum | number :'1.2-2'):0}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #totalWeightUtilCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">{{(totalWeightUtilSum)?(totalWeightUtilSum | number :'1.2-2'):0}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #volumeCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">{{(volumeSum)?(volumeSum | number :'1.2-2'):0}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #totalVolumeCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">{{(totalVolumeSum)?(totalVolumeSum | number :'1.2-2'):0}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #totalVolumeUtilCell>
+      <div class="name-container">
+        <div class="chip">
+          <span class="chip-content">{{(totalVolumeUtilSum)?(totalVolumeUtilSum | number :'1.2-2'):0}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+<div id="commnetsModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Comments</h4>
+      </div>
+      <div class="modal-body">
+        {{modalComment}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

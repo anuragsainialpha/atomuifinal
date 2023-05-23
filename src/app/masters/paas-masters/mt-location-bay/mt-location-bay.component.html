@@ -1,0 +1,297 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+      <b> PaaS Masters &gt; Location Bay</b>
+    <span class="pull-right refresh-span">
+        <button class="theme-small-button" (click)="displayAddForm()" matTooltip="Add New">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button>
+       <!-- <button class="theme-small-button" [routerLink]="['/admin/paas-masters/upload-mt-location-bay']" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+<div class="mt-item-fields" *ngIf="isShow">
+  <div class="col-md-12 row">
+    <div class="col-md-12 padding-right-40">
+      <div class="row">
+
+            <div class="col-md-2">
+                <mat-form-field>
+                   <input matInput placeholder="Location Id" [(ngModel)]="locationId" name="locationId"> 
+                  <!-- <mat-select placeholder="Location Id" [(ngModel)]="locationId" name="locationId" #prior="ngModel">
+                      <mat-option *ngFor="let loc of locationIds" [value]="loc">
+                        {{loc}}
+                      </mat-option>
+                    </mat-select> -->
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-2">
+                <mat-form-field>
+                  <input matInput placeholder="Bay Id" [(ngModel)]="bayId" name="bayId">
+                </mat-form-field>
+            </div>
+
+            <!-- <div class="col-md-3">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Bay Status" [(ngModel)]="bayStatus" name="bayStatus">
+                  </mat-form-field>
+                </div>
+              </div> -->
+
+
+
+              <!-- <div class="col-md-2">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Batch Code" [(ngModel)]="batchCode" name="batchCode">
+                  </mat-form-field>
+                </div>
+              </div> -->
+
+      </div>
+    </div>
+   
+    <div class="pull-right">
+      <div class="search-fileds">
+        <button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+          <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+        </button>
+        <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+  <div class="mt-item-table">
+    <div>
+      <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [columnMode]="'force'"
+      [rows]='responseItemsList' [scrollbarH]="false" 
+      [externalPaging]="true" (page)="datatablePageData($event)"
+        [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count" [offset]="page.offset">
+        <ngx-datatable-column name="Location Id" [width]="100" [resizeable]="false" prop="locationId" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.locationId}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Bay Id" [width]="80" [resizeable]="false" prop="bayId" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.bayId}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Bay Description" [width]="180" [resizeable]="false" prop="bayDesc" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.bayDescription}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Bay Status" [width]="100" [resizeable]="false" prop="bayStatus" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.bayStatus}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Insert User" [width]="130" [resizeable]="false" prop="insertUser" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.insertUser}}
+            </ng-template>
+          </ngx-datatable-column>
+  
+        <ngx-datatable-column name="Insert Date" [width]="100" [resizeable]="false" prop="insertDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{trimDate(row.insertDate)}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Update User" [width]="100" [resizeable]="false" prop="updateUser" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.updateUser}}
+            </ng-template>
+          </ngx-datatable-column>
+  
+  
+        <ngx-datatable-column name="Update Date" [width]="100" [resizeable]="false" prop="updateDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{trimDate(row.updateDate)}}
+          </ng-template>
+        </ngx-datatable-column>
+  
+        
+        <ngx-datatable-column name="Action" [width]="100" [resizeable]="false" [sortable]="false">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <button class="theme-delete-button btn" matTooltip="Delete" (click)="showUpdateModel(row)" [disabled]="(row.isError)">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+          </ng-template>
+        </ngx-datatable-column>
+           <!-- Footer Template starts -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+          let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+          <div class="page-count">
+            <span *ngIf="selectedCount">
+              {{selectedCount.toLocaleString()}} Selected |
+            </span>
+            Showing {{(offset * pageSize)+1}} to {{(rowCount>
+            (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+            {{(rowCount)}} records.
+          </div>
+          <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+            [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+            [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+          </datatable-pager>
+        </ng-template>
+      </ngx-datatable-footer>
+      <!-- Footer Template Ends -->
+  
+      </ngx-datatable>
+    </div>
+  </div>
+  </div>
+
+
+
+<!--  -->
+<div class="modal" id="myModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && updateForm(f))">
+  <div class="modal-header">
+    <h4 class="modal-title text-primary">Are you sure you want to delete</h4>
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+  </div>
+  <!-- <div class="modal-body"> -->
+      <!-- <div class="form-group">
+          <mat-form-field appearance="standard" class="invisible example-full-width">
+            <input matInput placeholder="Location Id" aria-label="State" [(ngModel)]="locationIdu" name="locationIdu"
+               autocomplete="off">
+            <mat-error *ngIf="(f.submitted && locationIdu.invalid)">
+              <p *ngIf="locationIdu.errors.required">Item Category is <strong>required</strong>
+              </p>
+            </mat-error>
+          </mat-form-field>
+        </div> -->
+    <!-- <div class="form-group">
+      <mat-form-field appearance="standard" class="invisible example-full-width">
+        <input matInput placeholder="Bay Id" aria-label="State" [(ngModel)]="bayIdu" name="bayIdu"
+           autocomplete="off">
+        <mat-error *ngIf="(f.submitted && bayIdu.invalid)">
+          <p *ngIf="bayIdu.errors.required">Batch Code is
+            <strong>required</strong>
+          </p>
+        </mat-error>
+      </mat-form-field>
+    </div> -->
+    <!-- <div class="form-group">
+        <mat-form-field appearance="standard" class="invisible  example-full-width">
+          <input matInput placeholder="Bay Status" aria-label="State" [(ngModel)]="bayStatusu" name="bayStatusu"
+             autocomplete="off">
+          <mat-error *ngIf="(f.submitted && bayStatusu.invalid)">
+            <p *ngIf="bayIdu.errors.required">Batch Code is
+              <strong>required</strong>
+            </p>
+          </mat-error>
+        </mat-form-field>
+      </div> -->
+   
+  <!-- </div> -->
+  <div class="modal-footer">
+    <button type="submit" mat-raised-button color="primary" class="btm-action-btn">Delete</button>
+    <button type="button" mat-raised-button class="mat-default" color="default" data-dismiss="modal">Cancel</button>
+  </div>
+</form>
+</div>
+</div>
+</div>
+
+
+
+<br><br>
+<div class="mt-item-fields" *ngIf="displayForm">
+<div class="col-md-12 text-center padding-right-40">
+<mat-card>
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && saveForm(f))">
+  <h4 class="mt-item-header text-center text-primary">
+    <b> Add Location Bay </b></h4>
+  <br>
+  <div class="row">
+    <!-- <div class="col-md-2">
+            </div> -->
+    <div class="col-md-3">
+      <div class="form-group">
+        <mat-form-field>
+            <mat-select placeholder="Location Id" [(ngModel)]="locationIdf" name="locationIdf" #qty="ngModel" required>
+                <mat-option *ngFor="let loc of locationIds" [value]="loc" >
+                  {{loc}}
+                </mat-option>
+              </mat-select>
+            <mat-error *ngIf="(f.submitted && qty.invalid)">
+                <p *ngIf="qty.errors.required">Location Id is <strong>required</strong></p>
+              </mat-error>
+
+          <!-- <input matInput placeholder="Location Id" [(ngModel)]="locationIdf" name="locationIdf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Location Id is <strong>required</strong></p>
+            </mat-error> -->
+        </mat-form-field>
+
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Bay Id" [(ngModel)]="bayIdf" name="bayIdf" required #qty="ngModel" required>
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Bay Id is <strong>required</strong></p>
+            </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <!-- <div class="col-md-3">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Bay Desc" [(ngModel)]="bayDescf" name="bayDescf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Bay Desc is <strong>required</strong></p>
+            </mat-error>
+        </mat-form-field>
+      </div>
+    </div> -->
+    <!-- <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Bay Status" [(ngModel)]="bayStatusf" name="bayStatusf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Bay Status is <strong>required</strong></p>
+            </mat-error>
+        </mat-form-field>
+      </div>
+    </div> -->
+    <div class="col-md-1">
+      <div class="form-group">
+        <button mat-raised-button color="primary" class="btm-action-btn">Save</button>
+      </div>
+    </div>
+  </div>
+</form>
+</mat-card>
+</div>
+</div>

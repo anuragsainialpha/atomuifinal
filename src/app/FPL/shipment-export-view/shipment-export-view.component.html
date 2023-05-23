@@ -1,0 +1,406 @@
+<app-loader *ngIf="isLoading">
+</app-loader>
+<div class="container-fluid">
+  <h6><b>Shipment Export View</b>
+    <span class="pull-right refresh-span">
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="Filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+  <div class="clearfix"></div>
+  <div class="manualplan-fields" *ngIf="IsShow">
+    <div class="row">
+      <div class="col-md-11">
+        <div class="row">
+          <div class="col-md-2 pr-0">
+            <mat-form-field>
+              <input matInput [(ngModel)]="model.shipmentId" name="shipment" autocomplete="off"
+                placeholder="Shipment Id"  oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="Source" placeholder="Source" autocomplete="off"
+                  (keyup)="getfilterDestination($event)" autocomplete="off" [matAutocomplete]="sourceAutocomplete"
+                  [(ngModel)]="model.sourceLoc" name="source"  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #sourceAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of sourceList" [value]="list.value">
+                    <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <mat-form-field>
+              <input matInput [(ngModel)]="model.pol" name="polName" autocomplete="off" placeholder="POL"  oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1 pr-0">
+            <mat-form-field>
+              <input matInput [(ngModel)]="model.pod" name="poDName" autocomplete="off" placeholder="POD"  oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1 pr-0">
+            <mat-form-field>
+              <input matInput [(ngModel)]="model.containerNum" name="containerNumb" autocomplete="off"
+                placeholder="Container Number"  oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1 pr-0">
+            <mat-form-field>
+              <input matInput [(ngModel)]="model.customerName" name="customerName" autocomplete="off"
+                placeholder="Customer Name"  oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1 pr-0">
+            <mat-form-field>
+              <input matInput [(ngModel)]="model.forwarder" name="forwarderName" autocomplete="off"
+                placeholder="Forwarder"  oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1 pr-0">
+            <mat-form-field>
+              <input matInput [(ngModel)]="model.cha" name="chaName" autocomplete="off" placeholder="CHA"  oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1 pr-0">
+            <mat-form-field>
+              <input matInput [(ngModel)]="model.piNum" name="piNumber" autocomplete="off" placeholder="PI Number"  oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1 pr-0">
+            <mat-form-field>
+              <input matInput [(ngModel)]="model.sapInvoice" name="SapInvoice" autocomplete="off"
+                placeholder="SAP Invoice"  oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1 pr-0">
+            <mat-form-field>
+              <input matInput [(ngModel)]="model.bookingNum" name="bookingNumb" autocomplete="off"
+                placeholder="Booking Number"  oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-1 text-center">
+        <div class="margin-top-10">
+          <button class="theme-small-button" (click)="exportShippingFilter()" matTooltip="Search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </button>
+          <button class="theme-delete-button" (click)="clearData()" matTooltip="Clear All">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+
+
+  </div>
+  <ngx-datatable #table class='material  ngx-table-custom-scroll ngx-table-tr-custom-scroll' [rows]='shipmentexportdata'
+    [scrollbarH]="true" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="30" [rowHeight]="'auto'"
+    [limit]="page.limit" [count]="page.count" [offset]="page.offset" [externalPaging]="true"
+    (page)="serverSidePagination($event)">
+    <ngx-datatable-column [frozenLeft]="true" name="Shipment Id" [width]="130" [resizeable]="false" [sortable]="true"
+      prop="shipmentId">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.shipmentId | uppercase}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column [frozenLeft]="true" name="Source" [width]="50" [resizeable]="false" [sortable]="true"
+      prop="sourceLoc">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.sourceLoc | uppercase}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column [frozenLeft]="true" name="PI No." [width]="150" [resizeable]="false" [sortable]="true"
+      prop="piNum">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.piNum}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column [frozenLeft]="true" name="Customer Name" [width]="170" [resizeable]="false" [sortable]="true"
+      prop="customerName">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.customerName}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column [frozenLeft]="true" name="Pre Inv No." [width]="150" [resizeable]="false" [sortable]="false"
+      prop="preInvNum">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.preInvNum}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Term of Delivery" [width]="130" [resizeable]="false" [sortable]="true" prop="incoTerm">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.incoTerm}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Term of Payment" [width]="90" [resizeable]="false" [sortable]="true" prop="paymetTerms">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.paymetTerms}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="POL" [width]="130" [resizeable]="false" [sortable]="true" prop="pol">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.pol}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="POD" [width]="130" [resizeable]="false" [sortable]="true" prop="pod">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.pod}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="COFD" [width]="200" [resizeable]="false" [sortable]="true" prop="cofd">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.cofd}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Freight Forwarder" [width]="120" [resizeable]="false" [sortable]="true"
+      prop="forwarder">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.forwarder}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Billing Party" [width]="100" [resizeable]="false" [sortable]="true" prop="billingParty">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.billingParty}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Shipping Line" [width]="120" [resizeable]="false" [sortable]="true" prop="shippingLine">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.shippingLine}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Container Number" [width]="125" [resizeable]="false" [sortable]="true"
+      prop="containerNum">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.containerNum }}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Container Pick up Date" [width]="125" [resizeable]="false" [sortable]="true"
+      prop="countPicDate">
+      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+        <span>{{(row.countPicDate)?(row.countPicDate | customDateFormat | date:'dd-MMM-yyyy'):'' }}</span>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Stuffing/ Billing Date" [width]="150" [resizeable]="false" [sortable]="true"
+      prop="stuffingDate">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.stuffingDate?(row.stuffingDate | customDateFormat | date:'dd-MMM-yyyy'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Booking Num" [width]="125" [resizeable]="false" [sortable]="true" prop="bookingNum">
+      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+        <span>{{row.bookingNum}}</span>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Post Inv No." [width]="150" [resizeable]="false" [sortable]="true" prop="postInvNum">
+      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+        <span>{{row.postInvNum}}</span>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Post Inv No. (SAP Invoice)" [width]="125" [resizeable]="false" [sortable]="true"
+      prop="sapInvoice">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.sapInvoice}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Post Inv Amount" [width]="130" [resizeable]="false" [sortable]="false" prop="invAmount">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.invAmount}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="CHA" [width]="130" [resizeable]="false" [sortable]="true" prop="cha">
+      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+        {{row.cha?row.cha:''}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Planned Vessel Name" [width]="150" [resizeable]="false" [sortable]="true"
+      prop="plannedVessel">
+      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+        {{row.plannedVessel?row.plannedVessel:''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Planned vsl ETD Loadport" [width]="130" [resizeable]="false" [sortable]="true"
+      prop="vesslDepartPolDate">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.vesslDepartPolDate)?(row.vesslDepartPolDate | customDateFormat | date:'dd-MMM-yyyy'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Shipping Bill No." [width]="100" [resizeable]="false" prop="shippingBill"
+      [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.shippingBill}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Shipping Bill Date" [width]="110" [resizeable]="false" [sortable]="true"
+      prop="shippingBillDate">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.shippingBillDate)?(row.shippingBillDate | customDateFormat | date:'dd-MMM-yyyy'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Container Placed at CFS/Buffer" [width]="120" [resizeable]="false" prop="gateInDateCfs"
+      [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.gateInDateCfs)?(row.gateInDateCfs | customDateFormat | date:'dd-MMM-yyyy'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Customs Exams Date" [width]="100" [resizeable]="false" prop="customsExamDate"
+      [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.customsExamDate)?(row.customsExamDate | customDateFormat | date:'dd-MMM-yyyy'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="LEO Date" [width]="90" [resizeable]="false" [sortable]="true" prop="leoDate">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.leoDate)?(row.leoDate | customDateFormat | date:'dd-MMM-yyyy'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Container Moved to Port" [width]="100" [resizeable]="false" [sortable]="true"
+      prop="gateOutDateCgs">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.gateOutDateCgs)?(row.gateOutDateCgs | customDateFormat | date:'dd-MMM-yyyy'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Container Gated in" [width]="100" [resizeable]="false" [sortable]="true"
+      prop="gateInDatePort">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.gateInDatePort)?(row.gateInDatePort | customDateFormat | date:'dd-MMM-yyyy'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Actual Vessel Name" [width]="100" [resizeable]="false" [sortable]="true"
+      prop="actualVessel">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.actualVessel}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Actual Vessel SOB/ ETD Date" [width]="100" [resizeable]="false" [sortable]="true"
+      prop="shipmentOnBordDate">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.shipmentOnBordDate)?(row.shipmentOnBordDate | customDateFormat | date:'dd-MMM-yyyy'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="ETA" [width]="100" [resizeable]="false" [sortable]="true" prop="etaPod">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.etaPod)?(row.etaPod | customDateFormat | date:'dd-MMM-yyyy'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Remarks" [width]="100" [resizeable]="false" [sortable]="true" prop="exportRemarks">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.exportRemarks}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Insert User" [width]="100" [resizeable]="false" [sortable]="true" prop="insertUser">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.insertUser}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Insert Date" [width]="120" [resizeable]="false" [sortable]="true" prop="insertDate">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.insertDate)?(row.insertDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Update User" [width]="100" [resizeable]="false" [sortable]="true" prop="updateUser">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.updateUser}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Update Date" [width]="120" [resizeable]="false" [sortable]="true" prop="updateDate">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{(row.updateDate)?(row.updateDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'):''}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Is Sync OTM" [width]="80" [resizeable]="false" [sortable]="true" prop="isSyncOtm">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.isSyncOtm}}
+      </ng-template>
+    </ngx-datatable-column>
+    <!-- Footer Template starts -->
+    <ngx-datatable-footer>
+      <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+        let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+        <div class="page-count">
+          <span *ngIf="selectedCount">
+            {{selectedCount.toLocaleString()}} Selected |
+          </span>
+          Showing {{(offset * pageSize)+1}} to {{(rowCount>
+          (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+          {{(rowCount)}} records.
+        </div>
+        <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+          [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage"
+          [size]="pageSize" [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)"
+          (change)="table.onFooterPage($event)">
+        </datatable-pager>
+      </ng-template>
+    </ngx-datatable-footer>
+    <!-- Footer Template Ends -->
+  </ngx-datatable>
+
+  <!-- View Loadslips  for coorsponding shipment -->
+  <div class="modal" id="loadslipsModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Loadslip List</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <ul>
+            <li *ngFor="let item of loadslipList;let i=index">
+              <span>
+                {{i+1}})
+                <span class="link" style="margin-left: 10px;margin-right: 50px"
+                  (click)="viewLoadslipnavigation(item)">{{item.loadlipId}}
+                </span>
+                <span>
+                  {{item.type}}
+                </span>
+              </span>
+            </li>
+          </ul>
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- View Loadslips  for coorsponding shipment -->
+  <div class="modal" id="commentModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">{{commentHeader}}</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <p>{{commentMsg}}</p>
+        </div>
+        <!-- Modal footer -->
+      </div>
+    </div>
+  </div>

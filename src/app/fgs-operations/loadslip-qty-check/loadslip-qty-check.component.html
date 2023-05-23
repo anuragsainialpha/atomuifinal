@@ -1,0 +1,41 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header">
+    <b> Loadslip QTY Check</b>
+  </h6>
+  <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [columnMode]="'force'"
+    [headerHeight]="50" [footerHeight]="30" [rowHeight]="'auto'">
+    <ngx-datatable-column name="Load Slip Id" [width]="170" [resizeable]="false" [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <!-- <a (click)="viewDraftLoadSlipData(row)">{{row.loadslipId}}</a> -->
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Load Slip QTY" [width]="170" [resizeable]="false" [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <!-- <a (click)="viewDraftLoadSlipData(row)">{{row.loadslipId}}</a> -->
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Invoice QTY" [width]="170" [resizeable]="false" [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <!-- <a (click)="viewDraftLoadSlipData(row)">{{row.loadslipId}}</a> -->
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="GRN QTY" [width]="170" [resizeable]="false" [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <!-- <a (click)="viewDraftLoadSlipData(row)">{{row.loadslipId}}</a> -->
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="DIT" [width]="170" [resizeable]="false" [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <!-- <a (click)="viewDraftLoadSlipData(row)">{{row.loadslipId}}</a> -->
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Shortage" [width]="170" [resizeable]="false" [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <!-- <a (click)="viewDraftLoadSlipData(row)">{{row.loadslipId}}</a> -->
+      </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+</div>

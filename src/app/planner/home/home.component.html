@@ -1,0 +1,2780 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<!--  *ngIf="!checkShow()" -->
+<div class="container-fluid" *ngIf="!isGateRole()">
+  <div class="row">
+    <div class="col-md-12 ">
+      <div class='box'>
+        <div class="row">
+          <div class="col-md-4">
+            <h5 class="margin-top-10"> Truck Status</h5>
+          </div>
+          <div class="col-md-3 offset-5" *ngIf="checkShow()">
+            <mat-form-field class="locationDropdown">
+              <mat-label>Select Location</mat-label>
+              <mat-select name="locations" [(ngModel)]="location" (ngModelChange)="getTrcukdetails(location)">
+                <mat-option *ngFor="let item of locations" [value]="item">
+                  {{item}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row rounded-box">
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{truckStatusStatics?.reportedTrucksCount?truckStatusStatics?.reportedTrucksCount:0}}</h4>
+
+              </div>
+            </div>
+            <p>Reported &amp; Waiting</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{truckStatusStatics?.gatedInTrucksCount?truckStatusStatics?.gatedInTrucksCount:0}}</h4>
+              </div>
+            </div>
+            <p>Gated - In</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/Loading.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">{{truckStatusStatics?.trucksLoadingIn?truckStatusStatics?.trucksLoadingIn:0}}
+                </h4>
+              </div>
+            </div>
+            <p>In Loading</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(truckStatusStatics?.watingMoreThen3HTrucks)?(truckStatusStatics?.watingMoreThen3HTrucks):0}}</h4>
+
+              </div>
+            </div>
+            <p>Waiting (Gated In/Under Loading) >
+              {{(truckStatusStatics?.excessWaitingTime)?(truckStatusStatics?.excessWaitingTime):'X'}}hrs</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{truckStatusStatics?.excessWaitingLocCount?truckStatusStatics?.excessWaitingLocCount:0}}</h4>
+
+              </div>
+            </div>
+            <p>Reported & Waiting >
+              {{(truckStatusStatics?.excessReportingWaitingTime)?(truckStatusStatics?.excessReportingWaitingTime):'X'}}hrs
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="row" *ngIf="showPlanTables()">
+    <div class="col-md-12">
+      <div class="box">
+        <h5>Open Plans
+          <span class="pull-right">
+            <!-- <button mat-raised-button color="primary">Export to Excel</button> -->
+            <!-- <button class="theme-small-button" (click)="exportOpenPlans()" matTooltip="Export to excel">
+              <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+            </button> -->
+          </span>
+        </h5>
+        <!-- Filter Row Start -->
+        <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="formPicker" placeholder="From Disp Date"
+                  [(ngModel)]="fromDate" name="fromDate" (dateChange)="addEvent('change', $event)">
+                <mat-datepicker-toggle matSuffix [for]="formPicker"></mat-datepicker-toggle>
+                <mat-datepicker #formPicker disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="toPicker" [min]="fromDate" placeholder="To Disp Date"
+                  [(ngModel)]="toDate" name="toDate">
+                <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toPicker [disabled]="!fromDate"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- <div class="col-md-2 pr-0">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Source" (keyup)="getfilterSource($event)" [disabled]="(isSoureDisable()) "
+                autocomplete="off" [matAutocomplete]="sourceOpenPlanAutocomplete" [(ngModel)]="sourceCode" name="source"
+                oninput="this.value = this.value.toUpperCase()">
+              <mat-autocomplete #sourceOpenPlanAutocomplete="matAutocomplete">
+                <mat-option *ngFor="let list of sourceList" [value]="list.value">
+                  <span matTooltip={{list.value}}>{{list.value}} - ({{list.description}})</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div> -->
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Source" [(ngModel)]="sourceCodeOpenPlanList" name="sourceCodeOpenPlanList"
+                  multiple [disabled]="(isSoureDisable()) ">
+                  <mat-option *ngFor="let source of openPlanSourceList" [value]="source">{{source}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination" aria-label="State" [matAutocomplete]="openPlansAutocomplete"
+                  [(ngModel)]="destination" name="destination" (keyup)="getUserSearchData($event)"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #openPlansAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationList" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="MKT Segment" [(ngModel)]="mktsegmentOpenPlan" name="mktsegmentOpenPlan"
+                  multiple>
+                  <!-- <mat-option [value]="">None</mat-option> -->
+                  <mat-option *ngFor="let mktsegment of mktsegmentList" [value]="mktsegment">
+                    {{mktsegment}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Category" [(ngModel)]="materialGroup" name="materialGroup" multiple>
+                  <mat-option *ngFor="let category of categoryList" [value]="category">{{category}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="App Status" [(ngModel)]="appStatuses" name="appStatuses" multiple>
+                  <mat-option *ngFor="let item of appStatusList" [value]="item.value">
+                    {{item.key}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Plan Status" [(ngModel)]="planStatusOpenPlan" name="planStatusOpenPlan">
+                  <mat-option *ngFor="let status of planStatusList" [value]="status">{{status}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class=" col-md-1 ">
+            <div class="search-fileds">
+              <button class="theme-small-button" (click)="searchOpenPlans()" matTooltip="Search">
+                <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)="clearAllOpenPlans()" matTooltip="Clear All">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+        <!-- Filter Row End -->
+
+        <!-- <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>No. Of Tyres</th>
+              <th>Equivalent Truck Count</th>
+              <th>Cumm Tyres</th>
+              <th>Cumm Equi Truck Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{openPlanData.tyreAvailQtySum}}</td>
+              <td>{{openPlanData.tyreTruckCount | number : '1.2-2'}}</td>
+              <td>{{openPlanData.tyreAvailQtySum}}</td>
+              <td>{{openPlanData.tyreTruckCount | number : '1.2-2'}}</td>
+            </tr>
+            <tr>
+              <td colspan="10" class="text-center no-data-row">No data Available</td>
+            </tr>
+          </tbody>
+        </table> -->
+        <div
+          *ngIf="((plansDataDtoList?.length == 0) || (plansDataDtoList?.length > 0 && !plansDataDtoList[0].itemCategory))">
+          <!-- NORMAL Records -->
+          <div class="row rounded-box">
+            <div class="col-md-2 truckstatus-card ">
+              <div class="media p-3">
+                <!-- <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{(plansDataDtoList.length>0 ? (plansDataDtoList[0].totalPlanQty ? plansDataDtoList[0].totalPlanQty : 0) : 0) | number}}
+                  </h5>
+                </div>
+              </div>
+              <p>Plan Qty</p>
+            </div>
+            <div class="col-md-2 truckstatus-card">
+              <div class="media p-3">
+                <!-- <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{(plansDataDtoList.length>0 ? (plansDataDtoList[0].totalAvailQty ? plansDataDtoList[0].totalAvailQty : 0) : 0) | number}}
+                  </h5>
+                </div>
+              </div>
+              <p>Avail Qty</p>
+            </div>
+            <div class="col-md-2 truckstatus-card">
+              <div class="media p-3">
+                <!-- <img src="assets/images/Loading.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{ (plansDataDtoList.length>0 ? (plansDataDtoList[0].totalTotAvailQty ? plansDataDtoList[0].totalTotAvailQty : 0) : 0 )| number}}
+                  </h5>
+                </div>
+              </div>
+              <p>Total Avail Qty</p>
+            </div>
+            <div class="col-md-2 truckstatus-card ">
+              <div class="media p-3">
+                <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{(plansDataDtoList.length>0 ? (plansDataDtoList[0].totalReservedQty ? plansDataDtoList[0].totalReservedQty : 0)  : 0)| number}}
+                  </h5>
+
+                </div>
+              </div>
+              <p>Total Reserved/Loaded Qty</p>
+            </div>
+            <div class="col-md-2 truckstatus-card">
+              <div class="media p-3">
+                <!-- <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{(plansDataDtoList.length>0 ? (plansDataDtoList[0].totalTTE ? plansDataDtoList[0].totalTTE : 0) : 0)| number:'1.2-2'}}
+                  </h5>
+
+                </div>
+              </div>
+              <p>Total TTE</p>
+            </div>
+            <div class="col-md-2 truckstatus-card ">
+              <div class="media p-3">
+                <!-- <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{ (plansDataDtoList.length>0 ? (plansDataDtoList[0].truckCount ? plansDataDtoList[0].truckCount : 0) : 0 )| number:'1.2-2' }}
+                  </h5>
+                </div>
+              </div>
+              <p>Total Truck Count</p>
+            </div>
+          </div>
+          <!-- CUMM Part -->
+          <div class="row rounded-box" style="margin-top:  15px;">
+            <div class="col-md-2 truckstatus-card">
+              <div class="media p-3">
+                <!-- <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{(plansDataDtoList.length>0 ? (plansDataDtoList[0].cummTotalPlanQty ? plansDataDtoList[0].cummTotalPlanQty : 0) : 0) | number}}
+                  </h5>
+                </div>
+              </div>
+              <p>Cumm Qty</p>
+            </div>
+            <div class="col-md-2 truckstatus-card">
+              <div class="media p-3">
+                <!-- <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{(plansDataDtoList.length>0 ? (plansDataDtoList[0].cummTotalAvailQty ? plansDataDtoList[0].cummTotalAvailQty : 0) : 0) | number}}
+                  </h5>
+                </div>
+              </div>
+              <p>Cumm Avail Qty</p>
+            </div>
+            <div class="col-md-2 truckstatus-card">
+              <div class="media p-3">
+                <!-- <img src="assets/images/Loading.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{ (plansDataDtoList.length>0 ? (plansDataDtoList[0].cummTotalTotAvailQty ? plansDataDtoList[0].cummTotalTotAvailQty : 0) : 0 )| number}}
+                  </h5>
+                </div>
+              </div>
+              <p>Cumm Total Avail Qty</p>
+            </div>
+            <div class="col-md-2 truckstatus-card">
+              <div class="media p-3">
+                <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{(plansDataDtoList.length>0 ? (plansDataDtoList[0].cummTotalReservedQty ? plansDataDtoList[0].cummTotalReservedQty : 0)  : 0)| number}}
+                  </h5>
+
+                </div>
+              </div>
+              <p>Cumm Reserved/Loaded Qty</p>
+            </div>
+
+            <div class="col-md-2 truckstatus-card">
+              <div class="media p-3">
+                <!-- <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{(plansDataDtoList.length>0 ? (plansDataDtoList[0].cummTotalTTE ? plansDataDtoList[0].cummTotalTTE : 0) : 0)| number:'1.2-2'}}
+                  </h5>
+
+                </div>
+              </div>
+              <p>Cumm TTE</p>
+            </div>
+            <div class="col-md-2 truckstatus-card">
+              <div class="media p-3">
+                <!-- <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;"> -->
+                <div class="media-body">
+                  <h5 class="text-center">
+                    {{ (plansDataDtoList.length>0 ? (plansDataDtoList[0].cummTruckCount ? plansDataDtoList[0].cummTruckCount : 0) : 0 )| number:'1.2-2'}}
+                  </h5>
+                </div>
+              </div>
+              <p>Cumm Truck Count</p>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="(plansDataDtoList?.length > 0 && plansDataDtoList[0].itemCategory)">
+          <ngx-datatable class='material' [rows]='plansDataDtoList' [columnMode]="'force'" [headerHeight]="50"
+            [scrollbarH]="flase" [footerHeight]="30" [rowHeight]="'auto'" [summaryRow]="true" [summaryHeight]="'auto'"
+            [summaryPosition]="'bottom'" [scrollbarH]="true">
+            <ngx-datatable-column name="Item Category" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="itemCategory">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.itemCategory}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Plan Qty" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="totalPlanQty" [summaryTemplate]="totalPlanQty">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalPlanQty ? row.totalPlanQty : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Avail Qty" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="totalAvailQty" [summaryTemplate]="totalAvailQty">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalAvailQty? row.totalAvailQty : 0 ) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total Avail Qty" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="totalTotAvailQty" [summaryTemplate]="totalTotAvailQty">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalTotAvailQty ? row.totalTotAvailQty : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total Reserved/Loaded Qty" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="totalReservedQty" [summaryTemplate]="totalReservedQty">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalReservedQty ? row.totalReservedQty : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total TTE" [width]="200" [resizeable]="false" [sortable]="true" prop="totalTTE"
+              [summaryTemplate]="totalTTE">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalTTE ? row.totalTTE : 0) | number:'1.2-2'}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total Truck Count" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="truckCount" [summaryTemplate]="truckCount">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.truckCount? row.truckCount : 0 ) | number:'1.2-2'}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Qty" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalPlanQty" [summaryTemplate]="cummTotalPlanQty">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalPlanQty ? row.cummTotalPlanQty : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Avail Qty" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalAvailQty" [summaryTemplate]="cummTotalAvailQty">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalAvailQty? row.cummTotalAvailQty : 0 ) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Total Avail Qty" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalTotAvailQty" [summaryTemplate]="cummTotalTotAvailQty">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalTotAvailQty ? row.cummTotalTotAvailQty : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Reserved/Loaded Qty" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalReservedQty" [summaryTemplate]="cummTotalReservedQty">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalReservedQty ? row.cummTotalReservedQty : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm TTE" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalTTE" [summaryTemplate]="cummTotalTTE">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalTTE ? row.cummTotalTTE : 0) | number:'1.2-2'}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Truck Count" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTruckCount" [summaryTemplate]="cummTruckCount">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTruckCount? row.cummTruckCount : 0 ) | number:'1.2-2'}}
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+          <!-- Table bottom grid columns -->
+          <ng-template #totalPlanQty>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(totalPlanQtySum)?(totalPlanQtySum | number):0 | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalAvailQty>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(totalAvailQtySum ? totalAvailQtySum : 0) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalTotAvailQty>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(totalTotAvailQtySum ? totalTotAvailQtySum : 0) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalReservedQty>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(totalReservedQtySum ? totalReservedQtySum : 0 ) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalTTE>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(totalTTESum ? totalTTESum : 0) | number:'1.2-2'}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+
+          <ng-template #truckCount>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(truckCountSum ? truckCountSum : 0) | number:'1.2-2'}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalPlanQty>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummTotalPlanQtySum)?(cummTotalPlanQtySum | number):0 | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalAvailQty>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummTotalAvailQtySum ? cummTotalAvailQtySum : 0) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalTotAvailQty>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummTotalTotAvailQtySum ? cummTotalTotAvailQtySum : 0) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalReservedQty>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummTotalReservedQtySum ? cummTotalReservedQtySum : 0 ) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalTTE>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummTotalTTESum ? cummTotalTTESum : 0) | number:'1.2-2'}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTruckCount>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummTruckCountSum ? cummTruckCountSum : 0) | number:'1.2-2'}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ROW 1 OPEN PLANS END -->
+  <!-- DISPATCH PLAN START -->
+
+  <div class="row" *ngIf="showPlanTables()">
+    <div class="col-md-12">
+      <div class="box">
+        <h5>Dispatch Plans
+          <span class="pull-right">
+            <!-- <button mat-raised-button color="primary">Export to Excel</button> -->
+            <!-- <button class="theme-small-button" (click)="exportOpenPlans()" matTooltip="Export to excel">
+              <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+            </button> -->
+          </span>
+        </h5>
+        <!-- Filter Row Start -->
+        <div class="row">
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="formDispatchPlanPicker" placeholder="From Disp Date"
+                  [(ngModel)]="fromDateDispatchPlan" name="fromDateDispatchPlan"
+                  (dateChange)="addEventDispatchPlan('change', $event)">
+                <mat-datepicker-toggle matSuffix [for]="formDispatchPlanPicker"></mat-datepicker-toggle>
+                <mat-datepicker #formDispatchPlanPicker disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="toDispatchPlanPicker" [min]="fromDateDispatchPlan"
+                  placeholder="To Disp Date" [(ngModel)]="toDateDispatchPlan" name="toDateDispatchPlan">
+                <mat-datepicker-toggle matSuffix [for]="toDispatchPlanPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toDispatchPlanPicker [disabled]="!fromDateDispatchPlan"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- <div class="col-md-2 pr-0">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Source" (keyup)="getfilterSourceDispatchPlan($event)" [disabled]="(isSoureDisable()) "
+                autocomplete="off" [matAutocomplete]="sourceDispatchPlanAutocomplete" [(ngModel)]="sourceCodeDispatchPlan" name="sourceDispatchPlan"
+                oninput="this.value = this.value.toUpperCase()">
+              <mat-autocomplete #sourceDispatchPlanAutocomplete="matAutocomplete">
+                <mat-option *ngFor="let list of sourceListDispatchPlan" [value]="list.value">
+                  <span matTooltip={{list.value}}>{{list.value}} - ({{list.description}})</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div> -->
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Source" [(ngModel)]="sourceCodeDispatchPlanList"
+                  name="sourceCodeDispatchPlanList" multiple [disabled]="(isSoureDisable()) ">
+                  <mat-option *ngFor="let source of openPlanSourceList" [value]="source">{{source}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination" aria-label="State"
+                  [matAutocomplete]="dispatchPlanAutocomplete" [(ngModel)]="destinationDispatchPlan"
+                  name="destinationDispatchPlan" (keyup)="getUserSearchDataDispatchPlan($event)"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #dispatchPlanAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationListDispatchPlan" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="MKT Segment" [(ngModel)]="mktsegmentDispatchPlan" name="mktsegmentDispatchPlan"
+                  multiple>
+                  <!-- <mat-option [value]="">None</mat-option> -->
+                  <mat-option *ngFor="let mktsegment of mktsegmentList" [value]="mktsegment">
+                    {{mktsegment}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Category" [(ngModel)]="materialGroupDispatchPlan"
+                  name="materialGroupDispatchPlan" multiple>
+                  <mat-option *ngFor="let category of categoryList" [value]="category">{{category}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Plan Status" [(ngModel)]="planStatusDispatchPlan"
+                  name="planStatusDispatchPlan">
+                  <mat-option *ngFor="let status of planStatusList" [value]="status">{{status}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class=" col-md-1 ">
+            <div class="search-fileds">
+              <button class="theme-small-button" (click)="searchDispatchPlan()" matTooltip="Search">
+                <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)="clearAllDispatchPlan()" matTooltip="Clear All">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Filter Row End -->
+
+        <!-- <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>No. Of Tyres</th>
+              <th>Equivalent Truck Count</th>
+              <th>Cumm Tyres</th>
+              <th>Cumm Equi Truck Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{openPlanData.tyreAvailQtySum}}</td>
+              <td>{{openPlanData.tyreTruckCount | number : '1.2-2'}}</td>
+              <td>{{openPlanData.tyreAvailQtySum}}</td>
+              <td>{{openPlanData.tyreTruckCount | number : '1.2-2'}}</td>
+            </tr>
+            <tr>
+              <td colspan="10" class="text-center no-data-row">No data Available</td>
+            </tr>
+          </tbody>
+        </table> -->
+        <div class="row rounded-box"
+          *ngIf="((dispatchPlansDtoList?.length == 0) || (dispatchPlansDtoList?.length > 0 && !dispatchPlansDtoList[0].itemCategory))">
+          <div class="col-md-2 truckstatus-card ">
+            <div class="media p-3">
+              <!-- <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(dispatchPlansDtoList.length>0 ? (dispatchPlansDtoList[0].totalDispatchedQty ? dispatchPlansDtoList[0].totalDispatchedQty : 0) : 0) | number}}
+                </h4>
+              </div>
+            </div>
+            <p>Total Disp Qty</p>
+          </div>
+          <div class="col-md-2 truckstatus-card">
+            <div class="media p-3">
+              <!-- <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(dispatchPlansDtoList.length>0 ? (dispatchPlansDtoList[0].totalTTE ? dispatchPlansDtoList[0].totalTTE : 0) : 0) | number:'1.2-2'}}
+                </h4>
+              </div>
+            </div>
+            <p>Disp TTE</p>
+          </div>
+          <div class="col-md-2 truckstatus-card">
+            <div class="media p-3">
+              <!-- <img src="assets/images/Loading.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{ (dispatchPlansDtoList.length>0 ? (dispatchPlansDtoList[0].truckCount ? dispatchPlansDtoList[0].truckCount : 0) : 0 )| number:'1.2-2'}}
+                </h4>
+              </div>
+            </div>
+            <p>Disp Truck Count</p>
+          </div>
+          <div class="col-md-2 truckstatus-card ">
+            <div class="media p-3">
+              <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(dispatchPlansDtoList.length>0 ? (dispatchPlansDtoList[0].cummTotalDispatchedQty ? dispatchPlansDtoList[0].cummTotalDispatchedQty : 0)  : 0)| number}}
+                </h4>
+
+              </div>
+            </div>
+            <p>Cumm Disp Qty</p>
+          </div>
+          <div class="col-md-2 truckstatus-card">
+            <div class="media p-3">
+              <!-- <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(dispatchPlansDtoList.length>0 ? (dispatchPlansDtoList[0].cummTotalTTE ? dispatchPlansDtoList[0].cummTotalTTE : 0) : 0)| number:'1.2-2'}}
+                </h4>
+
+              </div>
+            </div>
+            <p>Cumm Disp TTE</p>
+          </div>
+          <div class="col-md-2 truckstatus-card ">
+            <div class="media p-3">
+              <!-- <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{ (dispatchPlansDtoList.length>0 ? (dispatchPlansDtoList[0].cummTruckCount ? dispatchPlansDtoList[0].cummTruckCount : 0) : 0 )| number:'1.2-2' }}
+                </h4>
+              </div>
+            </div>
+            <p>Cumm Disp Truck Count</p>
+          </div>
+
+        </div>
+        <div *ngIf="(dispatchPlansDtoList?.length > 0 && dispatchPlansDtoList[0].itemCategory)">
+          <ngx-datatable class='material' [rows]='dispatchPlansDtoList' [columnMode]="'force'" [headerHeight]="50"
+            [scrollbarH]="false" [footerHeight]="30" [rowHeight]="'auto'" [summaryRow]="true" [summaryHeight]="'auto'"
+            [summaryPosition]="'bottom'" [scrollbarH]="true">
+            <ngx-datatable-column name="Item Category" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="itemCategory">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.itemCategory}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total Disp Qty" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="totalDispatchedQty" [summaryTemplate]="totalDispatchedQty">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalDispatchedQty ? row.totalDispatchedQty : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Disp TTE" [width]="200" [resizeable]="false" [sortable]="true" prop="totalTTE"
+              [summaryTemplate]="totalTTE">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalTTE ? row.totalTTE : 0) | number:'1.2-2'}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Disp Truck Count" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="truckCount" [summaryTemplate]="truckCount">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.truckCount? row.truckCount : 0 ) | number:'1.2-2'}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Disp Qty" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalDispatchedQty" [summaryTemplate]="cummTotalDispatchedQty">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalDispatchedQty ? row.cummTotalDispatchedQty : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Disp TTE" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalTTE" [summaryTemplate]="cummTotalTTE">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalTTE ? row.cummTotalTTE : 0) | number:'1.2-2'}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Disp Truck Count" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTruckCount" [summaryTemplate]="cummTruckCount">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTruckCount? row.cummTruckCount : 0 ) | number:'1.2-2'}}
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+          <!-- Table bottom grid columns -->
+          <ng-template #totalDispatchedQty>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(totalDispatchQtySum)?(totalDispatchQtySum | number):0 | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalTTE>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(totalDispTTESum ? totalDispTTESum : 0) | number:'1.2-2'}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+
+          <ng-template #truckCount>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(truckDispCountSum ? truckDispCountSum : 0) | number:'1.2-2'}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalDispatchedQty>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummTotalDispatchQtySum)?(cummTotalDispatchQtySum | number):0 | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalTTE>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummTotalDispTTESum ? cummTotalDispTTESum : 0) | number:'1.2-2'}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTruckCount>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummTruckDispCountSum ? cummTruckDispCountSum : 0) | number:'1.2-2'}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISPATCH PLAN END -->
+  <!-- Row 2 Start INDENT STATUS -->
+  <div class="row">
+
+    <div class="col-md-12">
+      <div class="box">
+        <h5>Indent Status
+          <span class="pull-right">
+            <!-- <button mat-raised-button color="primary">Export to Excel</button> -->
+            <!-- <button class="theme-small-button" (click)="exportIndentStatus()" matTooltip="Export to excel">
+              <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+            </button> -->
+          </span>
+        </h5>
+        <!-- Filter Row Start -->
+        <div class="row">
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="formIndStatusPicker" placeholder="From Disp Date"
+                  [(ngModel)]="fromDateIndStatus" name="fromDateIndStatus"
+                  (dateChange)="addEventIndStatus('change', $event)">
+                <mat-datepicker-toggle matSuffix [for]="formIndStatusPicker"></mat-datepicker-toggle>
+                <mat-datepicker #formIndStatusPicker disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="toIndStatusPicker" [min]="fromDateIndStatus"
+                  placeholder="To Disp Date" [(ngModel)]="toDateIndStatus" name="toDateIndStatus">
+                <mat-datepicker-toggle matSuffix [for]="toIndStatusPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toIndStatusPicker [disabled]="!fromDateIndStatus"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <mat-form-field class="example-full-width">
+              <!-- Source Input editble for DP_REP role & for external wareHouses -->
+              <input matInput placeholder="Source" (keyup)="getfilterSourceIndStatus($event)"
+                [disabled]="(isSoureDisable() || service.CheckExtWareHouse()) " autocomplete="off"
+                [matAutocomplete]="sourceIndentStatusAutocomplete" [(ngModel)]="sourceCodeIndStatus"
+                name="sourceCodeIndStatus" oninput="this.value = this.value.toUpperCase()">
+              <mat-autocomplete #sourceIndentStatusAutocomplete="matAutocomplete">
+                <mat-option *ngFor="let list of sourceListIndStatus" [value]="list.value">
+                  <span matTooltip={{list.value}}>{{list.value}} - ({{list.description}})</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination" aria-label="State" [matAutocomplete]="statesAutocomplete"
+                  [(ngModel)]="destinationIndStatus" name="destinationIndStatus"
+                  (keyup)="getUserSearchDataIndStatus($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #statesAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationListIndStatus" [value]="list.value">
+                    <span>{{list.value}} - ({{list.description}})</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="Transporter" placeholder="Transporter"
+                  (keyup)="getfilterTransporterIndStatus($event)" autocomplete="off"
+                  [matAutocomplete]="transporterAutocomplete" [(ngModel)]="transporterIndStatus"
+                  name="transporterIndStatus" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #transporterAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of transporterListIndStatus" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div> -->
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="Transporter" [(ngModel)]="transportersIndStatus" name="transportersIndStatus"
+                  multiple>
+                  <mat-option *ngFor="let trans of transporterList" [value]="trans"> {{trans}} </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="Truck/Container Type" [(ngModel)]="truckType" name="trcktype" multiple>
+                  <mat-option *ngFor="let truck of truckList" [value]="truck.value"> {{truck.value}} </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Category" [(ngModel)]="materialGroupIndentStatus"
+                  name="materialGroupIndentStatus" multiple>
+                  <mat-option *ngFor="let category of categoryListIndentStatus" [value]="category">{{category}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class=" col-md-1 ">
+            <div class="search-fileds">
+              <button class="theme-small-button" (click)="searchIndStatus()" matTooltip="Search">
+                <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)="clearAllIndStatus()" matTooltip="Clear All">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Filter Row End -->
+        <!-- <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Destination</th>
+              <th>Planned TTE</th>
+              <th>Indented TTE</th>
+              <th>Balance TTE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of secondPlanData;let i=index">
+              <td>{{data.destination}}</td>
+              <td>{{data.plannedTTE}}</td>
+              <td>{{data.indentedTTE}}</td>
+              <td>{{data.balancedTTE}}</td>
+            </tr>
+            <tr>
+              <td *ngIf="secondPlanData.length == 0" colspan="10" class="text-center no-data-row">No data Available</td>
+            </tr>
+          </tbody>
+        </table> -->
+        <div class="row rounded-box"
+          *ngIf="((indentStatusDtoList?.length == 0) || (indentStatusDtoList?.length > 0 && !indentStatusDtoList[0].itemCategory))">
+          <div class="col-lg-6 col-md-12 truckstatus-card custom-bootstrap-grid">
+            <div class="row">
+              <div class="col-md-3 ">
+                <div class="media p-3">
+                  <!-- <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;"> -->
+                  <div class="media-body">
+                    <h4 class="text-center">
+                      {{(indentStatusDtoList.length>0 ? (indentStatusDtoList[0].totalNetIndented ? indentStatusDtoList[0].totalNetIndented : 0) : 0) | number}}
+                    </h4>
+                  </div>
+                </div>
+                <p>Total Indented</p>
+              </div>
+              <div class="col-md-3 ">
+                <div class="media p-3">
+                  <!-- <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;"> -->
+                  <div class="media-body">
+                    <h4 class="text-center">
+                      {{(indentStatusDtoList.length>0 ? (indentStatusDtoList[0].totalReported ? indentStatusDtoList[0].totalReported : 0) : 0) | number}}
+                    </h4>
+                  </div>
+                </div>
+                <p>Total Reported</p>
+              </div>
+              <div class="col-md-3 ">
+                <div class="media p-3">
+                  <!-- <img src="assets/images/Loading.svg" class="img img-fluid" style="width:30px;"> -->
+                  <div class="media-body">
+                    <h4 class="text-center">
+                      {{ (indentStatusDtoList.length>0 ? (indentStatusDtoList[0].totalRejected ? indentStatusDtoList[0].totalRejected : 0) : 0 )| number}}
+                    </h4>
+                  </div>
+                </div>
+                <p>Total Rejected</p>
+              </div>
+              <div class="col-md-3 br-1">
+                <div class="media p-3">
+                  <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+                  <div class="media-body">
+                    <h4 class="text-center">
+                      {{(indentStatusDtoList.length>0 ? (indentStatusDtoList[0].totalNetBalance ? indentStatusDtoList[0].totalNetBalance : 0)  : 0)| number}}
+                    </h4>
+
+                  </div>
+                </div>
+                <p>Total Net Balance</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-12 truckstatus-card custom-bootstrap-grid">
+            <div class="row">
+              <div class="col-md-3 ">
+                <div class="media p-3">
+                  <!-- <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;"> -->
+                  <div class="media-body">
+                    <h4 class="text-center">
+                      {{(indentStatusDtoList.length>0 ? (indentStatusDtoList[0].cummTotalNetIndented ? indentStatusDtoList[0].cummTotalNetIndented : 0) : 0)| number}}
+                    </h4>
+
+                  </div>
+                </div>
+                <p>Cumm Total Indented</p>
+              </div>
+              <div class="col-md-3 ">
+                <div class="media p-3">
+                  <!-- <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;"> -->
+                  <div class="media-body">
+                    <h4 class="text-center">
+                      {{ (indentStatusDtoList.length>0 ? (indentStatusDtoList[0].cummTotalReported ? indentStatusDtoList[0].cummTotalReported : 0) : 0 )| number}}
+                    </h4>
+                  </div>
+                </div>
+                <p>Cumm Total Reported</p>
+              </div>
+              <div class="col-md-3 ">
+                <div class="media p-3">
+                  <!-- <img src="assets/images/Loading.svg" class="img img-fluid" style="width:30px;"> -->
+                  <div class="media-body">
+                    <h4 class="text-center">
+                      {{ (indentStatusDtoList.length>0 ? (indentStatusDtoList[0].cummTotalRejected ? indentStatusDtoList[0].cummTotalRejected : 0) : 0) | number}}
+                    </h4>
+                  </div>
+                </div>
+                <p>Cumm Total Rejected</p>
+              </div>
+              <div class="col-md-3 ">
+                <div class="media p-3">
+                  <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+                  <div class="media-body">
+                    <h4 class="text-center">
+                      {{(indentStatusDtoList.length>0 ? (indentStatusDtoList[0].cummTotalNetBalance ? indentStatusDtoList[0].cummTotalNetBalance : 0) : 0) | number}}
+                    </h4>
+
+                  </div>
+                </div>
+                <p>Cumm Total Net Balance</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="(indentStatusDtoList?.length > 0 && indentStatusDtoList[0].itemCategory)">
+          <ngx-datatable class='material' [rows]='indentStatusDtoList' [columnMode]="'force'" [headerHeight]="50"
+            [scrollbarH]="flase" [footerHeight]="30" [rowHeight]="'auto'" [summaryRow]="true" [summaryHeight]="'auto'"
+            [summaryPosition]="'bottom'" [scrollbarH]="true">
+            <ngx-datatable-column name="Item Category" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="itemCategory">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.itemCategory}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total Indented" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="totalNetIndented" [summaryTemplate]="totalNetIndented">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalNetIndented ? row.totalNetIndented : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total Reported" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="totalReported" [summaryTemplate]="totalReported">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalReported? row.totalReported : 0 ) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total Rejected" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="totalRejected" [summaryTemplate]="totalRejected">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalRejected ? row.totalRejected : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Net Balance" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="totalNetBalance" [summaryTemplate]="totalNetBalance">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalNetBalance ? row.totalNetBalance : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Total Indented" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalNetIndented" [summaryTemplate]="cummTotalNetIndented">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalNetIndented ? row.cummTotalNetIndented : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Total Reported" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalReported" [summaryTemplate]="cummTotalReported">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalReported? row.cummTotalReported : 0 ) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Total Rejected" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalRejected" [summaryTemplate]="cummTotalRejected">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalRejected ? row.cummTotalRejected : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Net Balance" [width]="200" [resizeable]="false" [sortable]="true"
+              prop="cummTotalNetBalance" [summaryTemplate]="cummTotalNetBalance">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalNetBalance ? row.cummTotalNetBalance : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+          <!-- Table bottom grid columns -->
+          <ng-template #totalNetIndented>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(indentedSum)?(indentedSum | number):0 | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalReported>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(reportedSum ? reportedSum : 0) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalRejected>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(rejectedSum ? rejectedSum : 0) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalNetBalance>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(balanceSum ? balanceSum : 0 ) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalNetIndented>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummIndentedSum ? cummIndentedSum : 0) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalReported>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummReportedSum ? cummReportedSum : 0) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalRejected>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummRejectedSum ? cummRejectedSum : 0) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalNetBalance>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummBalanceSum ? cummBalanceSum : 0 ) | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ROW 2 END -->
+  <!-- ROW 3 START PLACEMENT STATUS -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box">
+        <h5>Placement Status
+          <span class="pull-right">
+            <!-- <button mat-raised-button color="primary">Export to Excel</button> -->
+            <!-- <button class="theme-small-button" (click)="exportIndentStatus()" matTooltip="Export to excel">
+              <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+            </button> -->
+          </span>
+        </h5>
+        <!-- Filter Row Start -->
+        <div class="row">
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="formPlacementPicker" placeholder="From Disp Date"
+                  [(ngModel)]="fromDatePlacement" name="fromDatePlacement"
+                  (dateChange)="addEventPlacement('change', $event)">
+                <mat-datepicker-toggle matSuffix [for]="formPlacementPicker"></mat-datepicker-toggle>
+                <mat-datepicker #formPlacementPicker disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="toPlacementPicker" [min]="fromDatePlacement"
+                  placeholder="To Disp Date" [(ngModel)]="toDatePlacement" name="toDatePlacement">
+                <mat-datepicker-toggle matSuffix [for]="toPlacementPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toPlacementPicker [disabled]="!fromDatePlacement"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <mat-form-field class="example-full-width">
+              <!-- Source Input editble for DP_REP role & for external wareHouses -->
+              <input matInput placeholder="Source" (keyup)="getfilterSourcePlacement($event)"
+                [disabled]="(isSoureDisable() || service.CheckExtWareHouse()) " autocomplete="off"
+                [matAutocomplete]="sourcePlacementAutocomplete" [(ngModel)]="sourceCodePlacement"
+                name="sourceCodePlacement" oninput="this.value = this.value.toUpperCase()">
+              <mat-autocomplete #sourcePlacementAutocomplete="matAutocomplete">
+                <mat-option *ngFor="let list of sourceListPlacement" [value]="list.value">
+                  <span matTooltip={{list.value}}>{{list.value}} - ({{list.description}})</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination" aria-label="State"
+                  [matAutocomplete]="statesPlacementAutocomplete" [(ngModel)]="destinationPlacement"
+                  name="destinationPlacement" (keyup)="getUserSearchDataPlacement($event)"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #statesPlacementAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationListPlacement" [value]="list.value">
+                    <span>{{list.value}} - ({{list.description}})</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="Transporter" placeholder="Transporter"
+                  (keyup)="getfilterTransporterPlacement($event)" autocomplete="off"
+                  [matAutocomplete]="transporterPlacementAutocomplete" [(ngModel)]="transporterPlacement"
+                  name="transporterPlacement" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #transporterPlacementAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of transporterListPlacement" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div> -->
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="Transporter" [(ngModel)]="transportersPlacementStatus"
+                  name="transportersPlacementStatus" multiple>
+                  <mat-option *ngFor="let trans of transporterList" [value]="trans"> {{trans}} </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="Truck/Container Type" [(ngModel)]="truckTypePlacement" name="trcktypePlacement"
+                  multiple>
+                  <mat-option *ngFor="let truck of truckListPlacement" [value]="truck.value"> {{truck.value}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Category" [(ngModel)]="materialGroupPlacement" name="materialGroupPlacement"
+                  multiple>
+                  <mat-option *ngFor="let category of categoryListPlacement" [value]="category">{{category}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class=" col-md-1 ">
+            <div class="search-fileds">
+              <button class="theme-small-button" (click)="searchPlacement()" matTooltip="Search">
+                <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)="clearAllPlacement()" matTooltip="Clear All">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Filter Row End -->
+        <!-- <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Destination</th>
+              <th>Planned TTE</th>
+              <th>Indented TTE</th>
+              <th>Balance TTE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of secondPlanData;let i=index">
+              <td>{{data.destination}}</td>
+              <td>{{data.plannedTTE}}</td>
+              <td>{{data.indentedTTE}}</td>
+              <td>{{data.balancedTTE}}</td>
+            </tr>
+            <tr>
+              <td *ngIf="secondPlanData.length == 0" colspan="10" class="text-center no-data-row">No data Available</td>
+            </tr>
+          </tbody>
+        </table> -->
+        <div class="row rounded-box"
+          *ngIf="((indentStatusDtoList.length == 0) || (placementStatusDtoList?.length > 0 && !placementStatusDtoList[0].itemCategory))">
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].totalNetIndented ? placementStatusDtoList[0].totalNetIndented : 0) : 0) | number}}
+                </h4>
+
+              </div>
+            </div>
+            <p>Total Indented</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].totalReported ? placementStatusDtoList[0].totalReported : 0) : 0) | number}}
+                </h4>
+              </div>
+            </div>
+            <p>Total Reported</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/Loading.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].totalRejected ? placementStatusDtoList[0].totalRejected : 0) : 0 )| number}}
+                </h4>
+              </div>
+            </div>
+            <p>Total Rejected</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].totalNetBalance ? placementStatusDtoList[0].totalNetBalance : 0) :0) | number}}
+                </h4>
+
+              </div>
+            </div>
+            <p>Total Net Balance</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].totalNetPlaced  ? placementStatusDtoList[0].totalNetPlaced : 0) :0 )| number}}
+                </h4>
+
+              </div>
+            </div>
+            <p>Total Net Placed</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].placementPercentage ? placementStatusDtoList[0].placementPercentage : 0 ) :0)  | number:'1.2-2'}}
+                </h4>
+
+              </div>
+            </div>
+            <p>Placement %</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? ( placementStatusDtoList[0].cummTotalNetIndented ? placementStatusDtoList[0].cummTotalNetIndented : 0) : 0) | number}}
+                </h4>
+
+              </div>
+            </div>
+            <p>Cumm Indented</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].cummTotalReported ? placementStatusDtoList[0].cummTotalReported : 0) : 0) | number}}
+                </h4>
+              </div>
+            </div>
+            <p>Cumm Reported</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/Loading.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].cummTotalRejected  ? placementStatusDtoList[0].cummTotalRejected : 0) : 0 )| number}}
+                </h4>
+              </div>
+            </div>
+            <p>Cumm Rejected</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].cummTotalNetBalance ? placementStatusDtoList[0].cummTotalNetBalance : 0) : 0) | number}}
+                </h4>
+
+              </div>
+            </div>
+            <p>Cumm Net Balance</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].cummTotalNetPlaced ? placementStatusDtoList[0].cummTotalNetPlaced : 0) :0) | number}}
+                </h4>
+
+              </div>
+            </div>
+            <p>Cumm Net Placed</p>
+          </div>
+          <div class="col-lg-1 col-md-2 truckstatus-card custom-bootstrap-grid">
+            <div class="media p-3">
+              <!-- <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;"> -->
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(placementStatusDtoList.length>0 ? (placementStatusDtoList[0].cummPlacementPercentage ? placementStatusDtoList[0].cummPlacementPercentage : 0 )  : 0 ) | number:'1.2-2'}}
+                </h4>
+
+              </div>
+            </div>
+            <p>Cumm Placement %</p>
+          </div>
+        </div>
+        <div *ngIf="(placementStatusDtoList?.length > 0 && placementStatusDtoList[0].itemCategory)">
+          <ngx-datatable class='material' [rows]='placementStatusDtoList' [columnMode]="'force'" [headerHeight]="50"
+            [scrollbarH]="false" [footerHeight]="30" [rowHeight]="'auto'" [summaryRow]="true" [summaryHeight]="'auto'"
+            [summaryPosition]="'bottom'" [scrollbarH]="true">
+            <ngx-datatable-column name="Item Category" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="itemCategory">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.itemCategory}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total Indented" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="totalNetIndented" [summaryTemplate]="totalNetIndentedPlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalNetIndented ? row.totalNetIndented : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total Reported" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="totalReported" [summaryTemplate]="totalReportedPlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalReported? row.totalReported : 0 ) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Total Rejected" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="totalRejected" [summaryTemplate]="totalRejectedPlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalRejected ? row.totalRejected : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Net Balance" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="totalNetBalance" [summaryTemplate]="totalNetBalancePlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalNetBalance ? row.totalNetBalance : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Net Plced" [width]="150" [resizeable]="false" [sortable]="true" prop="netPlaced"
+              [summaryTemplate]="netPlacedPlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.totalNetPlaced ? row.totalNetPlaced : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Placement %" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="placementPercentage" [summaryTemplate]="placementPercentagePlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.placementPercentage ? row.placementPercentage : 0) | number : '1.2-2'}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Total Indented" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="cummTotalNetIndented" [summaryTemplate]="cummTotalNetIndentedPlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalNetIndented ? row.cummTotalNetIndented : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Total Reported" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="cummTotalReported" [summaryTemplate]="cummTotalReportedPlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalReported? row.cummTotalReported : 0 ) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Total Rejected" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="cummTotalRejected" [summaryTemplate]="cummTotalRejectedPlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalRejected ? row.cummTotalRejected : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Net Balance" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="cummTotalNetBalance" [summaryTemplate]="cummTotalNetBalancePlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalNetBalance ? row.cummTotalNetBalance : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Net Plced" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="cummNetPlaced" [summaryTemplate]="cummNetPlacedPlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummTotalNetPlaced ? row.cummTotalNetPlaced : 0) | number}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Cumm Placement %" [width]="150" [resizeable]="false" [sortable]="true"
+              prop="cummPlacementPercentage" [summaryTemplate]="cummPlacementPercentagePlacement">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{(row.cummPlacementPercentage ? row.cummPlacementPercentage : 0) | number : '1.2-2'}}
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+          <!-- Table bottom grid columns -->
+          <ng-template #totalNetIndentedPlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(indentedSumPlacement)?(indentedSumPlacement | number):0}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalReportedPlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(reportedSumPlacement ? reportedSumPlacement : 0)  | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalRejectedPlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(rejectedSumPlacement ? rejectedSumPlacement : 0)  | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #totalNetBalancePlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(balanceSumPlacement ? balanceSumPlacement : 0)  | number }}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #netPlacedPlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(netPlacedSum ? netPlacedSum : 0 )  | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #placementPercentagePlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{placementPercentageSum ? (placementPercentageSum | number: '1.2-2') : 0 }}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalNetIndentedPlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummIndentedSumPlacement ? cummIndentedSumPlacement : 0)  | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalReportedPlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummReportedSumPlacement ? cummReportedSumPlacement : 0)  | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalRejectedPlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummRejectedSumPlacement ? cummRejectedSumPlacement : 0)  | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummTotalNetBalancePlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummBalanceSumPlacement ? cummBalanceSumPlacement : 0)  | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummNetPlacedPlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{(cummNetPlacedSum ? cummNetPlacedSum : 0)  | number}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #cummPlacementPercentagePlacement>
+            <div class="name-container">
+              <div class="chip">
+                <span class="chip-content">
+                  {{cummPlacementPercentageSum ? (cummPlacementPercentageSum | number: '1.2-2') : 0}}
+                </span>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ROW 3 END -->
+  <!-- ROW 4 START UNRATED SHIPMENT -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box">
+        <h5>Unrated Shipments
+          <span class="pull-right">
+            <!-- <button mat-raised-button color="primary">Export to Excel</button> -->
+            <!-- <button class="theme-small-button" (click) = "exportIndentStatus()" matTooltip="Export to excel">
+            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+          </button> -->
+          </span>
+        </h5>
+        <!-- Filter Row Start -->
+        <div class="row">
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="formShipmentStatusPicker" placeholder="From Insert Date"
+                  [(ngModel)]="fromDateShipmentStatus" name="fromDateShipmentStatus"
+                  (dateChange)="addEventShipmentStatus('change', $event)">
+                <mat-datepicker-toggle matSuffix [for]="formShipmentStatusPicker"></mat-datepicker-toggle>
+                <mat-datepicker #formShipmentStatusPicker disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="toShipmentStatusPicker" [min]="fromDateShipmentStatus"
+                  placeholder="To Insert Date" [(ngModel)]="toDateShipmentStatus" name="toDateShipmentStatus">
+                <mat-datepicker-toggle matSuffix [for]="toShipmentStatusPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toShipmentStatusPicker [disabled]="!fromDateShipmentStatus"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Source" [(ngModel)]="sourceCodeShipmentStatuses"
+                  name="sourceCodeShipmentStatuses" multiple
+                  [disabled]="(isSoureDisable() || service.CheckExtWareHouse()) ">
+                  <mat-option *ngFor="let source of shipmentSourceList" [value]="source">{{source}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination" aria-label="State"
+                  [matAutocomplete]="statesShipmentStatusAutocomplete" [(ngModel)]="destinationShipmentStatus"
+                  name="destinationShipmentStatus" (keyup)="getUserSearchDataShipmentStatus($event)"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #statesShipmentStatusAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationListShipmentStatus" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="Transporter" placeholder="Transporter"
+                  (keyup)="getfilterTransporterShipmentStatus($event)" autocomplete="off"
+                  [matAutocomplete]="transporterAutocompleteShipmentStatus" [(ngModel)]="transporterShipmentStatus"
+                  name="transporterShipmentStatus" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #transporterAutocompleteShipmentStatus="matAutocomplete">
+                  <mat-option *ngFor="let list of transporterListShipmentStatus" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div> -->
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="Transporter" [(ngModel)]="transportersShipmentStatus"
+                  name="transportersShipmentStatus" multiple>
+                  <mat-option *ngFor="let trans of transporterList" [value]="trans"> {{trans}} </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class=" col-md-1 ">
+            <div class="search-fileds">
+              <button class="theme-small-button" (click)="searchShipmentStatus()" matTooltip="Search">
+                <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)="clearAllShipmentStatus()" matTooltip="Clear All">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Filter Row End -->
+
+        <!-- <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Destination</th>
+            <th>Planned TTE</th>
+            <th>Dispatched TTE</th>
+            <th>Balanced TTE</th>
+            <th>Adherance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of thirdPlanData;let i=index">
+            <td>{{data.destination}}</td>
+            <td>{{data.plannedTTE}}</td>
+            <td>{{data.dispatchedTTE}}</td>
+            <td>{{data.balancedTTE}}</td>
+            <td>{{data.adherance}}</td>
+          </tr>
+          <tr>
+            <td *ngIf="thirdPlanData.length == 0" colspan="10" class="text-center no-data-row">No data Available</td>
+          </tr>
+        </tbody>
+      </table> -->
+        <ngx-datatable class='material' [rows]='shipmentStatusDataList' [columnMode]="'force'" [headerHeight]="50"
+          [scrollbarH]="false" [footerHeight]="30" [rowHeight]="'auto'" [summaryRow]="true" [summaryHeight]="'auto'"
+          [summaryPosition]="'bottom'" [scrollbarH]="true">
+          <ngx-datatable-column name="Source" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="shipmentWithNReportLoc">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.shipmentWithNReportLoc}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Shipment Without Freight" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="shipmentWithN" [summaryTemplate]="shipmentWithN">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.shipmentWithN ? row.shipmentWithN : 0) | number}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Shipment With Freight" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="shipmentWithY" [summaryTemplate]="shipmentWithY">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.shipmentWithY? row.shipmentWithY : 0 ) | number}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Total" [width]="150" [resizeable]="false" [sortable]="true" prop="total"
+            [summaryTemplate]="total">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.total ? row.total : 0) | number}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Shipment Without Freight %" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="total" [summaryTemplate]="shipmentWithoutFreightPer">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.total && row.shipmentWithN ? (((row.shipmentWithN ? row.shipmentWithN : 0) / (row.total ? row.total : 0)) *100) : 0) | number : '1.2-2'}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Cumm Without Freight" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="cummShipmentWithN" [summaryTemplate]="cummShipmentWithN">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.cummShipmentWithN ? row.cummShipmentWithN : 0) | number}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Cumm With Freight" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="cummShipmentWithY" [summaryTemplate]="cummShipmentWithY">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.cummShipmentWithY ? row.cummShipmentWithY : 0) | number}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Cumm Total" [width]="150" [resizeable]="false" [sortable]="true" prop="cummTotal"
+            [summaryTemplate]="cummTotal">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.cummTotal ? row.cummTotal : 0) | number}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Cumm Without Freight %" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="total" [summaryTemplate]="cummWithoutFreightPer">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.cummTotal && row.cummShipmentWithN ? (((row.cummShipmentWithN ? row.cummShipmentWithN : 0) / (row.cummTotal ? row.cummTotal : 0)) * 100) : 0) | number: '1.2-2'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+        </ngx-datatable>
+        <!-- Table bottom grid columns -->
+        <ng-template #shipmentWithN>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(shipmentWithNSum)?(shipmentWithNSum | number):0}}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #shipmentWithY>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(shipmentWithYSum ? shipmentWithYSum : 0)  | number}}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #total>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(totalSum ? totalSum : 0)  | number}}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #shipmentWithoutFreightPer>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(shipmentWithoutFreightPerSum ? shipmentWithoutFreightPerSum : 0)  | number : '1.2-2'}}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #cummShipmentWithN>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(cummShipmentWithNSum ? cummShipmentWithNSum : 0)  | number }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #cummShipmentWithY>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(cummShipmentWithYSum ? cummShipmentWithYSum : 0 )  | number}}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #cummTotal>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{cummTotalSum ? (cummTotalSum | number) : 0 }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #cummWithoutFreightPer>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{cummWithoutFreightPerSum ? (cummWithoutFreightPerSum | number: '1.2-2') : 0 }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+  <!-- ROW 4 END -->
+  <!-- ROW START PLAN UPLOAD -->
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box ">
+        <h5>Plan Upload
+          <!-- <span class="pull-right">
+            <button mat-raised-button color="primary">Export to Excel</button>
+          </span> -->
+        </h5>
+        <!-- Filter Row Start -->
+        <div class="row ">
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="formPlanUploadPicker" placeholder="From Disp Date"
+                  [(ngModel)]="fromDatePlanUpload" name="fromDatePlanUpload"
+                  (dateChange)="addEventPlanUpload('change', $event)">
+                <mat-datepicker-toggle matSuffix [for]="formPlanUploadPicker"></mat-datepicker-toggle>
+                <mat-datepicker #formPlanUploadPicker disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="toPlanUploadPicker" [min]="fromDatePlanUpload"
+                  placeholder="To Disp Date" [(ngModel)]="toDatePlanUpload" name="toDatePlanUpload">
+                <mat-datepicker-toggle matSuffix [for]="toPlanUploadPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toPlanUploadPicker [disabled]="!fromDatePlanUpload"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- <div class="col-md-1 pr-0">
+              <mat-form-field class="example-full-width">
+                
+                <input matInput placeholder="Source" (keyup)="getfilterSourcePlanUpload($event)"
+                  [disabled]="(isSoureDisable()) " autocomplete="off" [matAutocomplete]="sourcePlanUploadAutocomplete"
+                  [(ngModel)]="sourceCodePlanUpload" name="sourcePlanUpload"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #sourcePlanUploadAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of sourceListPlanUpload" [value]="list.value">
+                    <span matTooltip={{list.value}}>{{list.value}} - ({{list.description}})</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div> -->
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Source" [(ngModel)]="sourceCodePlanUploads" name="sourceCodePlanUploads"
+                  multiple [disabled]="(isSoureDisable()) ">
+                  <mat-option *ngFor="let source of openPlanSourceList" [value]="source">{{source}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination" aria-label="State" [matAutocomplete]="PlanUploadAutocomplete"
+                  [(ngModel)]="destinationPlanUpload" name="destinationPlanUpload"
+                  (keyup)="getUserSearchDataPlanUpload($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #PlanUploadAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationListPlanUpload" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Category" [(ngModel)]="materialGroupPlanUpload" name="materialGroupPlanUpload"
+                  multiple>
+                  <mat-option *ngFor="let category of categoryList" [value]="category">{{category}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="MKT Segment" [(ngModel)]="mktsegmentPlanUpload" name="mktsegmentPlanUpload"
+                  multiple>
+                  <!-- <mat-option [value]="">None</mat-option> -->
+                  <mat-option *ngFor="let mktsegment of mktsegmentList" [value]="mktsegment">
+                    {{mktsegment}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Plan Status" [(ngModel)]="planStatusPlanUpload" name="planStatusPlanUpload">
+                  <mat-option *ngFor="let status of planStatusList" [value]="status">{{status}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class=" col-md-1 ">
+            <div class="search-fileds">
+              <button class="theme-small-button" (click)="searchPlanUpload()" matTooltip="Search">
+                <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)="clearAllPlanUpload()" matTooltip="Clear All">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Filter Row End -->
+        <!-- <table class="table table-bordered cust-table">
+          <thead>
+            <tr>
+              <th>User Roles</th>
+              <th>Total No Of Lines</th>
+              <th>Total No Of Lines %</th>
+              <th>Cumm No Of Lines</th>
+              <th>Cumm No Of Lines %</th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let planUploadDto of planUploadDtoList">
+            <tr>
+              <td colspan="5" style="text-align: center; font-size: 15px;background-color: lightgrey">
+                <b>{{planUploadDto.sourceLoc}}</b></td>
+            </tr>
+            <tr>
+              <td><b>PLN/RDC</b></td>
+              <td>{{(planUploadDto?.uploadedByOthers?planUploadDto?.uploadedByOthers:0) | number}}</td>
+              <td>{{(planUploadDto?.percentageOthers?planUploadDto?.percentageOthers:0) | number:'1.2-2'}}</td>
+              <td>{{(planUploadDto?.cummUploadedByOthers?planUploadDto?.cummUploadedByOthers: 0) | number}}</td>
+              <td>{{(planUploadDto?.cummPercentageOthers?planUploadDto?.cummPercentageOthers:0) | number:'1.2-2'}}</td>
+            </tr>
+            <tr>
+              <td><b>3PL</b></td>
+              <td>{{(planUploadDto?.uploadedBy3PL?planUploadDto?.uploadedBy3PL:0) | number}}</td>
+              <td>{{(planUploadDto?.percentage3PL?planUploadDto?.percentage3PL:0) | number:'1.2-2'}}</td>
+              <td>{{(planUploadDto?.cummUploadedBy3PL?planUploadDto?.cummUploadedBy3PL: 0) | number}}</td>
+              <td>{{(planUploadDto?.cummPercentage3PL?planUploadDto?.cummPercentage3PL:0) | number:'1.2-2'}}</td>
+            </tr>
+          </tbody>
+        </table> -->
+        <ngx-datatable class='material' [rows]='planUploadDtoList' [columnMode]="'force'" [headerHeight]="50"
+          [scrollbarH]="false" [footerHeight]="30" [rowHeight]="'auto'" [summaryRow]="true" [summaryHeight]="'auto'"
+          [summaryPosition]="'bottom'" [scrollbarH]="true">
+          <ngx-datatable-column name="Source" [width]="150" [resizeable]="false" [sortable]="true" prop="sourceLoc">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.sourceLoc}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="No Of Lines By PLN/RDC" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="uploadedByOthers" [summaryTemplate]="uploadedByOthers">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.uploadedByOthers ? row.uploadedByOthers : 0) | number}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="No Of Lines By 3PL" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="uploadedBy3PL" [summaryTemplate]="uploadedBy3PL">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.uploadedBy3PL? row.uploadedBy3PL : 0 ) | number}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="No Of Lines % By PLN/RDC" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="percentageOthers" [summaryTemplate]="percentageOthers">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.percentageOthers ? row.percentageOthers : 0) | number: '1.2-2'}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="No Of Lines % By 3PL" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="total" [summaryTemplate]="percentage3PL">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.percentage3PL ? row.percentage3PL : 0) | number : '1.2-2'}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Cumm No Of Lines By PLN/RDC" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="cummUploadedByOthers" [summaryTemplate]="cummUploadedByOthers">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.cummUploadedByOthers ? row.cummUploadedByOthers : 0) | number}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Cumm No Of Lines By 3PL" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="cummUploadedBy3PL" [summaryTemplate]="cummUploadedBy3PL">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.cummUploadedBy3PL? row.cummUploadedBy3PL : 0 ) | number}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Cumm No Of Lines % By PLN/RDC" [width]="150" [resizeable]="false"
+            [sortable]="true" prop="cummPercentageOthers" [summaryTemplate]="cummPercentageOthers">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.cummPercentageOthers ? row.cummPercentageOthers : 0) | number: '1.2-2'}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="cumm No Of Lines % By 3PL" [width]="150" [resizeable]="false" [sortable]="true"
+            prop="cummPercentage3PL" [summaryTemplate]="cummPercentage3PL">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{(row.cummPercentage3PL ? row.cummPercentage3PL : 0) | number : '1.2-2'}}
+            </ng-template>
+          </ngx-datatable-column>
+
+        </ngx-datatable>
+        <!-- Table bottom grid columns -->
+        <ng-template #uploadedByOthers>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(uploadedByOthersSum)?(uploadedByOthersSum | number):0}}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #uploadedBy3PL>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(uploadedBy3PLSum ? uploadedBy3PLSum : 0)  | number}}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #percentageOthers>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(percentageOthersSum ? percentageOthersSum : 0)  | number:'1.2-2'}}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #percentage3PL>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(percentage3PLSum ? percentage3PLSum : 0)  | number : '1.2-2'}}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #cummUploadedByOthers>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(cummUploadedByOthersSum ? cummUploadedByOthersSum : 0)  | number }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #cummUploadedBy3PL>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{(cummUploadedBy3PLSum ? cummUploadedBy3PLSum : 0 )  | number}}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #cummPercentageOthers>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{cummPercentageOthersSum ? (cummPercentageOthersSum | number:'1.2-2') : 0 }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #cummPercentage3PL>
+          <div class="name-container">
+            <div class="chip">
+              <span class="chip-content">
+                {{cummPercentage3PLSum ? (cummPercentage3PLSum | number: '1.2-2') : 0 }}
+              </span>
+            </div>
+          </div>
+        </ng-template>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW END PLAN UPLOAD -->
+  <!-- ROW 5 Start -->
+  <div class="row" *ngIf="showPlanTables()">
+    <div class="col-md-12">
+      <div class="box cust-box">
+        <h5>Ageing
+          <!-- <span class="pull-right">
+          <button mat-raised-button color="primary">Export to Excel</button>
+        </span> -->
+        </h5>
+        <!-- Filter Row Start -->
+        <div class="row ">
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="formPlanAgeingPicker" placeholder="From Disp Date"
+                  [(ngModel)]="fromDatePlanAgeing" name="fromDatePlanAgeing"
+                  (dateChange)="addEventPlanAgeing('change', $event)">
+                <mat-datepicker-toggle matSuffix [for]="formPlanAgeingPicker"></mat-datepicker-toggle>
+                <mat-datepicker #formPlanAgeingPicker disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="toPlanAgeingPicker" [min]="fromDatePlanAgeing"
+                  placeholder="To Disp Date" [(ngModel)]="toDatePlanAgeing" name="toDatePlanAgeing">
+                <mat-datepicker-toggle matSuffix [for]="toPlanAgeingPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toPlanAgeingPicker [disabled]="!fromDatePlanAgeing"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- <div class="col-md-2 pr-0">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Source" (keyup)="getfilterSourcePlanAgeing($event)"
+                [disabled]="(isSoureDisable()) " autocomplete="off" [matAutocomplete]="sourcePlanAgeingAutocomplete"
+                [(ngModel)]="sourceCodePlanAgeing" name="sourcePlanAgeing"
+                oninput="this.value = this.value.toUpperCase()">
+              <mat-autocomplete #sourcePlanAgeingAutocomplete="matAutocomplete">
+                <mat-option *ngFor="let list of sourceListPlanAgeing" [value]="list.value">
+                  <span matTooltip={{list.value}}>{{list.value}} - ({{list.description}})</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div> -->
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Source" [(ngModel)]="sourceCodePlanAgeing" name="sourceCodePlanAgeing"
+                  [disabled]="(isSoureDisable()) ">
+                  <mat-option *ngFor="let source of openPlanSourceList" [value]="source">{{source}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination" aria-label="State" [matAutocomplete]="planAgeingAutocomplete"
+                  [(ngModel)]="destinationPlanAgeing" name="destinationPlanAgeing"
+                  (keyup)="getUserSearchDataPlanAgeing($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #planAgeingAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationListPlanAgeing" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Category" [(ngModel)]="materialGroupPlanAgeing" name="materialGroupPlanAgeing"
+                  multiple>
+                  <mat-option *ngFor="let category of categoryList" [value]="category">{{category}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="MKT Segment" [(ngModel)]="mktsegmentPlanAgeing" name="mktsegment" multiple>
+                  <!-- <mat-option [value]="">None</mat-option> -->
+                  <mat-option *ngFor="let mktsegment of mktsegmentList" [value]="mktsegment">
+                    {{mktsegment}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Plan Status" [(ngModel)]="planStatusPlanAgeing" name="planStatusPlanAgeing">
+                  <mat-option *ngFor="let status of planStatusList" [value]="status">{{status}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class=" col-md-1 ">
+            <div class="search-fileds">
+              <button class="theme-small-button" (click)="searchPlanAgeing()" matTooltip="Search">
+                <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)="clearAllPlanAgeing()" matTooltip="Clear All">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Filter Row End -->
+        <table class="table table-bordered cust-table">
+          <thead>
+            <tr>
+              <th>Age Bucket</th>
+              <th>No Of Lines</th>
+              <th>Total Avail Qty (Including Reserved+Loaded)</th>
+              <th>Cumm No Of Lines</th>
+              <th>Cumm Total Avail Qty (Including Reserved+Loaded)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <!-- <td>0-2 Days</td> -->
+              <td>
+                <!--<input name="myInput" matInput ng-model="firstLineStart" ng-maxlength="2"> -->
+                <input name="firstLineStart" class="cust-input" [(ngModel)]="firstLineStart" maxlength="3">
+                &nbsp; TO &nbsp;<input name="firstLineEnd" class="cust-input" [(ngModel)]="firstLineEnd" maxlength="3">
+                &nbsp; DAYS
+              </td>
+              <td>{{(planAgeingData?.lessThan2Count?planAgeingData?.lessThan2Count:0) | number}}</td>
+              <td>{{(planAgeingData?.lessThan2?planAgeingData?.lessThan2:0) | number}}</td>
+              <td>{{(planAgeingData?.cummLessThan2Count?planAgeingData?.cummLessThan2Count: 0) | number}}</td>
+              <td>{{(planAgeingData?.cummLessThan2?planAgeingData?.cummLessThan2:0) | number}}</td>
+            </tr>
+            <tr>
+              <!-- <td>2-7 Days</td> -->
+              <td>
+                <!--<input name="myInput" matInput ng-model="firstLineStart" ng-maxlength="2"> -->
+                <input name="secondLineStart" class="cust-input" [(ngModel)]="secondLineStart" maxlength="3">
+                &nbsp; TO &nbsp;<input name="secondLineEnd" class="cust-input" [(ngModel)]="secondLineEnd"
+                  maxlength="3">
+                &nbsp; DAYS
+              </td>
+              <td>{{(planAgeingData?.lessThan7Count?planAgeingData?.lessThan7Count:0) | number}}</td>
+              <td>{{(planAgeingData?.lessThan7?planAgeingData?.lessThan7:0) | number}}</td>
+              <td>{{(planAgeingData?.cummLessThan7Count?planAgeingData?.cummLessThan7Count : 0) | number}}</td>
+              <td>{{(planAgeingData?.cummLessThan7?planAgeingData?.cummLessThan7 : 0) | number}}</td>
+            </tr>
+            <tr>
+              <!-- <td> > 7 Days</td> -->
+              <td>
+                <!--<input name="myInput" matInput ng-model="firstLineStart" ng-maxlength="2"> -->
+                > &nbsp; <input name="thirdLine" class="cust-input" [(ngModel)]="thirdLine" maxlength="3">
+                &nbsp;DAYS
+              </td>
+              <td>{{(planAgeingData?.greaterThan7Count?planAgeingData?.greaterThan7Count:0) | number}}</td>
+              <td>{{(planAgeingData?.greaterThan7?planAgeingData?.greaterThan7:0) | number}}</td>
+              <td>{{(planAgeingData?.cummGreaterThan7Count?planAgeingData?.cummGreaterThan7Count : 0) | number}}</td>
+              <td>{{(planAgeingData?.cummGreaterThan7?planAgeingData?.cummGreaterThan7Count : 0) | number}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- ROW 5 END -->
+
+  <!-- ROW 6 START DELAYED DAYS -->
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box cust-box">
+        <h5>Delayed Days
+          <!-- <span class="pull-right">
+          <button mat-raised-button color="primary">Export to Excel</button>
+        </span> -->
+        </h5>
+        <!-- Filter Row Start -->
+        <div class="row ">
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="formDelayedDaysPicker" placeholder="From Insert Date"
+                  [(ngModel)]="fromDateDelayedDays" name="fromDateDelayedDays"
+                  (dateChange)="addEventDelayedDays('change', $event)">
+                <mat-datepicker-toggle matSuffix [for]="formDelayedDaysPicker"></mat-datepicker-toggle>
+                <mat-datepicker #formDelayedDaysPicker disabled="false"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field>
+                <input matInput disabled [matDatepicker]="toDelayedDaysPicker" [min]="fromDateDelayedDays"
+                  placeholder="To Insert Date" [(ngModel)]="toDateDelayedDays" name="toDateDelayedDays">
+                <mat-datepicker-toggle matSuffix [for]="toDelayedDaysPicker"></mat-datepicker-toggle>
+                <mat-datepicker #toDelayedDaysPicker [disabled]="!fromDateDelayedDays"></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <mat-form-field class="example-full-width">
+              <!-- Source Input editble for DP_REP role & for external wareHouses -->
+              <input matInput placeholder="Source" (keyup)="getfilterSourceDelayedDays($event)"
+                [disabled]="(isSoureDisable()  || service.CheckExtWareHouse()) " autocomplete="off"
+                [matAutocomplete]="sourceDelayedDaysAutocomplete" [(ngModel)]="sourceCodeDelayedDays"
+                name="sourceDelayedDays" oninput="this.value = this.value.toUpperCase()">
+              <mat-autocomplete #sourceDelayedDaysAutocomplete="matAutocomplete">
+                <mat-option *ngFor="let list of sourceListDelayedDays" [value]="list.value">
+                  <span matTooltip={{list.value}}>{{list.value}} - ({{list.description}})</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination" aria-label="State" [matAutocomplete]="delayedDaysAutocomplete"
+                  [(ngModel)]="destinationDelayedDays" name="destinationDelayedDays"
+                  (keyup)="getUserSearchDataDelayedDays($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #delayedDaysAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationListDelayedDays" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Category" [(ngModel)]="materialGroupDelayedDays"
+                  name="materialGroupDelayedDays" multiple>
+                  <mat-option *ngFor="let category of categoryListDelayedDays" [value]="category">{{category}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="MKT Segment" [(ngModel)]="mktsegmentDelayedDays" name="mktsegmentDelayedDays"
+                  multiple>
+                  <!-- <mat-option [value]="">None</mat-option> -->
+                  <mat-option *ngFor="let mktsegment of mktsegmentList" [value]="mktsegment">
+                    {{mktsegment}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pr-0">
+            <div class="form-group cust-form-group">
+              <mat-form-field class="example-full-width">
+                <mat-select placeholder="Shipment Status" [(ngModel)]="shipmentStatusDelayedDays"
+                  name="shipmentStatusDelayedDays" multiple>
+                  <mat-option *ngFor="let status of shipmentStatusList" [value]="status">{{status}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class=" col-md-1 ">
+            <div class="search-fileds">
+              <button class="theme-small-button" (click)="searchDelayedDays()" matTooltip="Search">
+                <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)="clearAllDelayedDays()" matTooltip="Clear All">
+                <i class="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Filter Row End -->
+        <table class="table table-bordered cust-table">
+          <thead>
+            <tr>
+              <th>Age Bucket</th>
+              <th>No Of Shipments</th>
+              <th>Cumm No Of Shipments</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <!-- <td>0-2 Days</td> -->
+              <td>
+                <!--<input name="myInput" matInput ng-model="firstLineStart" ng-maxlength="2"> -->
+                <input name="firstLineStart" class="cust-input" [(ngModel)]="firstLineStartDelayedDays" maxlength="3">
+                &nbsp; TO &nbsp;<input name="firstLineEnd" class="cust-input" [(ngModel)]="firstLineEndDelayedDays"
+                  maxlength="3">
+                &nbsp; DAYS
+              </td>
+              <td>{{(delayedDaysDto?.lessThan2?delayedDaysDto?.lessThan2:0) | number}}</td>
+              <td>{{(delayedDaysDto?.cummLessThan2?delayedDaysDto?.cummLessThan2:0) | number}}</td>
+            </tr>
+            <tr>
+              <!-- <td>2-7 Days</td> -->
+              <td>
+                <!--<input name="myInput" matInput ng-model="firstLineStart" ng-maxlength="2"> -->
+                <input name="secondLineStart" class="cust-input" [(ngModel)]="secondLineStartDelayedDays" maxlength="3">
+                &nbsp; TO &nbsp;<input name="secondLineEnd" class="cust-input" [(ngModel)]="secondLineEndDelayedDays"
+                  maxlength="3">
+                &nbsp; DAYS
+              </td>
+              <td>{{(delayedDaysDto?.lessThan7?delayedDaysDto?.lessThan7:0) | number}}</td>
+              <td>{{(delayedDaysDto?.cummLessThan7?delayedDaysDto?.cummLessThan7:0) | number}}</td>
+            </tr>
+            <tr>
+              <!-- <td> > 7 Days</td> -->
+              <td>
+                <!--<input name="myInput" matInput ng-model="firstLineStart" ng-maxlength="2"> -->
+                > &nbsp; <input name="thirdLine" class="cust-input" [(ngModel)]="thirdLineDelayedDays" maxlength="3">
+                &nbsp;DAYS
+              </td>
+              <td>{{(delayedDaysDto?.greaterThan7?delayedDaysDto?.greaterThan7:0) | number}}</td>
+              <td>{{(delayedDaysDto?.cummGreaterThan7?delayedDaysDto?.cummGreaterThan7:0) | number}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ROW 6 END DELAYED DAYS -->
+<!-- <div class="row">
+    <div class='col-md-6'>
+      <div class='box'>
+        <h5>Truck Status
+        </h5>
+        <div class="row rounded-box">
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">{{truckStatusStatics?.reportedTrucksCount?truckStatusStatics?.reportedTrucksCount:0}}</h4>
+
+              </div>
+            </div>
+            <p>Reported &amp; Waiting</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">{{truckStatusStatics?.gatedInTrucksCount?truckStatusStatics?.gatedInTrucksCount:0}}</h4>
+              </div>
+            </div>
+            <p>Gated - In</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/Loading.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">{{truckStatusStatics?.trucksLoadingIn?truckStatusStatics?.trucksLoadingIn:0}}</h4>
+              </div>
+            </div>
+            <p>In Loading</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">{{truckStatusStatics?.watingMoreThen3HTrucks?truckStatusStatics?.watingMoreThen3HTrucks:0}}</h4>
+
+              </div>
+            </div>
+            <p>Waiting > Xhrs</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">{{truckStatusStatics?.excessWaitingLocCount?truckStatusStatics?.excessWaitingLocCount:0}}</h4>
+
+              </div>
+            </div>
+            <p>Reported & Waiting > Xhrs</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='col-md-6'>
+      <div class='box'>
+        <h5>TTE Pending Planner Approval : --
+        </h5>
+      </div>
+    </div>
+  </div> -->
+
+
+<div class="container-fluid" *ngIf="isGateRole()" [ngClass]="{'content' : 'isGateRole()'}">
+  <div class="row">
+    <div class="col-md-12 ">
+      <div class='box'>
+        <div class="row">
+          <div class="col-md-4">
+            <h5 class="margin-top-10"> Truck Status</h5>
+          </div>
+          <div class="col-md-3 offset-5" *ngIf="checkShow()">
+            <mat-form-field class="locationDropdown">
+              <mat-label>Select Location</mat-label>
+              <mat-select name="locations" [(ngModel)]="location" (ngModelChange)="getTrcukdetails(location)">
+                <mat-option *ngFor="let item of locations" [value]="item">
+                  {{item}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row rounded-box">
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/reported.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{truckStatusStatics?.reportedTrucksCount?truckStatusStatics?.reportedTrucksCount:0}}</h4>
+
+              </div>
+            </div>
+            <p>Reported &amp; Waiting</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/Gated In.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{truckStatusStatics?.gatedInTrucksCount?truckStatusStatics?.gatedInTrucksCount:0}}</h4>
+              </div>
+            </div>
+            <p>Gated - In</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/Loading.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">{{truckStatusStatics?.trucksLoadingIn?truckStatusStatics?.trucksLoadingIn:0}}
+                </h4>
+              </div>
+            </div>
+            <p>In Loading</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{(truckStatusStatics?.watingMoreThen3HTrucks)?(truckStatusStatics?.watingMoreThen3HTrucks):0}}</h4>
+
+              </div>
+            </div>
+            <p>Waiting (Gated In/Under Loading) >
+              {{(truckStatusStatics?.excessWaitingTime)?(truckStatusStatics?.excessWaitingTime):'X'}}hrs</p>
+          </div>
+          <div class="col-md-3 truckstatus-card">
+            <div class="media p-3">
+              <img src="assets/images/waiting.svg" class="img img-fluid" style="width:30px;">
+              <div class="media-body">
+                <h4 class="text-center">
+                  {{truckStatusStatics?.excessWaitingLocCount?truckStatusStatics?.excessWaitingLocCount:0}}</h4>
+
+              </div>
+            </div>
+            <p>Reported & Waiting >
+              {{(truckStatusStatics?.excessReportingWaitingTime)?(truckStatusStatics?.excessReportingWaitingTime):'X'}}hrs
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

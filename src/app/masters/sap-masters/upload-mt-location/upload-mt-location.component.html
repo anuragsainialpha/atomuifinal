@@ -1,0 +1,60 @@
+  <!-- <p>
+    create-freight works!
+  </p> -->
+  <app-loader *ngIf="isLoading"></app-loader>
+  <div class="container-fluid">
+    <h6 class="manulal-plan-header">
+        <b>SAP Masters </b><a class="" [routerLink]="['/admin/sap-masters/mt-location']">Location </a>
+    </h6>
+  </div>
+  
+  
+  <div class="container">
+    <div class="row">
+        <div class="col-md-1"></div>
+      <div class="col-md-8">
+        <div class="create-freight ">
+          <div class="uploadfile create-freight">
+            <img src="./assets/images/Upload.png" alt="upload image" class="img-fluid" />
+            <h5>
+              <label for="plan-file">
+                <u>Click here</u> to Upload Files</label>
+            </h5>
+            <input type="file" (change)="onFileChange($event)" value="" id="plan-file" accept=".xls,.xlsx" (click)="itemsImportInput.value = null"
+              #itemsImportInput/>
+            <a download href="./assets/excel/Location_template.xlsx">
+              <p>Download Location Template</p>
+            </a>
+            <h5 class="color-green" *ngIf="gotResponse">Uploaded Total Records {{totalRecords}} </h5>
+          </div>
+          </div>
+      </div>
+    </div>
+  </div>
+  
+    <div class="clearfix"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+          <div class="col-md-8">
+              <div class="error-log" *ngIf="IsErrorLog">
+               
+                <mat-card>
+                    <br>
+                  <h5 class="error-log">Total Error Records  {{totalErrorRecords}} </h5>
+                  <mat-list role="list">
+                    <mat-list-item *ngFor="let data of ErrorData">
+                      Error Record Id {{data.recId}}, Error Message {{data.errorMessage}}</mat-list-item>
+                  </mat-list>
+              
+                </mat-card>
+              </div>
+              </div>
+  
+         
+            </div>
+          </div>
+  
+  
+  
+  

@@ -1,0 +1,39 @@
+@import '../../../assets/styles/variables';
+@import '../../../assets/styles/mixins';
+
+
+.manualplan-fields{
+    background-color: transparent;
+    box-shadow: none;
+    padding: 0px;
+    p > i{
+        cursor: pointer;
+    }
+    .col-md-3{
+        padding: 0px 15px;
+    }
+    .wid-12p{
+        flex: 0 0 12%;
+        max-width: 12%;
+    }
+    .wid-13p{
+        flex: 0 0 13%;
+        max-width: 13%;
+    }
+    .form-group{
+        margin-bottom: 0;
+        .mat-form-field {
+            .mat-form-field-wrapper{
+                padding-bottom: 0.5em !important;
+            }
+        }
+    }
+    label{
+        display: block;
+    }
+        
+}
+
+.margin-left-30{
+    margin-left: 30px;
+}

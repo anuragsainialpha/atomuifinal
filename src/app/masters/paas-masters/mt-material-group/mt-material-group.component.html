@@ -1,0 +1,349 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+      <b> PaaS Masters &gt; Material Group</b>
+    <span class="pull-right refresh-span">
+        <button class="theme-small-button" (click)="displayAddForm()" matTooltip="Add New">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button>
+      <!-- <button class="theme-small-button" (click)="upload()" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+
+      <!-- <button class="theme-small-button" [routerLink]="['/admin/paas-masters/upload-mt-material-group']" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+
+
+
+<div class="mt-item-fields" *ngIf="isShow">
+<div class="col-md-12 row">
+  <div class="col-md-12 padding-right-40">
+    <div class="row">
+      <div class="col-md-3">
+          <mat-form-field>
+            <input matInput placeholder="Material Group Id" [(ngModel)]="materialGroupId" name="materialGroupId">
+          </mat-form-field>
+      </div>
+      <div class="col-md-3">
+            <mat-form-field>
+              <input matInput placeholder="SCM Group" [(ngModel)]="scmGroup" name="scmGroup">
+            </mat-form-field>
+        </div>
+
+      <!-- <div class="col-md-2">
+        <div class="form-group">
+          <mat-form-field>
+            <input matInput placeholder="Description 1" [(ngModel)]="description1" name="description1">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-group">
+          <mat-form-field>
+            <input matInput placeholder="Description 2" [(ngModel)]="description2" name="description2">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-group">
+          <mat-form-field>
+            <input matInput placeholder="Mg Id" [(ngModel)]="mgId" name="mgId">
+          </mat-form-field>
+        </div>
+      </div> -->
+    </div>
+  </div>
+  <div class="pull-right">
+    <div class="search-fileds">
+      <button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+        <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+        <i class="fa fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+
+  <div class="mt-item-table">
+      <!-- <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [rows]='responseItemsList' [scrollbarH]="true" 
+      [externalPaging]="true" (page)="datatablePageData($event)" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count" [offset]="page.offset">
+         -->
+      <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [columnMode]="'force'"
+      [rows]='responseItemsList' [externalPaging]="true" (page)="datatablePageData($event)" [scrollbarH]="false"
+      [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count"
+      [offset]="page.offset">
+      <ngx-datatable-column name="Material Group Id" [width]="160" [resizeable]="false" prop="materialGroupId" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.materialGroupId}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Description 1" [width]="220" [resizeable]="false" prop="itemId" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.description_1}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Description 2" [width]="210" [resizeable]="false" prop="compQty"  [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.description_2}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="SCM Group" [width]="130" [resizeable]="false" prop="itemSeq" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.scmGroup}}
+          </ng-template>
+        </ngx-datatable-column>
+        <!-- <ngx-datatable-column name="MG Id" [width]="100" [resizeable]="false" prop="itemSeq" [cellClass]="'text-right'" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.mgId}}
+            </ng-template>
+          </ngx-datatable-column> -->
+
+          <ngx-datatable-column name="Insert User" [width]="120" [resizeable]="false" prop="insertUser" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.insertUser}}
+              </ng-template>
+            </ngx-datatable-column>
+
+        <ngx-datatable-column name="Insert Date" [width]="120" [resizeable]="false" prop="insertDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{trimDate(row.insertDate)}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Update User" [width]="120" [resizeable]="false" prop="updateUser" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.updateUser}}
+            </ng-template>
+          </ngx-datatable-column>
+
+        <ngx-datatable-column name="Update Date" [width]="120" [resizeable]="false" prop="updateDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{trimDate(row.updateDate)}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Action" [width]="100" [resizeable]="false" [sortable]="false">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <button class="theme-small-button btn" matTooltip="Modify" (click)="showUpdateModel(row)" [disabled]="(row.isError)">
+              <i class="fa fa-edit fa-2x" aria-hidden="true"></i>
+            </button>
+          </ng-template>
+        </ngx-datatable-column>
+           <!-- Footer Template starts -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+          let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+          <div class="page-count">
+            <span *ngIf="selectedCount">
+              {{selectedCount.toLocaleString()}} Selected |
+            </span>
+            Showing {{(offset * pageSize)+1}} to {{(rowCount>
+            (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+            {{(rowCount)}} records.
+          </div>
+          <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+            [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+            [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+          </datatable-pager>
+        </ng-template>
+      </ngx-datatable-footer>
+      <!-- Footer Template Ends -->
+      </ngx-datatable>
+  </div>
+</div>
+
+
+
+
+<!--  -->
+<div class="modal" id="myModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && updateMtMaterialGroup(f))">
+<div class="modal-header">
+  <h4 class="modal-title text-primary">Update Material Group</h4>
+  <button type="button" class="close" data-dismiss="modal">&times;</button>
+</div>
+<div class="modal-body">
+  
+  <!-- <div class="form-group">
+    <mat-form-field appearance="standard" class="example-full-width">
+      <input matInput placeholder="Material Group Id" aria-label="State" [(ngModel)]="materialGroupIdu" name="materialGroupIdu"
+        required autocomplete="off">
+      <mat-error *ngIf="(f.submitted && materialGroupIdu.invalid)">
+        <p *ngIf="locationIdu.errors.required">Material Group Id is <strong>required</strong> </p>
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <mat-form-field appearance="standard" class="example-full-width">
+      <input matInput placeholder="Description1" aria-label="State" [(ngModel)]="description1u" name="description1u"
+        required autocomplete="off">
+      <mat-error *ngIf="(f.submitted && description1u.invalid)">
+        <p *ngIf="description1u.errors.required">Description 1 is <strong>required</strong> </p>
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <mat-form-field appearance="standard" class="example-full-width">
+      <input matInput placeholder="Description2" aria-label="State" [(ngModel)]="description2u" name="description2u"
+        required autocomplete="off">
+      <mat-error *ngIf="(f.submitted && description2u.invalid)">
+        <p *ngIf="description2u.errors.required">Description 2 is <strong>required</strong> </p>
+      </mat-error>
+    </mat-form-field>
+  </div> -->
+
+  <div class="form-group">
+    <mat-form-field appearance="standard" class="example-full-width">
+       <input matInput placeholder="SCM Group" aria-label="State" [(ngModel)]="scmGroupu" name="scmGroupu"
+        required autocomplete="off" oninput="this.value = this.value.toUpperCase()">
+      <mat-error *ngIf="(f.submitted && scmGroupu.invalid)">
+        <p *ngIf="scmGroupu.errors.required">Scm Group is <strong>required</strong> </p>
+      </mat-error> 
+
+      <!-- <mat-select placeholder="SCM Group" [(ngModel)]="scmGroupu" name="scmGroupu" #qty="ngModel" required>
+          <mat-option *ngFor="let loc of scmGroupList" [value]="loc">
+            {{loc}}
+          </mat-option>
+        </mat-select>
+      <mat-error *ngIf="(f.submitted && qty.invalid)">
+          <p *ngIf="qty.errors.required">SCM Group is <strong>required</strong></p>
+        </mat-error> -->
+
+
+      <p class="mtop6">SCM Group</p>
+    </mat-form-field>
+  </div>
+
+</div>
+<div class="modal-footer">
+  <button type="submit" mat-raised-button color="primary" class="btm-action-btn">Save</button>
+  <button type="button" mat-raised-button class="mat-default" color="default" data-dismiss="modal">Close</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+
+
+
+
+<br><br>
+<div class="mt-item-fields" *ngIf="displayForm">
+<div class="col-md-12 text-center padding-right-40">
+<mat-card>
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && addMtMaterialGroup(f))">
+  <h4 class="mt-item-header text-center text-primary">
+    <b> Add New Material Group </b></h4>
+  <br>
+  <div class="row">
+
+      <div class="col-md-1">
+          <div class="form-group">
+          </div>
+        </div>
+
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <!-- <input matInput placeholder="Material Group Id" [(ngModel)]="materialGroupIdf" name="materialGroupIdf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Material Group Id is <strong>required</strong></p>
+          </mat-error> -->
+
+          <mat-select placeholder="Material Group Id" [(ngModel)]="materialGroupIdf" name="materialGroupIdf" #qty="ngModel" required oninput="this.value = this.value.toUpperCase()">
+              <mat-option *ngFor="let loc of itemGroupsList" [value]="loc">
+                {{loc}}
+              </mat-option>
+            </mat-select>
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Material Group Id is <strong>required</strong></p>
+            </mat-error>
+
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Description 1" [(ngModel)]="description1f" name="description1f" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Description 1 is <strong>required</strong></p>
+            </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Description 2" [(ngModel)]="description2f" name="description2f" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Description 2 is <strong>required</strong></p>
+            </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="SCM Group" [(ngModel)]="scmGroupf" name="scmGroupf" required #qty="ngModel" oninput="this.value = this.value.toUpperCase()">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Scm Group is <strong>required</strong></p>
+            </mat-error>
+
+            <!-- <mat-select placeholder="SCM Group" [(ngModel)]="scmGroupf" name="scmGroupf" #qty="ngModel" required>
+                <mat-option *ngFor="let loc of scmGroupList" [value]="loc">
+                  {{loc}}
+                </mat-option>
+              </mat-select>
+            <mat-error *ngIf="(f.submitted && qty.invalid)">
+                <p *ngIf="qty.errors.required">SCM Group is <strong>required</strong></p>
+              </mat-error> -->
+
+              
+        </mat-form-field>
+      </div>
+    </div>
+    <!-- <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Mg Id" [(ngModel)]="mgIdf" name="mgIdf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Mg Id is <strong>required</strong></p>
+            </mat-error>
+        </mat-form-field>
+      </div>
+    </div> -->
+    <div class="col-md-2">
+      <div class="form-group">
+        <button mat-raised-button color="primary" class="btm-action-btn">Save</button>
+      </div>
+    </div>
+  </div>
+</form>
+</mat-card>
+</div>
+</div>
+

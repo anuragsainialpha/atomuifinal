@@ -1,0 +1,631 @@
+<nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+  <a class="navbar-brand" href="#">
+    <img src="./assets/images/atom.png" alt="logo" class="logo img-fluid" />
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText"
+    aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <b class="font-20">{{environment | uppercase}}</b>
+    <!-- FGS PLANNER ROLE NAVBAR -->
+    <ul class="navbar-nav mr-auto" *ngIf="(service.checkRole() == userRoles.planner1) || (service.checkRole() == userRoles.planner2) || (service.checkRole() == userRoles.planner3) 
+    || (service.checkRole() == userRoles.L1MGR) || (service.checkRole() == userRoles.L2MGR)">
+      <li class="nav-item home-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'home'}">
+        <a class="nav-link" [routerLink]="['/home']">Home</a>
+      </li>
+      <li class="nav-item dropdown create-plan-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'create-plan'}">
+        <a class="nav-link" #createPlanmenuTrigger="matMenuTrigger" [matMenuTriggerFor]="createPlan" #matMenuTrigger="matMenuTrigger"
+          (mouseenter)="createPlanmenuTrigger.openMenu()">Create Plan</a>
+        <mat-menu #createPlan="matMenu">
+          <div (mouseleave)="createPlanmenuTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/plan/manual-plan']" (click)="navClose()">Manual Plan
+            </button>
+            <button mat-menu-item [routerLink]="['/plan/create-plan']" (click)="navClose()">Upload Plan
+            </button>
+            <button mat-menu-item [routerLink]="['/plan/pending-plans']" (click)="navClose()" class="">Error Lines
+            </button>
+          </div>
+        </mat-menu>
+      </li>
+      <li class="nav-item dispatch-plan-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'dispatch-plan'}">
+        <a class="nav-link" [matMenuTriggerFor]="dispatchPlan" #plannerDispatchMenu="matMenuTrigger" (mouseenter)="plannerDispatchMenu.openMenu()">Dispatch
+          Plan</a>
+        <mat-menu #dispatchPlan="matMenu">
+          <div (mouseleave)="plannerDispatchMenu.closeMenu()">
+            <button mat-menu-item [routerLink]="['/dispatch-plan/view-plan']" (click)="navClose()">View Plans
+            </button>
+            <button mat-menu-item [routerLink]="['/dispatch-plan/modifiy-plan']" (click)="navClose()">Modify Plans
+            </button>
+            <button mat-menu-item [routerLink]="['/dispatch-plan/approve-plans']" (click)="navClose()">Approve Plans
+            </button>
+          </div>
+        </mat-menu>
+      </li>
+      <li class="nav-item fgs-indents-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-indents'}">
+        <a class="nav-link" [matMenuTriggerFor]="plannerIndent" #plannerIndentList="matMenuTrigger" (mouseenter)="plannerIndentList.openMenu()">Indents</a>
+        <mat-menu #plannerIndent="matMenu">
+          <div (mouseleave)="plannerIndentList.closeMenu()">
+            <button mat-menu-item [routerLink]="['/indent/view-indents']" (click)="navClose()">View Indents </button>
+          </div>
+        </mat-menu>
+      </li>
+      <li class="nav-item load-slip-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'load-slip'}">
+        <a class="nav-link" [matMenuTriggerFor]="plannerLoadslip" #plannerLoadslipList="matMenuTrigger" (mouseenter)="plannerLoadslipList.openMenu()">Load
+          Slip</a>
+        <mat-menu #plannerLoadslip="matMenu">
+          <div (mouseleave)="plannerLoadslipList.closeMenu()">
+            <button mat-menu-item [routerLink]="['/fgs/drafted-load-slip']" (click)="navClose()">Drafted Loadslips</button>
+            <button mat-menu-item [routerLink]="['/loadslip/view-loadslip']" (click)="navClose()">View Loadslips</button>
+            <button mat-menu-item [routerLink]="['/fgs/cancelled-load-slips']" (click)="navClose()">Cancelled Loadslips</button>
+            <button mat-menu-item [routerLink]="['/fgs/loadslip-movement']" (click)="navClose()">Loadslip Movement</button>
+          </div>
+        </mat-menu>
+      </li>
+      <!-- Truck status tab only visible for FGS Planner role  ==  DP_REP, L1_MGR, L2_MGR    -->
+      <li class="nav-item fgs-truck-status-menu side-menu " routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-truck-status'}"
+        *ngIf="(service.checkRole() == userRoles.planner3 || service.checkRole() == userRoles.L1MGR || service.checkRole() == userRoles.L2MGR)">
+        <a class="nav-link" [matMenuTriggerFor]="truckStatus" #truckStatusTrigger="matMenuTrigger" (mouseenter)="truckStatusTrigger.openMenu()">TruckStatus</a>
+        <mat-menu #truckStatus="matMenu">
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/transit-trucks']" (click)="navClose()">In-Transit Trucks </button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-inventory-shipping']" (click)="navClose()">Truck Inventory-Shipping</button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-inventory-receiving']" (click)="navClose()">Truck
+            Inventory-Receiving</button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-history-shipping']" (click)="navClose()">Truck History-Shipping</button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-history-receiving']" (click)="navClose()">Truck History-Receiving</button>
+          <button mat-menu-item [routerLink]="['/fgs/share-truck']" (click)="navClose()">Shared Truck</button>
+          <!-- <button mat-menu-item [routerLink]="['/transporter/export-trucking']">Export Tracking</button> -->
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-movement']" (click)="navClose()">Truck Movement</button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/cls']" (click)="navClose()">Export Tracking</button>
+        </mat-menu>
+      </li>
+      <!-- Freight tab visible for DP_REP role, L1_MGR, L2_MGR roles -->
+      <li class="nav-item fgs-freight-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-freight'}"  *ngIf="((service.checkRole() == userRoles.L1MGR) || (service.checkRole() == userRoles.L2MGR))">
+        <a class="nav-link" [routerLink]="['/fgs/freight']">Freight</a>
+      </li>
+    </ul>
+
+    <!--FGS OPERATIONS NAVBAR -->
+    <ul class="navbar-nav mr-auto" *ngIf="(service.checkRole() == userRoles.fgsOperations1) || (service.checkRole() == userRoles.fgsOperations2) || (service.checkRole() == userRoles.fgsOperations3) || (service.checkRole() == userRoles.fgsOperations4)">
+      <li class="nav-item home-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'home'}">
+        <a class="nav-link" [routerLink]="['/home']">Home</a>
+      </li>
+      <li class="nav-item dropdown create-plan-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'create-plan'}">
+        <a class="nav-link" [matMenuTriggerFor]="FGScreatePlan" #FGSPLANmatMenuTrigger="matMenuTrigger" (mouseenter)="open(FGSPLANmatMenuTrigger)">Create
+          Plan</a>
+        <mat-menu #FGScreatePlan="matMenu">
+          <div (mouseleave)="FGSPLANmatMenuTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/fgs/manual-plan']" (click)="navClose()">Manual Plan</button>
+            <button mat-menu-item [routerLink]="['/fgs/create-plan']" (click)="navClose()">Upload Plan</button>
+            <button mat-menu-item [routerLink]="['/fgs/pending-plans']" (click)="navClose()" class="">Error Lines</button>
+          </div>
+        </mat-menu>
+      </li>
+      <li class="nav-item dispatch-plan-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'dispatch-plan'}">
+        <a class="nav-link" [matMenuTriggerFor]="dispatchPlan" #matMenuTrigger2="matMenuTrigger" (mouseenter)="open(matMenuTrigger2)">DispatchPlan</a>
+        <mat-menu #dispatchPlan="matMenu">
+          <div (mouseleave)="matMenuTrigger2.closeMenu()">
+            <button mat-menu-item [routerLink]="['/fgs/view-plan']" (click)="navClose()">View Plans</button>
+            <button mat-menu-item [routerLink]="['/fgs/modifiy-plan']" (click)="navClose()">Modify Plans</button>
+            <button mat-menu-item [routerLink]="['/fgs/approve-plans']" (click)="navClose()">Approve Plans </button>
+          </div>
+        </mat-menu>
+      </li>
+      <!-- <li class="nav-item fgs-view-plans-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-view-plans'}">
+        <a class="nav-link" [routerLink]="['/fgs/view-plans']">View Plans</a>
+      </li> -->
+      <li class="nav-item fgs-indents-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-indents'}">
+        <a class="nav-link" #indents="matMenuTrigger" [matMenuTriggerFor]="indentslist" #matMenuTrigger="matMenuTrigger"
+          (mouseenter)="open(matMenuTrigger)">Indents</a>
+        <mat-menu #indentslist="matMenu">
+          <div (mouseleave)="matMenuTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/fgs/indent/create-indents']" (click)="navClose()">Create Indent</button>
+            <button mat-menu-item [routerLink]="['/fgs/indent/create-indent-excel-upload']" (click)="navClose()">Upload Indent</button>
+            <button mat-menu-item [routerLink]="['/fgs/indent/view-indents']" (click)="navClose()">View Indents </button>
+            <button mat-menu-item [routerLink]="['/fgs/indent/modify-indents']" (click)="navClose()">Modify Indents </button>
+          </div>
+        </mat-menu>
+      </li>
+      <li class="nav-item load-slip-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'load-slip'}">
+        <a class="nav-link" [matMenuTriggerFor]="loadSlip" #loadslipTrigger="matMenuTrigger" (mouseenter)="open(loadslipTrigger)">Load
+          Slip</a>
+        <mat-menu #loadSlip="matMenu">
+          <div (mouseleave)="loadslipTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/fgs/create-load-slip']" (click)="navClose()" class="">Create Loadslip</button>
+            <!-- <button mat-menu-item [routerLink]="['/fgs/ewm-create-loadslip']">Create Loadslip for Ewm</button> -->
+            <!-- <button mat-menu-item [routerLink]="['/fgs/ewm-loadslip-planner-view']">Loadslip view for Ewm</button> -->
+            <button mat-menu-item [routerLink]="['/fgs/create-load-slip-for-export']" (click)="navClose()" class="">Create Loadslip For
+              Export</button>
+            <button mat-menu-item [routerLink]="['/fgs/drafted-load-slip']" (click)="navClose()">Drafted Loadslips</button>
+            <button mat-menu-item [routerLink]="['/fgs/view-loadslip']" (click)="navClose()">View Loadslips</button>
+            <button mat-menu-item [routerLink]="['/fgs/cancelled-load-slips']" (click)="navClose()">Cancelled Loadslips</button>
+            <button mat-menu-item [routerLink]="['/fgs/loadslip-movement']" (click)="navClose()">Loadslip Movement</button>
+            <!-- <button mat-menu-item [routerLink]="['/fgs/loadslip-qty-check']">Loadslips QTY Check</button> -->
+          </div>
+        </mat-menu>
+      </li>
+      <li class="nav-item fgs-truck-status-menu side-menu " routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-truck-status'}">
+        <a class="nav-link" [matMenuTriggerFor]="truckStatus" #truckStatusTrigger="matMenuTrigger" (mouseenter)="open(truckStatusTrigger)">Truck
+          Status</a>
+        <mat-menu #truckStatus="matMenu">
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/transit-trucks']" (click)="navClose()">In-Transit Trucks </button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-inventory-shipping']" (click)="navClose()">Truck Inventory-Shipping
+          </button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-inventory-receiving']" (click)="navClose()">Truck
+            Inventory-Receiving</button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-history-shipping']" (click)="navClose()">Truck History-Shipping
+          </button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-history-receiving']" (click)="navClose()">Truck History-Receiving</button>
+          <button mat-menu-item [routerLink]="['/fgs/share-truck']" (click)="navClose()">Shared Truck</button>
+          <!-- <button mat-menu-item [routerLink]="['/transporter/export-trucking']">Export Tracking</button> -->
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-movement']" (click)="navClose()">Truck Movement</button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/cls']" (click)="navClose()">Export Tracking</button>
+        </mat-menu>
+      </li>
+    </ul>
+
+    <!-- FGS GATE SECURITY NAVBAR -->
+    <ul class="navbar-nav mr-auto gateHeader" *ngIf="(service.checkRole() == userRoles.gateSecurity)">
+      <li class="nav-item home-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'home'}">
+        <a class="nav-link fs-14" [routerLink]="['/home']" (click)="navClose()">Home</a>
+      </li>
+      <li class="nav-item GAT-REPORT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-REPORT'}">
+        <a class="nav-link" [routerLink]="['/gate-security/report-truck']" (click)="navClose()">Report Truck-Indent</a>
+      </li>
+      <li class="nav-item GAT-INTRASIT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-INTRASIT'}">
+        <a class="nav-link" [routerLink]="['/gate-security/report-intransit-truck']" (click)="navClose()">Report Truck-Intransit</a>
+      </li>
+      <li class="nav-item GAT-INVENTORY-SHIPPING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-INVENTORY-SHIPPING'}">
+        <a class="nav-link" [routerLink]="['/gate-security/gate-truck-inventory-shipping']" (click)="navClose()">Truck Inventory-Shipping</a>
+      </li>
+      <!-- <li class="nav-item GAT-INVENTORY-RECEIVING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-INVENTORY-RECEIVING'}">
+        <a class="nav-link" [routerLink]="['/gate-security/gate-truck-inventory-receiving']">Truck Inventory-Receiving</a>
+      </li> -->
+      <li class="nav-item GAT-HISTORY-SHIPPING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-HISTORY-SHIPPING'}">
+        <a class="nav-link" [routerLink]="['/gate-security/gate-truck-history-shipping']" (click)="navClose()">Truck History-Shipping</a>
+      </li>
+      <!-- <li class="nav-item GAT-HISTORY-RECEIVING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-HISTORY-RECEIVING'}">
+        <a class="nav-link" [routerLink]="['/gate-security/gate-truck-history-receiving']">Truck History-Receiving</a>
+      </li> -->
+      <li class="nav-item GAT-TRUCK-MOVEMENT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-TRUCK-MOVEMENT'}">
+        <a class="nav-link" [routerLink]="['/rdc/truck-status/truck-movement']" (click)="navClose()">Truck Movement</a>
+      </li>
+      <li class="nav-item GAT-RECEIVING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-RECEIVING'}">
+        <a class="nav-link" [matMenuTriggerFor]="GATHistory" #GATHistorymatMenuTrigger="matMenuTrigger" 
+        (mouseenter)="open(GATHistorymatMenuTrigger)">Truck Receiving</a>
+        <mat-menu #GATHistory="matMenu">
+          <div (mouseleave)="GATHistorymatMenuTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/gate-security/gate-truck-inventory-receiving']" (click)="navClose()">Inventory</button>
+            <button mat-menu-item [routerLink]="['/gate-security/gate-truck-history-receiving']" (click)="navClose()">History</button>
+          </div>
+        </mat-menu>
+      </li>
+    </ul>
+
+    <!-- RDC PLANNER / OPERATIONS ROLE NAVBAR -->
+    <ul class="navbar-nav mr-auto" *ngIf="(service.checkRole() == userRoles.rdc_PLN)">
+      <li class="nav-item home-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'home'}">
+        <a class="nav-link" [routerLink]="['/home']">Home</a>
+      </li>
+      <li class="nav-item dropdown create-plan-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'create-plan'}">
+        <a class="nav-link" [matMenuTriggerFor]="FGScreatePlan" #FGSPLANmatMenuTrigger="matMenuTrigger" (mouseenter)="FGSPLANmatMenuTrigger.openMenu()">Create
+          Plan</a>
+        <mat-menu #FGScreatePlan="matMenu">
+          <div (mouseleave)="FGSPLANmatMenuTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/rdc/manual-plan']" (click)="navClose()">Manual Plan</button>
+            <button mat-menu-item [routerLink]="['/rdc/create-plan']" (click)="navClose()">Upload Plan</button>
+            <button mat-menu-item [routerLink]="['/rdc/pending-plans']" (click)="navClose()" class="">Error Lines</button>
+          </div>
+        </mat-menu>
+      </li>
+      <li class="nav-item dispatch-plan-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'dispatch-plan'}">
+        <a class="nav-link" [matMenuTriggerFor]="dispatchPlan" #matMenuTrigger2="matMenuTrigger" (mouseenter)="matMenuTrigger2.openMenu()">DispatchPlan</a>
+        <mat-menu #dispatchPlan="matMenu">
+          <div (mouseleave)="matMenuTrigger2.closeMenu()">
+            <button mat-menu-item [routerLink]="['/rdc/view-plan']" (click)="navClose()">View Plans</button>
+            <button mat-menu-item [routerLink]="['/rdc/modifiy-plan']" (click)="navClose()">Modify Plans</button>
+            <button mat-menu-item [routerLink]="['/rdc/approve-plans']" (click)="navClose()">Approve Plans </button>
+          </div>
+        </mat-menu>
+      </li>
+
+      <li class="nav-item fgs-indents-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-indents'}">
+        <a class="nav-link" #indents="matMenuTrigger" [matMenuTriggerFor]="indentslist" #matMenuTrigger="matMenuTrigger"
+          (mouseenter)="matMenuTrigger.openMenu()">Indents</a>
+        <mat-menu #indentslist="matMenu">
+          <div (mouseleave)="matMenuTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/rdc/indent/create-indents']" (click)="navClose()">Create Indent</button>
+            <button mat-menu-item [routerLink]="['/rdc/indent/create-indent-excel-upload']" (click)="navClose()">Upload Indent</button>
+            <button mat-menu-item [routerLink]="['/rdc/indent/view-indents']" (click)="navClose()">View Indents </button>
+            <button mat-menu-item [routerLink]="['/rdc/indent/modify-indents']" (click)="navClose()">Modify Indents </button>
+          </div>
+        </mat-menu>
+      </li>
+
+      <li class="nav-item load-slip-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'load-slip'}">
+        <a class="nav-link" [matMenuTriggerFor]="loadSlip" #loadslipTrigger="matMenuTrigger" (mouseenter)="loadslipTrigger.openMenu()">Load
+          Slip</a>
+        <mat-menu #loadSlip="matMenu">
+          <div (mouseleave)="loadslipTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/rdc/create-load-slip']" (click)="navClose()" class="">Create Loadslip</button>
+            <button mat-menu-item [routerLink]="['/rdc/create-load-slip-for-export']" (click)="navClose()" class="">Create Loadslip For
+              Export</button>
+            <button mat-menu-item [routerLink]="['/rdc/drafted-load-slip']" (click)="navClose()">Drafted Loadslips</button>
+            <button mat-menu-item [routerLink]="['/rdc/view-loadslip']" (click)="navClose()">View Loadslips</button>
+            <button mat-menu-item [routerLink]="['/rdc/cancelled-load-slips']" (click)="navClose()">Cancelled Loadslips</button>
+            <button mat-menu-item [routerLink]="['/rdc/loadslip-movement']" (click)="navClose()">Loadslip Movement</button>
+            <!-- <button mat-menu-item [routerLink]="['/rdc/loadslip-qty-check']">Loadslips QTY Check</button> -->
+          </div>
+        </mat-menu>
+      </li>
+      <li class="nav-item fgs-truck-status-menu side-menu " routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-truck-status'}">
+        <a class="nav-link" [matMenuTriggerFor]="truckStatus" #truckStatusTrigger="matMenuTrigger" (mouseenter)="truckStatusTrigger.openMenu()">Truck
+          Status</a>
+        <mat-menu #truckStatus="matMenu">
+          <button mat-menu-item [routerLink]="['/rdc/truck-status/truck-inventory-shipping']" (click)="navClose()">Truck Inventory-Shipping
+          </button>
+          <button mat-menu-item [routerLink]="['/rdc/truck-status/truck-inventory-receiving']" (click)="navClose()">Truck
+            Inventory-Receiving</button>
+          <button mat-menu-item [routerLink]="['/fgs/share-truck']" (click)="navClose()">Shared Truck</button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/cls']" (click)="navClose()">Export Tracking</button>
+        </mat-menu>
+      </li>
+      <li class="nav-item RDC-GAT-REPORT-menu side-menu " routerLinkActive="active" [ngClass]="{'active':userMenu == 'RDC-GAT-REPORT'}">
+        <a class="nav-link" [matMenuTriggerFor]="rdcReceive" #rdcReceivingTrigger="matMenuTrigger" (mouseenter)="rdcReceivingTrigger.openMenu()">Gate
+          Security</a>
+        <mat-menu #rdcReceive="matMenu">
+          <button mat-menu-item [routerLink]="['/gate-security/report-truck']">Report Truck-Indent </button>
+          <button mat-menu-item [routerLink]="['/rdc/receving-rdc/report-Intransit-truck']">Report Truck-Intransit</button>
+          <button mat-menu-item [routerLink]="['/rdc/truck-status/gate-truck-inventory-shipping']">Truck
+            Inventory-Shipping
+          </button>
+          <button mat-menu-item [routerLink]="['/rdc/truck-status/gate-truck-inventory-receiving']">Truck
+            Inventory-Receiving</button>
+          <button mat-menu-item [routerLink]="['/rdc/truck-status/gate-truck-history-shipping']">Truck History-Shipping
+          </button>
+          <button mat-menu-item [routerLink]="['/rdc/truck-status/gate-truck-history-receiving']">Truck
+            History-Receiving</button>
+            <button mat-menu-item [routerLink]="['/rdc/truck-status/truck-movement']">Truck Movement</button>
+        </mat-menu>
+      </li>
+    </ul>
+
+    <!-- RDC GATE-SECURITY NAVBAR  -->
+    <ul class="navbar-nav mr-auto" *ngIf="(service.checkRole() == userRoles.rdc_GAT)">
+      <li class="nav-item home-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'home'}">
+        <a class="nav-link" [routerLink]="['/home']">Home</a>
+      </li>
+      <li class="nav-item GAT-REPORT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-REPORT'}">
+        <a class="nav-link" [routerLink]="['/gate-security/report-truck']">Report Truck-Indent</a>
+      </li>
+      <li class="nav-item GAT-INTRASIT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-INTRASIT'}">
+        <a class="nav-link" [routerLink]="['/rdc/receving-rdc/report-Intransit-truck']">Report Truck-InTransit</a>
+      </li>
+
+      <li class="nav-item GAT-INVENTORY-SHIPPING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-INVENTORY-SHIPPING'}">
+        <a class="nav-link" [routerLink]="['/rdc/truck-status/gate-truck-inventory-shipping']">Truck Inventory-Shipping</a>
+      </li>
+           <!-- <li class="nav-item GAT-INVENTORY-RECEIVING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-INVENTORY-RECEIVING'}">
+        <a class="nav-link" [routerLink]="['/gate-security/gate-truck-inventory-receiving']">Truck Inventory-Receiving</a>
+      </li> -->
+      <li class="nav-item GAT-HISTORY-SHIPPING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-HISTORY-SHIPPING'}">
+        <a class="nav-link" [routerLink]="['/gate-security/gate-truck-history-shipping']">Truck History-Shipping</a>
+      </li>
+      <!-- <li class="nav-item GAT-HISTORY-RECEIVING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-HISTORY-RECEIVING'}">
+        <a class="nav-link" [routerLink]="['/gate-security/gate-truck-history-receiving']">Truck History-Receiving</a>
+      </li> -->
+      <li class="nav-item GAT-TRUCK-MOVEMENT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-TRUCK-MOVEMENT'}">
+        <a class="nav-link" [routerLink]="['/rdc/truck-status/truck-movement']">Truck Movement</a>
+      </li>
+      <li class="nav-item GAT-RECEIVING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-RECEIVING'}">
+        <a class="nav-link" [matMenuTriggerFor]="GATHistory" #GATHistorymatMenuTrigger="matMenuTrigger" 
+        (mouseenter)="GATHistorymatMenuTrigger.openMenu()">Truck Receiving</a>
+        <mat-menu #GATHistory="matMenu">
+          <div (mouseleave)="GATHistorymatMenuTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/gate-security/gate-truck-inventory-receiving']">Inventory</button>
+            <button mat-menu-item [routerLink]="['/gate-security/gate-truck-history-receiving']">History</button>
+          </div>
+        </mat-menu>
+      </li>
+      
+    </ul>
+
+
+
+
+    <!--TRANSPORTER NAVBAR -->
+    <ul class="navbar-nav mr-auto" *ngIf="service.checkRole() == userRoles.transporter">
+      <li class="nav-item side-menu assign-trucks-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'assign-trucks'}">
+        <a class="nav-link" [routerLink]="['/transporter/assign-truck']">Assign Trucks</a>
+      </li>
+      <!-- <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/trucks/truck-details']">Truck Details</a>
+      </li> -->
+    </ul>
+
+
+    <!-- For JIT Operations role Navbar -->
+    <ul class="navbar-nav mr-auto" *ngIf="(service.checkRole() == userRoles.JIT_OPERATION)">
+      <li class="nav-item home-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'home'}">
+        <a class="nav-link" [routerLink]="['/home']" (click)="navClose()">Home</a>
+      </li>
+      <li class="nav-item fgs-indents-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-indents'}">
+        <a class="nav-link" #indents="matMenuTrigger" [matMenuTriggerFor]="indentslist" #matMenuTrigger="matMenuTrigger"
+          (mouseenter)="matMenuTrigger.openMenu()">Indents</a>
+        <mat-menu #indentslist="matMenu">
+          <div (mouseleave)="matMenuTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/jit/indent/create-indents']" (click)="navClose()">Create Indent</button>
+            <button mat-menu-item [routerLink]="['/jit/indent/create-indent-excel-upload']" (click)="navClose()">Upload Indent</button>
+            <button mat-menu-item [routerLink]="['/jit/indent/view-indents']" (click)="navClose()">View Indents </button>
+            <button mat-menu-item [routerLink]="['/jit/indent/modify-indents']" (click)="navClose()">Modify Indents </button>
+          </div>
+        </mat-menu>
+      </li>
+      <li class="nav-item load-slip-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'load-slip'}">
+        <a class="nav-link" [matMenuTriggerFor]="loadSlip" #loadslipTrigger="matMenuTrigger" (mouseenter)="dummy(loadslipTrigger)">Load
+          Slip</a>
+        <mat-menu #loadSlip="matMenu">
+          <div (mouseleave)="loadslipTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/jit/create-load-slip-for-jit']" (click)="navClose()" class="">Create Loadslip For JIT</button>
+            <button mat-menu-item [routerLink]="['/jit/drafted-load-slip']" (click)="navClose()">Drafted Loadslips</button>
+            <button mat-menu-item [routerLink]="['/jit/view-loadslip']" (click)="navClose()">View Loadslips</button>
+            <button mat-menu-item [routerLink]="['/jit/cancelled-load-slips']" (click)="navClose()">Cancelled Loadslips</button>
+            <button mat-menu-item [routerLink]="['/jit/loadslip-movement']" (click)="navClose()">Loadslip Movement</button>
+          </div>
+        </mat-menu>
+      </li>
+      <li class="nav-item fgs-truck-status-menu side-menu " routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-truck-status'}">
+        <a class="nav-link" [matMenuTriggerFor]="truckStatus" #truckStatusTrigger="matMenuTrigger" (mouseenter)="truckStatusTrigger.openMenu()">Truck
+          Status</a>
+        <mat-menu #truckStatus="matMenu">
+          <button mat-menu-item [routerLink]="['/jit/truck-status/truck-inventory-shipping']" (click)="navClose()">Truck Inventory-Shipping
+          </button>
+          <button mat-menu-item [routerLink]="['/jit/truck-status/truck-inventory-receiving']" (click)="navClose()">Truck
+            Inventory-Receiving</button>
+          <button mat-menu-item [routerLink]="['/jit/share-truck']" (click)="navClose()">Shared Truck</button>
+          <!-- <button mat-menu-item [routerLink]="['/fgs/truck-status/cls']">Export Tracking</button> -->
+          <!-- 
+            <button mat-menu-item [matMenuTriggerFor]="JITTRUCKINVENTORY">Truck Inventory</button>
+          <mat-menu #JITTRUCKINVENTORY="matMenu">
+            <button mat-menu-item [routerLink]="['/jit/truck-status/truck-inventory-shipping']">Truck Inventory-Shipping </button>
+            <button mat-menu-item [routerLink]="['/jit/truck-status/truck-inventory-receiving']">Truck Inventory-Receiving</button>
+          </mat-menu>
+              <button mat-menu-item [matMenuTriggerFor]="JITTRUCKHISTORY">Truck History</button>
+            <button mat-menu-item [routerLink]="['/jit/truck-status/transit-trucks']">In-Transit Trucks </button>
+            <mat-menu #JITTRUCKHISTORY="matMenu">
+            <button mat-menu-item [routerLink]="['/jit/truck-status/truck-history-shipping']">Shipping </button>
+            <button mat-menu-item [routerLink]="['/jit/truck-status/truck-history-receiving']">Receiving</button>
+          </mat-menu> -->
+        </mat-menu>
+      </li>
+      <li class="nav-item RDC-GAT-REPORT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'RDC-GAT-REPORT'}">
+        <a class="nav-link" [matMenuTriggerFor]="rdcReceive" #rdcReceivingTrigger="matMenuTrigger" (mouseenter)="rdcReceivingTrigger.openMenu()">Gate
+          Security</a>
+        <mat-menu #rdcReceive="matMenu">
+          <button mat-menu-item [routerLink]="['/jit/truck-status/report-intransit-truck']" (click)="navClose()">Report Truck-Intransit</button>
+          <button mat-menu-item [routerLink]="['/jit/truck-status/report-truck']" (click)="navClose()">Report Truck-Indent </button>
+          <button mat-menu-item [routerLink]="['/jit/truck-status/gate-truck-inventory-shipping']" (click)="navClose()">Truck
+            Inventory-Shipping </button>
+          <button mat-menu-item [routerLink]="['/jit/truck-status/gate-truck-inventory-receiving']" (click)="navClose()">Truck
+            Inventory-Receiving</button>
+          <button mat-menu-item [routerLink]="['/jit/truck-status/gate-truck-history-shipping']" (click)="navClose()">Truck History-Shipping
+          </button>
+          <button mat-menu-item [routerLink]="['/jit/truck-status/gate-truck-history-receiving']" (click)="navClose()">Truck
+            History-Receiving</button>
+            <button mat-menu-item [routerLink]="['/jit/truck-status/truck-movement']" (click)="navClose()">Truck Movement</button>
+        </mat-menu>
+      </li>
+    </ul>
+    <!-- for JIT Gate security role navbar -->
+    <ul class="navbar-nav mr-auto" *ngIf="(service.checkRole() == userRoles.JIT_GATE_SECURITY)">
+      <li class="nav-item home-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'home'}">
+        <a class="nav-link" [routerLink]="['/home']" (click)="navClose()">Home</a>
+      </li>
+      <li class="nav-item GAT-REPORT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-REPORT'}">
+        <a class="nav-link" [routerLink]="['/jit/truck-status/report-truck']" (click)="navClose()">Report Truck-Indent</a>
+      </li>
+      <li class="nav-item GAT-INTRASIT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-INTRASIT'}">
+        <a class="nav-link" [routerLink]="['/jit/truck-status/report-intransit-truck']" (click)="navClose()">Report Truck-Intransit</a>
+      </li>
+      <li class="nav-item GAT-INVENTORY-SHIPPING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-INVENTORY-SHIPPING'}">
+        <a class="nav-link" [routerLink]="['/jit/truck-status/gate-truck-inventory-shipping']" (click)="navClose()">Truck Inventory-Shipping</a>
+      </li>
+           <!-- <li class="nav-item GAT-INVENTORY-RECEIVING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-INVENTORY-RECEIVING'}">
+        <a class="nav-link" [routerLink]="['/gate-security/gate-truck-inventory-receiving']">Truck Inventory-Receiving</a>
+      </li> -->
+      <li class="nav-item GAT-HISTORY-SHIPPING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-HISTORY-SHIPPING'}">
+        <a class="nav-link" [routerLink]="['/gate-security/gate-truck-history-shipping']" (click)="navClose()">Truck History-Shipping</a>
+      </li>
+      <!-- <li class="nav-item GAT-HISTORY-RECEIVING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-HISTORY-RECEIVING'}">
+        <a class="nav-link" [routerLink]="['/gate-security/gate-truck-history-receiving']">Truck History-Receiving</a>
+      </li> -->
+      <li class="nav-item GAT-TRUCK-MOVEMENT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-TRUCK-MOVEMENT'}">
+        <a class="nav-link" [routerLink]="['/rdc/truck-status/truck-movement']" (click)="navClose()">Truck Movement</a>
+      </li>
+      <li class="nav-item GAT-RECEIVING-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'GAT-RECEIVING'}">
+        <a class="nav-link" [matMenuTriggerFor]="GATHistory" #GATHistorymatMenuTrigger="matMenuTrigger" 
+        (mouseenter)="GATHistorymatMenuTrigger.openMenu()">Truck Receiving</a>
+        <mat-menu #GATHistory="matMenu">
+          <div (mouseleave)="GATHistorymatMenuTrigger.closeMenu()">
+            <button mat-menu-item [routerLink]="['/gate-security/gate-truck-inventory-receiving']" (click)="navClose()">Inventory</button>
+            <button mat-menu-item [routerLink]="['/gate-security/gate-truck-history-receiving']" (click)="navClose()">History</button>
+          </div>
+        </mat-menu>
+      </li>
+
+      <!-- 
+      <li class="nav-item fgs-truck-status-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-truck-status'}">
+        <a class="nav-link " #fgsmenuTrigger="matMenuTrigger" [matMenuTriggerFor]="fgs" #fgsmenuTrigger="matMenuTrigger"
+          (mouseenter)="fgsmenuTrigger.openMenu()">FGS-JIT</a>
+        <mat-menu #fgs="matMenu">
+          <button mat-menu-item [routerLink]="['/jit/truck-status/transit-trucks']">In-Transit Trucks </button>
+          <button mat-menu-item [matMenuTriggerFor]="gateSecurityReporting">Report Truck </button>
+          <button mat-menu-item [matMenuTriggerFor]="JITGATETRUCKINVENTORY">Truck Inventory</button>
+          <button mat-menu-item [matMenuTriggerFor]="JITGATETRUCKHISTORY">Truck History</button>
+          <mat-menu #JITGATETRUCKINVENTORY="matMenu">
+            <button mat-menu-item [routerLink]="['/jit/truck-status/gate-truck-inventory-shipping']">Shipping </button>
+            <button mat-menu-item [routerLink]="['/jit/truck-status/gate-truck-inventory-receiving']">Receiving</button>
+          </mat-menu>
+          <mat-menu #JITGATETRUCKHISTORY="matMenu">
+            <button mat-menu-item [routerLink]="['/jit/truck-status/gate-truck-history-shipping']">Shipping </button>
+            <button mat-menu-item [routerLink]="['/jit/truck-status/gate-truck-history-receiving']">Receiving</button>
+          </mat-menu>
+          <mat-menu #gateSecurityReporting="matMenu">
+            <button mat-menu-item [routerLink]="['/jit/truck-status/report-truck']">Against Indent </button>
+            <button mat-menu-item [routerLink]="['/jit/truck-status/report-intransit-truck']">In-Transit Truck</button>
+          </mat-menu>
+        </mat-menu>
+         <button mat-menu-item [routerLink]="['/gate-security/report-container']">Report Container </button>
+          <button mat-menu-item [matMenuTriggerFor]="turckStuatus">Truck Status </button> 
+          <mat-menu #turckStuatus="matMenu">
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-inventory-jit']">Truck Inventory</button>
+          <button mat-menu-item [routerLink]="['/fgs/truck-status/truck-history-jit']">Truck History</button>
+        </mat-menu>
+      </li> -->
+
+    </ul>
+
+    <!-- CHA role navbar -->
+    <ul class="navbar-nav mr-auto" *ngIf="service.checkRole() == userRoles.EXPORT_CHA">
+      <li class="nav-item side-menu assign-trucks-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'assign-trucks'}">
+        <a class="nav-link" [routerLink]="['/transporter/assign-truck']">Assign Trucks</a>
+      </li>
+     <!--  <li class="nav-item side-menu export-trucking-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'export-trucking'}">
+        <a class="nav-link" [routerLink]="['/transporter/export-trucking']">Export Tracking</a>
+      </li> -->
+      <!-- <li class="nav-item" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/trucks/truck-details']">Truck Details</a>
+      </li> -->
+    </ul>
+
+
+
+    <!-- ABU_PLN Role NAVBAR  -->
+    <ul class="navbar-nav mr-auto" *ngIf="(service.checkRole() == userRoles.ABU_PLN)">
+      <li class="nav-item fgs-truck-status-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-truck-status'}">
+        <a class="nav-link" [routerLink]="['/rdc/receving-rdc/transit-trucks']">Intransit-Trucks</a>
+      </li>
+      <!--  <li class="nav-item RDC-GAT-REPORT-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'RDC-GAT-REPORT'}">
+        <a class="nav-link" [matMenuTriggerFor]="rdcReceive" #rdcReceivingTrigger="matMenuTrigger" (mouseenter)="rdcReceivingTrigger.openMenu()">Gate
+          Security</a>
+       <mat-menu #rdcReceive="matMenu">
+          <button mat-menu-item [routerLink]="['/rdc/receving-rdc/transit-trucks']">In-Transit Trucks </button>
+          <button mat-menu-item [matMenuTriggerFor]="rdcReporting">Report Trucks</button>
+          <button mat-menu-item [matMenuTriggerFor]="RDCGATTRUCKINVENTORY">Truck Inventory</button>
+          <button mat-menu-item [matMenuTriggerFor]="RDCGATTRUCKHISTORY">Truck History</button>
+          <mat-menu #RDCGATTRUCKINVENTORY="matMenu">
+            <button mat-menu-item [routerLink]="['/rdc/truck-status/gate-truck-inventory-shipping']">Shipping
+            </button>
+            <button mat-menu-item [routerLink]="['/rdc/truck-status/gate-truck-inventory-receiving']">Receiving</button>
+          </mat-menu>
+          <mat-menu #RDCGATTRUCKHISTORY="matMenu">
+            <button mat-menu-item [routerLink]="['/rdc/truck-status/gate-truck-history-shipping']">Shipping </button>
+            <button mat-menu-item [routerLink]="['/rdc/truck-status/gate-truck-history-receiving']">Receiving</button>
+          </mat-menu>
+          <mat-menu #rdcReporting="matMenu">
+            <button mat-menu-item [routerLink]="['/rdc/receving-rdc/report-Intransit-truck']">Against In-Transit Truck</button>
+            <button mat-menu-item [routerLink]="['/gate-security/report-truck']">Against Indent </button>
+          </mat-menu>
+        </mat-menu
+      </li>> -->
+    </ul>
+
+<!--FPL ROLE NAVBAR -->
+<ul class="navbar-nav mr-auto" *ngIf="service.checkRole() == userRoles.FPL"  >
+  <li class="nav-item side-menu shipment-export-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'shipment-export'}">
+    <a class="nav-link" [routerLink]="['/fpl/shipment-export-upload']">Shipment Export Upload</a>
+  </li>
+  <!-- <li class="nav-item side-menu shipment-export-view-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'shipment-export-view'}">
+    <a class="nav-link" [routerLink]="['/fpl/shipment-export-view']">Shipment Export View</a>
+  </li> -->
+  <li class="nav-item fgs-truck-status-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'fgs-truck-status'}">
+    <a class="nav-link"  [routerLink]="['/fgs/truck-status/cls']">Export Tracking</a>
+  </li>
+  
+</ul>
+
+<!-- Admin Role Navbar -->
+<ul class="navbar-nav mr-auto" *ngIf="service.checkRole() == userRoles.ADMIN">
+<li class="nav-item sap-master-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'sap-master-menu'}">
+<a class="nav-link" [matMenuTriggerFor]="sapMaster" #sapMasterTrigger="matMenuTrigger" 
+(mouseenter)="sapMasterTrigger.openMenu()">SAP Masters</a>
+<mat-menu #sapMaster="matMenu">
+  <button mat-menu-item [routerLink]="['/admin/sap-masters/mt-item']">Item</button>
+  <button mat-menu-item [routerLink]="['/admin/sap-masters/mt-oe-bom']">OE BOM </button>
+  <button mat-menu-item [routerLink]="['/admin/sap-masters/mt-rep-bom']">REP BOM</button>
+  <button mat-menu-item [routerLink]="['/admin/sap-masters/mt-plant-item']">Plant Item Weight</button>
+  <button mat-menu-item [routerLink]="['/admin/sap-masters/mt-transporter']">Transporter</button>
+  <button mat-menu-item [routerLink]="['/admin/sap-masters/mt-location']">Location</button>
+  <button mat-menu-item [routerLink]="['/admin/sap-masters/mt-customer-location']">Customer</button>
+
+   <!-- <button mat-menu-item [routerLink]="['/admin/sap-masters/mt-contact']">Contact</button> -->
+  <!--<button mat-menu-item [routerLink]="['/admin/sap-masters/mt-customer']">Customer</button>
+  <button mat-menu-item [routerLink]="['/admin/sap-masters/mt-customer-ship-to']">Customer Ship To</button>
+   -->
+
+</mat-menu>
+
+</li>
+<li class="nav-item paas-master-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'paas-master-menu'}">
+<a class="nav-link" [matMenuTriggerFor]="paasMaster" #paasMasterTrigger="matMenuTrigger" 
+(mouseenter)="paasMasterTrigger.openMenu()">PaaS Masters</a>
+
+<mat-menu #paasMaster="matMenu">
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/location-scan']">Location Scan</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-batch-codes']">Batch Codes</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-truck-type']">Truck Type</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-sap-truck-type']">SAP Truck Type</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-material-group']">Material Group</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-valve']">Valve</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/order-type-lookup']">Order Type Lookup</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-elr']">ELR</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-excess-waiting-loc-limit']">Excess Waiting Loc Limit</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-excess-waiting-rep-limit']">Excess Waiting Rep Limit</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-location-bay']">Location Bay</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/servprov']">Servprov</button>
+  <button mat-menu-item [routerLink]="['/admin/freight/mt-freight-dedicated']">Truck Dedicated</button> 
+  <!-- <button mat-menu-item [routerLink]="['/admin/paas-masters/ct-otm-freight-basis']">Otm Freight Basis</button> -->
+  <!-- <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-truck']">Truck</button>
+  
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/ct-uom']">Uom</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/ct-uom-map']">Uom Map</button>
+  <button mat-menu-item [routerLink]="['/admin/paas-masters/mt-incoterms']">Incoterms</button> -->
+</mat-menu>
+</li>
+
+
+<li class="nav-item user-management-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'user-management-menu'}">
+<a class="nav-link" [matMenuTriggerFor]="userManagement" #userManagementTrigger="matMenuTrigger" 
+(mouseenter)="userManagementTrigger.openMenu()">User Management</a>
+<mat-menu #userManagement="matMenu">
+  <button mat-menu-item [routerLink]="['/admin/user-management/um-user']">Users</button>
+  <button mat-menu-item [routerLink]="['/admin/user-management/create-user']">Create User</button>
+  <button mat-menu-item [routerLink]="['/admin/user-management/change-password']">Change Password</button>
+  <button mat-menu-item [routerLink]="['/admin/user-management/um-user-role']">User Roles</button>
+  <button mat-menu-item [routerLink]="['/admin/user-management/um-user-association']">User Association</button>
+</mat-menu>
+</li>
+
+<li class="nav-item freight-master-menu side-menu" routerLinkActive="active" [ngClass]="{'active':userMenu == 'freight-master-menu'}">
+<a class="nav-link" [matMenuTriggerFor]="freightMaster" #freightMasterTrigger="matMenuTrigger" (mouseenter)="freightMasterTrigger.openMenu()">Freight</a>
+<mat-menu #freightMaster="matMenu">
+  <button mat-menu-item [routerLink]="['/admin/freight/mt-frieght']">Freight</button>
+  <button mat-menu-item [routerLink]="['/admin/freight/create-frieght']">Create Freight</button>
+  <!-- <button mat-menu-item [routerLink]="['/admin/freight/mt-freight-dedicated']">Truck Dedicated</button> -->
+
+</mat-menu>
+</li>
+
+</ul>
+<span class="navbar-text flex-row ml-md-auto d-none d-md-flex">
+<div class="user">
+<i class="fa fa-user-circle" aria-hidden="true" [matMenuTriggerFor]="menu"></i>
+<button mat-button [matMenuTriggerFor]="menu">{{getUserName()}} - ({{getUserRole()}})-
+  ({{getUserSource()}})</button>
+<mat-menu #menu="matMenu" class='logout-menu'>
+  <button mat-menu-item (click)="logout()">Logout</button>
+</mat-menu>
+</div>
+</span>
+</div>
+</nav>

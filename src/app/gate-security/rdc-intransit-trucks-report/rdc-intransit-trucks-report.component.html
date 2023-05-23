@@ -1,0 +1,253 @@
+<app-loader *ngIf="isLoading">
+</app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header"><b> {{title}} </b>
+    <span class="pull-right refresh-span">
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="Filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+  <div class="clearfix"></div>
+  <div class="manualplan-fields" *ngIf="isShow">
+    <div class="row col-md-12">
+      <div class="col-md-12 padding-right-40">
+        <div class="row tab-loadslip-fields">
+          <div class="col-md-2">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput [(ngModel)]="shipmentId" autocomplete="off" name="shipmentid" placeholder="Shipment Id"
+                  oninput="this.value = this.value.toUpperCase()">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-1 pd-0">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="Source" placeholder="Source"
+                  (keyup)="getfilterDestination($event,'SOURCE', !isIntransitTruck)" autocomplete="off"
+                  [matAutocomplete]="sourceAutocomplete" [(ngModel)]="source" name="source"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #sourceAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of sourceList" [value]="list.value">
+                    <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- <div class="col-md-2">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="Destination" placeholder="Destination" (keyup)="getfilterDestination($event,'DESTINATION')"
+                  autocomplete="off" [matAutocomplete]="destinationAutocomplete" [(ngModel)]="destination" name="destination">
+                <mat-autocomplete #destinationAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationList" [value]="list.value">
+                    <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div> -->
+
+          <div class="col-md-1 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination" aria-label="State" [matAutocomplete]="statesAutocomplete"
+                  [(ngModel)]="destination" name="destination"
+                  (keyup)="getfilterDestination($event,'DESTINATION',isIntransitTruck)"
+                  oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #statesAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of destinationList" [value]="list.value"
+                    (click)="setDestDescription(list.description)"
+                    (onSelectionChange)="setDestDescription(list.description)">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2 pr-0">
+            <div class="form-group">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Destination Description" aria-label="State"
+                  [matAutocomplete]="destDisAutocomplete" [(ngModel)]="destinationDesc" name="destination"
+                  (keyup)="getUserDestinationList($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #destDisAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of descriptionList" [value]="list.description"
+                    (click)="setDestination(list.value)" (onSelectionChange)="setDestination(list.value)">
+                    <span>({{list.description}})</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="form-group">
+              <mat-form-field>
+                <mat-select placeholder="Truck/Container Type" [(ngModel)]="truckType" name="truckType" multiple>
+                  <!-- <mat-option [value]="">None</mat-option> -->
+                  <mat-option *ngFor="let truck of truckList" [value]="truck.value"> {{truck.value}} </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <mat-form-field>
+              <input matInput [(ngModel)]="truckNumber" autocomplete="off" name="truck number"
+                placeholder="Truck Number" oninput="this.value = this.value.toUpperCase()">
+            </mat-form-field>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <mat-form-field>
+                <input matInput aria-label="transporter" placeholder="Transporter"
+                  (keyup)="getfilterTransporter($event)" autocomplete="off" [matAutocomplete]="transporterAutocomplete"
+                  [(ngModel)]="transporter" name="transporter" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #transporterAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of transporterList" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- <div class="col-md-2">
+            <mat-form-field>
+              <mat-select placeholder="Select Status" name="status" [(ngModel)]="statusType">
+                <mat-option *ngFor="let status of reportTruckStatusList" [value]="status.value">
+                  {{status.key}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div> -->
+        </div>
+      </div>
+      <div class="pull-right">
+        <div class="search-fileds">
+          <button class="theme-small-button" (click)="truckstatusIndetsFilter()" matTooltip="Search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </button>
+          <button class="theme-delete-button" (click)="clearData()" matTooltip="Clear All">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ngx-datatable #table class='material  ngx-table-custom-scroll ngx-table-tr-custom-scroll'
+    [rows]='rdcGateSecurityTransitTrucks' [columnMode]="'force'" [headerHeight]="50" [footerHeight]="30"
+    [rowHeight]="'auto'" [limit]="rdcpage.limit" [scrollbarH]="true" [count]="rdcpage.count" [offset]="rdcpage.offset"
+    [externalPaging]="true" (page)="rdcGatesecurityDatetablePageData($event)">
+    <ngx-datatable-column name="Truck Number" [width]="100" [resizeable]="false" [sortable]="true" prop="truckNumber">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.truckNumber | uppercase}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Source" [width]="70" [resizeable]="false" [sortable]="true" prop="source">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.source}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Dest" [width]="70" [resizeable]="false" [sortable]="true" prop="destination">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.destination}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Shipment Id" [width]="130" [resizeable]="false" [sortable]="true" prop="shipmentId">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.shipmentId}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Dest Description" [width]="130" [resizeable]="false" [sortable]="true" prop="destDis">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.destDis}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Truck Type" [width]="130" [resizeable]="false" [sortable]="true" prop="truckType">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.truckType | uppercase}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Transporter" [width]="140" [resizeable]="false" [sortable]="true" prop="transporter">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.transporter | uppercase}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Source Report Date" [width]="125" [resizeable]="false" [sortable]="true"
+      prop="reportedDate">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.reportedDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Source Gate Out" [width]="125" [resizeable]="false" [sortable]="true"
+      prop="gateOutDate">
+      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+        <span *ngIf="row.gateOut">{{row.gateOutDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span>
+        <button mat-raised-button color="primary" *ngIf="!(row.gateOut)" (click)="eventTrigger(row,'INTRANSIT')"
+          class="table-btn">Gate
+          Out</button>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="ETA" [width]="125" [resizeable]="false" [sortable]="true" prop="etaDest">
+      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+        <span>{{row.etaDest | customDateFormat | date:'dd-MMM-yyyy' || '--'}}</span>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Driver Name" [width]="130" [resizeable]="false" [sortable]="true" prop="driverName">
+      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+        <span>{{row.driverName}}</span>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Driver Number" [width]="130" [resizeable]="false" [sortable]="true" prop="driverName">
+      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+        <span>{{row.driverContact}}</span>
+      </ng-template>
+    </ngx-datatable-column>
+    <!-- <ngx-datatable-column name="Driver License" [width]="130" [resizeable]="false" [sortable]="true" prop="driverName">
+      <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+        <span>{{row.driverLicense}}</span>
+      </ng-template>
+    </ngx-datatable-column> -->
+    <ngx-datatable-column name="Status" [width]="80" [resizeable]="false" [sortable]="true" prop="status">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.status}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Action" [width]="100" [resizeable]="false">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <button mat-raised-button color="primary" (click)="reportTruck(row)" class="table-btn"
+          *ngIf="(!row.truckReported)">Report</button>
+        <span *ngIf="(row.truckReported)">REPORTED</span>
+      </ng-template>
+    </ngx-datatable-column>
+    <!-- Footer Template starts -->
+    <ngx-datatable-footer>
+      <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+        let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+        <div class="page-count">
+          <span *ngIf="selectedCount">
+            {{selectedCount.toLocaleString()}} Selected |
+          </span>
+          Showing {{(offset * pageSize)+1}} to {{(rowCount>
+              (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+          {{(rowCount)}} records.
+        </div>
+        <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+          [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage"
+          [size]="pageSize" [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)"
+          (change)="table.onFooterPage($event)">
+        </datatable-pager>
+      </ng-template>
+    </ngx-datatable-footer>
+    <!-- Footer Template Ends -->
+  </ngx-datatable>
+</div>

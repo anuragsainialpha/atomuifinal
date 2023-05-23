@@ -1,0 +1,122 @@
+@import '../../../../assets/styles/variables';
+@import '../../../../assets/styles/mixins';
+
+.loadslip-fields {
+    box-shadow: none;
+    .form-group{
+        margin-bottom: 0em;
+        .mat-form-field-wrapper{
+            padding-bottom: 0em !important;
+            .mat-form-field-flex{
+                padding-top: 0em;
+                .mat-form-field-infix{
+                    border-top:0em solid transparent;
+                    padding: 0em;
+                }
+            }
+        }
+    }
+    .bordered {
+        padding:5px;
+        border: 1px solid $table-border-color;
+        // border-radius: 4px;
+        text-align: center;
+        div{
+            font-size: 12px;
+        }
+    }
+    .inputbordered{
+        padding:1px;
+        border: 1px solid $table-border-color;
+        // border-radius: 4px;
+        text-align: center;
+        .mat-form-field{
+            top: 8px;
+            padding: 0px 8px;
+        }
+    }
+    .flow-btns{
+        padding: 0px;
+        text-align: center;
+        margin-bottom: 5px;
+        margin-top: 2px;
+        button{
+            padding:0px 7px;
+        }
+        button.mat-default{
+            background-color: $theme-grey;
+            color: #555;
+            height: 34px;
+        }
+    }
+    .col-md-3{
+        padding: 0px 15px;
+        .bordered-box{
+            padding:5px;
+            border:1px solid $table-border-color;
+            // border-radius: 4px;
+            .col-md-4{
+                padding: 0px 10px;
+                text-align: center;
+            }
+            .bordered-box-left-div{
+                border-right: 1px solid $table-border-color;
+            }
+        }
+    }
+    .col-md-5 {
+        .bg-theme{
+            padding:5px;
+            margin-right: 0px;
+            background-color: $medium-color-theme;
+            color:$theme-white;
+            // border-radius: 4px;
+            margin-left: 0px;
+            .col-wid-20p{
+                flex: 0 0 20%;
+                max-width: 20%;
+                text-align: center;
+            }
+        }
+    }
+}
+.greenButton{
+    background-color: $theme-green-color !important;
+    padding: 0px 5px;
+    box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    // min-width: 110px;   
+    min-height: 35px;
+    span{
+        font-size: 8px;
+        color: #ffffff;
+        display: block;
+    }
+}
+
+
+.manulal-plan-header{
+    padding: 5px 0px;
+    margin-bottom: 0px;
+    font-weight: 600;
+    span{
+        color: $dark-color-theme;
+        margin-right: 15px;
+    }
+}
+
+
+.source-text{
+    margin-top: 5px;
+}
+.ngx-datatable.material{
+    margin-top: 10px;
+}
+
+
+.margin-bottom-5{
+    margin-bottom: 5px;
+}
+

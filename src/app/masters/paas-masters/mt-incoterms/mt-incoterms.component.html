@@ -1,0 +1,255 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+      <b> PaaS Masters &gt; Valve</b>
+    <span class="pull-right refresh-span">
+        <button class="theme-small-button" (click)="displayAddForm()" matTooltip="Add New Valve">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button>
+      <!-- <button class="theme-small-button" (click)="upload()" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+
+
+
+<div class="mt-item-fields" *ngIf="isShow">
+  <div class="col-md-12 row">
+    <div class="col-md-12 padding-right-40">
+      <div class="row">
+
+            <div class="col-md-2">
+              <div class="form-group">
+                <mat-form-field>
+                  <input matInput placeholder="Item Id" [(ngModel)]="itemId" name="itemId">
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="col-md-2">
+              <div class="form-group">
+                <mat-form-field>
+                  <input matInput placeholder="Item Description" [(ngModel)]="itemDescription" name="itemDescription">
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Item Category" [(ngModel)]="itemCategory" name="itemCategory">
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Batch Code" [(ngModel)]="batchCode" name="batchCode">
+                  </mat-form-field>
+                </div>
+              </div>
+
+      </div>
+    </div>
+   
+    <div class="pull-right">
+      <div class="search-fileds">
+        <button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+          <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+        </button>
+        <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+  <div class="mt-item-table">
+    <div>
+      <ngx-datatable class='material' #table [rows]='responseItemsList' [scrollbarH]="true" 
+      [externalPaging]="true" (page)="datatablePageData($event)"
+        [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count" [offset]="page.offset">
+        <ngx-datatable-column name="Item Id" [width]="220" [resizeable]="false" prop="itemId" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.itemId}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Item Description" [width]="250" [resizeable]="false" prop="itemDescription" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.itemDescription}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Item Category" [width]="100" [resizeable]="false" prop="itemCategory" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.itemCategory}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Batch Code" [width]="120" [resizeable]="false" prop="batchCode" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.batchCode}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Insert User" [width]="130" [resizeable]="false" prop="insertUser" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.insertUser}}
+            </ng-template>
+          </ngx-datatable-column>
+  
+        <ngx-datatable-column name="Insert Date" [width]="130" [resizeable]="false" prop="insertDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{trimDate(row.insertDate)}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Update User" [width]="130" [resizeable]="false" prop="updateUser" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.updateUser}}
+            </ng-template>
+          </ngx-datatable-column>
+  
+  
+        <ngx-datatable-column name="Update Date" [width]="130" [resizeable]="false" prop="updateDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{trimDate(row.updateDate)}}
+          </ng-template>
+        </ngx-datatable-column>
+  
+        <ngx-datatable-column name="Action" [width]="120" [resizeable]="false" [sortable]="false">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <button class="theme-small-button btn" matTooltip="Modify Item" (click)="showUpdateModel(row)" [disabled]="(row.isError)">
+              <i class="fa fa-edit fa-2x" aria-hidden="true"></i>
+            </button>
+          </ng-template>
+        </ngx-datatable-column>
+  
+      </ngx-datatable>
+    </div>
+  </div>
+  </div>
+
+
+
+<!--  -->
+<div class="modal" id="myModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && updateForm(f))">
+  <div class="modal-header">
+    <h4 class="modal-title text-primary">Update Mt Valve</h4>
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+  </div>
+  <div class="modal-body">
+      <div class="form-group">
+          <mat-form-field appearance="standard" class="example-full-width">
+            <input matInput placeholder="Item Category" aria-label="State" [(ngModel)]="itemCategoryu" name="itemCategoryu"
+              required autocomplete="off">
+            <mat-error *ngIf="(f.submitted && itemCategoryu.invalid)">
+              <p *ngIf="itemCategoryu.errors.required">Item Category is <strong>required</strong>
+              </p>
+            </mat-error>
+          </mat-form-field>
+        </div>
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Batch Code" aria-label="State" [(ngModel)]="batchCodeu" name="batchCodeu"
+          required autocomplete="off">
+        <mat-error *ngIf="(f.submitted && batchCodeu.invalid)">
+          <p *ngIf="batchCodeu.errors.required">Batch Code is
+            <strong>required</strong>
+          </p>
+        </mat-error>
+      </mat-form-field>
+    </div>
+   
+  </div>
+  <div class="modal-footer">
+    <button type="submit" mat-raised-button color="primary" class="btm-action-btn">Update</button>
+    <button type="button" mat-raised-button class="mat-default" color="default" data-dismiss="modal">Close</button>
+  </div>
+</form>
+</div>
+</div>
+</div>
+
+
+
+<br><br>
+<div class="mt-item-fields" *ngIf="displayForm">
+<div class="col-md-12 text-center padding-right-40">
+<mat-card>
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && saveForm(f))">
+  <h4 class="mt-item-header text-center text-primary">
+    <b> Add Mt Valve </b></h4>
+  <br>
+  <div class="row">
+    <!-- <div class="col-md-2">
+            </div> -->
+    <div class="col-md-3">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Item Id" [(ngModel)]="itemIdf" name="itemIdf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Item Id is <strong>required</strong></p>
+            </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Item Description" [(ngModel)]="itemDescriptionf" name="itemDescriptionf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Item Description is <strong>required</strong></p>
+            </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Item Category" [(ngModel)]="itemCategoryf" name="itemCategoryf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Item Category is <strong>required</strong></p>
+            </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Batch Code" [(ngModel)]="batchCodef" name="batchCodef" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Batch Code is <strong>required</strong></p>
+            </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-1">
+      <div class="form-group">
+        <button mat-raised-button color="primary" class="btm-action-btn">Save</button>
+      </div>
+    </div>
+  </div>
+</form>
+</mat-card>
+</div>
+</div>

@@ -1,0 +1,404 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+    <b> SAP Masters &gt; Location</b>
+    <span class="pull-right refresh-span">
+      <!-- <button class="theme-small-button" (click)="displayAddForm()" matTooltip="Add New Valve">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button> -->
+      <!-- <button class="theme-small-button" [routerLink]="['/admin/sap-masters/upload-mt-location']" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button>  -->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+  <div class="mt-item-fields" *ngIf="isShow">
+    <div class="col-md-12 row">
+      <div class="col-md-12 padding-right-40">
+        <div class="row">
+          <div class="col-md-1">
+            <mat-form-field>
+              <input matInput placeholder="Location Id" [(ngModel)]="locationId" name="locationId">
+            </mat-form-field>
+          </div>
+          <div class="col-md-2">
+            <mat-form-field>
+              <input matInput placeholder="Location Desc" [(ngModel)]="locationDesc" name="locationDesc">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1">
+            <mat-form-field>
+              <input matInput placeholder="Location Type" [(ngModel)]="locationType" name="locationType">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1">
+            <mat-form-field>
+              <input matInput placeholder="City" [(ngModel)]="city" name="city">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1">
+            <mat-form-field>
+              <input matInput placeholder="State" [(ngModel)]="state" name="state">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1">
+            <mat-form-field>
+              <input matInput placeholder="Country" [(ngModel)]="country" name="country">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1">
+            <mat-form-field>
+              <input matInput placeholder="State Code" [(ngModel)]="stateCode" name="stateCode">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1">
+            <mat-form-field>
+              <input matInput placeholder="GST State" [(ngModel)]="gstState" name="gstState">
+            </mat-form-field>
+          </div>
+          <div class="col-md-1">
+            <mat-form-field>
+              <input matInput placeholder="FT Access Key" [(ngModel)]="ftAccessKey" name="ftAccessKey">
+            </mat-form-field>
+          </div>
+          <div class="col-md-2">
+            <mat-form-field>
+              <input matInput placeholder="Location Class" [(ngModel)]="locationClass" name="locationClass">
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="pull-right">
+        <div class="search-fileds">
+          <button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </button>
+          <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <div class="mt-item-table">
+    <div>
+      <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table
+        [rows]='responseItemsList' [scrollbarH]="true" [externalPaging]="true" (page)="datatablePageData($event)"
+        [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count"
+        [offset]="page.offset">
+        <ngx-datatable-column name="Location Id" [width]="80" [resizeable]="false" prop="locationId" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.locationId}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Location Description" [width]="180" [resizeable]="false" prop="locationDesc"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.locationDesc}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Location Type" [width]="100" [resizeable]="false" prop="locationType"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.locationType}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Location Address" [width]="250" [resizeable]="false" prop="locationAddress"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.locationAddress}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="City" [width]="150" [resizeable]="false" prop="city" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.city}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="State" [width]="130" [resizeable]="false" prop="state" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.state}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Postal Code" [width]="80" [resizeable]="false" prop="postalCode" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.postalCode}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Country" [width]="60" [resizeable]="false" prop="country" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.country}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Is Active" [width]="70" [resizeable]="false" prop="isActive" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.isActive}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Latitude" [width]="90" [resizeable]="false" prop="lat" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.lat}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Longitude" [width]="90" [resizeable]="false" prop="lon" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.lon}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="State Code" [width]="80" [resizeable]="false" prop="stateCode" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.stateCode}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="GST No" [width]="130" [resizeable]="false" prop="gstNo" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.gstNo}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="GST State" [width]="80" [resizeable]="false" prop="gstState" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.gstState}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="PAN No" [width]="140" [resizeable]="false" prop="panNo" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.panNo}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="FT Access Key" [width]="150" [resizeable]="false" prop="ftAccessKey"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.ftAccessKey}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Location Class" [width]="150" [resizeable]="false" prop="locationClass"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.locationClass}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Linked Plant" [width]="100" [resizeable]="false" prop="linkedPlant"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.linkedPlant}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Email Id" [width]="150" [resizeable]="false" prop="emailId" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <ng-container >
+              <span  class="edit-label" [attr.title]="row.emailID" (click)="showEmailIds(row.emailID)">{{
+                (row.emailID?.length>15)? (row.emailID | slice:0:15)+'..':(row.emailID)}}</span>
+                <!-- <span *ngIf = "!row.emailId" class="edit-label" [attr.title]="row.emailId" (click)="showEmailIds('row.emailId')">ABC</span> -->
+            </ng-container>
+            
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Insert User" [width]="100" [resizeable]="false" prop="insertUser" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.insertUser}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Insert Date" [width]="100" [resizeable]="false" prop="insertDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.insertDate ? trimDate(row.insertDate) : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Update User" [width]="100" [resizeable]="false" prop="updateUser" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.updateUser}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Update Date" [width]="100" [resizeable]="false" prop="updateDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.updateDate ? trimDate(row.updateDate) : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Action" [width]="80" [resizeable]="false" [sortable]="false">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <button class="theme-small-button btn" matTooltip="Modify" (click)="showUpdateModel(row)"
+              [disabled]="(row.isError)">
+              <i class="fa fa-edit fa-2x" aria-hidden="true"></i>
+            </button>
+          </ng-template>
+        </ngx-datatable-column>
+           <!-- Footer Template starts -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+          let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+          <div class="page-count">
+            <span *ngIf="selectedCount">
+              {{selectedCount.toLocaleString()}} Selected |
+            </span>
+            Showing {{(offset * pageSize)+1}} to {{(rowCount>
+            (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+            {{(rowCount)}} records.
+          </div>
+          <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+            [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+            [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+          </datatable-pager>
+        </ng-template>
+      </ngx-datatable-footer>
+      <!-- Footer Template Ends -->
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+
+
+<!--  -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && updateForm(f))">
+        <div class="modal-header">
+          <h4 class="modal-title text-primary">Update Location</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <mat-form-field appearance="standard" class="example-full-width">
+              <input matInput placeholder="Latitude" aria-label="State" [(ngModel)]="latu" name="latu"
+                autocomplete="off">
+              <mat-error *ngIf="(f.submitted && latu.invalid)">
+                <p *ngIf="latu.errors.required">Latitude is <strong>required</strong>
+                </p>
+              </mat-error>
+              <p class="mtop6">Latitude</p>
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <mat-form-field appearance="standard" class="example-full-width">
+              <input matInput placeholder="Longitude" aria-label="State" [(ngModel)]="lonu" name="lonu"
+                autocomplete="off">
+              <mat-error *ngIf="(f.submitted && lonu.invalid)">
+                <p *ngIf="lonu.errors.required">Longitude is <strong>required</strong>
+                </p>
+              </mat-error>
+              <p class="mtop6">Longitude</p>
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <mat-form-field appearance="standard" class="example-full-width">
+              <input matInput placeholder="FT Access Key" aria-label="State" [(ngModel)]="ftAccessKeyu"
+                name="ftAccessKeyu" autocomplete="off">
+              <mat-error *ngIf="(f.submitted && ftAccessKeyu.invalid)">
+                <p *ngIf="ftAccessKeyu.errors.required">Longitude is <strong>required</strong>
+                </p>
+              </mat-error>
+              <p class="mtop6">FT Access Key</p>
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <mat-form-field appearance="standard" class="example-full-width">
+
+              <mat-select placeholder="Location Class" [(ngModel)]="locationClassu" name="locationClassu"
+                #qty="ngModel">
+                <mat-option *ngFor="let loc of locationCalssArray" [value]="loc">
+                  {{loc}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="(f.submitted && qty.invalid)">
+                <p *ngIf="qty.errors.required">Location Class is <strong>required</strong></p>
+              </mat-error>
+
+
+              <!-- <input matInput placeholder="Location Class" aria-label="State" [(ngModel)]="locationClassu"
+                name="locationClassu" autocomplete="off">
+              <mat-error *ngIf="(f.submitted && locationClassu.invalid)">
+                <p *ngIf="locationClassu.errors.required">Location Class is <strong>required</strong>
+                </p>
+              </mat-error> -->
+              <p class="mtop6">Location Class</p>
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <mat-form-field appearance="standard" class="example-full-width">
+              <mat-select placeholder="Linked Plant" [(ngModel)]="linkedPlantu" name="linkedPlantu" #qty="ngModel">
+                <mat-option *ngFor="let loc of locationIds" [value]="loc">
+                  {{loc}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="(f.submitted && qty.invalid)">
+                <p *ngIf="qty.errors.required">Linked Plant is <strong>required</strong></p>
+              </mat-error>
+
+              <!-- 
+              <input matInput placeholder="Linked Plant" aria-label="State" [(ngModel)]="linkedPlantu"
+                name="linkedPlantu" autocomplete="off">
+              <mat-error *ngIf="(f.submitted && linkedPlantu.invalid)">
+                <p *ngIf="linkedPlantu.errors.required">Linked Plant is <strong>required</strong>
+                </p>
+              </mat-error> -->
+              <p class="mtop6">Linked Plant</p>
+            </mat-form-field>
+            <!-- Email -->
+            <div class="cust-mat-form">
+              <mat-form-field class="example-chip-list cust-mat-form ">
+                <mat-chip-list #chipList aria-label="Fruit selection">
+                  <mat-chip *ngFor="let fruit of emails" [selectable]="selectable" [removable]="removable"
+                    (removed)="remove(fruit)">
+                    {{fruit.name}}
+                    <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+                  </mat-chip>
+                  <input  [matChipInputFor]="chipList" placeholder="Email"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+                    (matChipInputTokenEnd)="add($event)">
+                </mat-chip-list>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" mat-raised-button color="primary" class="btm-action-btn">Update</button>
+          <button type="button" mat-raised-button class="mat-default" color="default"
+            data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- View Email Modal -->
+<div class="modal" id="viewEmailModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form name="form" #f="ngForm">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Registered EmailIds</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div class="form-group">
+            <mat-chip-list class="mat-chip-list" aria-label="Email Id">
+              <mat-chip *ngFor="let chip of emails">
+                {{chip.name}}
+              </mat-chip>
+            </mat-chip-list>
+          </div>
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" mat-raised-button class="mat-default" color="default"
+            data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

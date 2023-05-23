@@ -1,0 +1,335 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+    <b> PaaS Masters &gt; Batch Codes</b>
+    <span class="pull-right refresh-span">
+      <button class="theme-small-button" (click)="displayAddForm()" matTooltip="Add New">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+      </button>
+      <!-- <button class="theme-small-button" [routerLink]="['/admin/paas-masters/upload-mt-batch-codes']" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+<div class="mt-item-fields" *ngIf="isShow">
+<div class="col-md-12 row">
+<div class="col-md-12 padding-right-40">
+<div class="row">
+<div class="col-md-6 pd-0">
+  <div class="row">
+    <div class="col-md-4">
+        <mat-form-field>
+          <input matInput placeholder="Batch Code" [(ngModel)]="batchCode" name="batchCode"> 
+
+          <!-- <input matInput aria-label="Batch Code" placeholder="Batch Code" (keyup)="getfilterDestination($event,'batchCode')"
+            autocomplete="off" [matAutocomplete]="sourceAutocomplete" [(ngModel)]="batchCode" name="batchCode">
+          <mat-autocomplete #sourceAutocomplete="matAutocomplete">
+            <mat-option *ngFor="let list of destinationList" [value]="list.value">
+              <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+            </mat-option>
+          </mat-autocomplete> -->
+
+        </mat-form-field>
+    </div>
+    <div class="col-md-4">
+        <mat-form-field>
+          <input matInput placeholder="Category" [(ngModel)]="category" name="category">
+        </mat-form-field>
+    </div>
+    <div class="col-md-4">
+        <mat-form-field>
+          <input matInput placeholder="Plant Code" [(ngModel)]="plantCode" name="plantCode">
+        </mat-form-field>
+    </div>
+  </div>
+</div>
+<div class='col-md-6 pd-0'>
+  <div class="row mg-0">
+
+  </div>
+</div>
+</div>
+</div>
+<div class="pull-right">
+<div class="search-fileds">
+<button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+  <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+</button>
+<button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+  <i class="fa fa-times" aria-hidden="true"></i>
+</button>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+  <div class="mt-item-table">
+      <!-- <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [rows]='responseItemsList' [scrollbarH]="true" [headerHeight]="50"
+      [externalPaging]="true" (page)="datatablePageData($event)" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count" [offset]="page.offset"> -->
+      <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [columnMode]="'force'"
+      [rows]='responseItemsList' [externalPaging]="true" (page)="datatablePageData($event)" [scrollbarH]="false"
+      [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count"
+      [offset]="page.offset">
+      <ngx-datatable-column name="Batch Code" [width]="150" [resizeable]="false" prop="batchCode" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.batchCode}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Category" [width]="130" [resizeable]="false" prop="category" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.category}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Plant Code" [width]="130" [resizeable]="false" prop="plantCode" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.plantCode}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Batch Description" [width]="250" [resizeable]="false" prop="batchDescription"
+          [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.batchDescription}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Insert User" [width]="110" [resizeable]="false" prop="insertUser" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.insertUser}}
+            </ng-template>
+          </ngx-datatable-column>
+       
+  
+          <ngx-datatable-column name="Insert Date" [width]="110" [resizeable]="false" prop="insertDate" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{trimDate(row.insertDate)}}
+              </ng-template>
+            </ngx-datatable-column>
+  
+            <ngx-datatable-column name="Update User" [width]="110" [resizeable]="false" prop="updateUser" [sortable]="true">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  {{row.updateUser}}
+                </ng-template>
+              </ngx-datatable-column>
+              
+          <ngx-datatable-column name="Update Date" [width]="110" [resizeable]="false" prop="updateDate" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{trimDate(row.updateDate)}}
+            </ng-template>
+          </ngx-datatable-column>
+
+        <ngx-datatable-column name="Action" [width]="100" [resizeable]="false" [sortable]="false">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <button class="theme-small-button btn" matTooltip="Modify" (click)="showUpdateModel(row)" [disabled]="(row.isError)">
+              <i class="fa fa-edit fa-2x" aria-hidden="true"></i>
+            </button>
+          </ng-template>
+        </ngx-datatable-column>
+           <!-- Footer Template starts -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+          let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+          <div class="page-count">
+            <span *ngIf="selectedCount">
+              {{selectedCount.toLocaleString()}} Selected |
+            </span>
+            Showing {{(offset * pageSize)+1}} to {{(rowCount>
+            (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+            {{(rowCount)}} records.
+          </div>
+          <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+            [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+            [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+          </datatable-pager>
+        </ng-template>
+      </ngx-datatable-footer>
+      <!-- Footer Template Ends -->
+      </ngx-datatable>
+  </div>
+</div>
+
+
+
+
+<br><br>
+<div class="mt-item-fields" *ngIf="displayForm">
+<div class="col-md-12 text-center padding-right-40">
+<mat-card>
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && saveForm(f))">
+  <h4 class="mt-item-header text-center text-primary">
+    <b> Add New Batch Code </b></h4>
+  <br>
+  <div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Batch Code" [(ngModel)]="batchCodef" name="batchCodef" required #qty="ngModel" oninput="this.value = this.value.toUpperCase()">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Batch Code is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+            <mat-select placeholder="Category" [(ngModel)]="categoryf" name="categoryf" #qty="ngModel" required>
+                <mat-option *ngFor="let loc of batchCategoryList" [value]="loc">
+                  {{loc}}
+                </mat-option>
+              </mat-select>
+            <mat-error *ngIf="(f.submitted && qty.invalid)">
+                <p *ngIf="qty.errors.required">Category is <strong>required</strong></p>
+              </mat-error>
+
+          <!-- <input matInput placeholder="Category" [(ngModel)]="categoryf" name="categoryf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Category is <strong>required</strong></p>
+          </mat-error> -->
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+            <mat-select placeholder="Plant Code" [(ngModel)]="plantCodef" name="plantCodef" #qty="ngModel" required>
+                <mat-option *ngFor="let loc of locationIds" [value]="loc">
+                  {{loc}}
+                </mat-option>
+              </mat-select>
+            <mat-error *ngIf="(f.submitted && qty.invalid)">
+                <p *ngIf="qty.errors.required">Plant Code is <strong>required</strong></p>
+              </mat-error>
+
+          <!-- <input matInput placeholder="Plant Code" [(ngModel)]="plantCodef" name="plantCodef" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Plant Code is <strong>required</strong></p>
+          </mat-error> -->
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Batch Description" [(ngModel)]="batchDescriptionf" name="batchDescriptionf"
+            required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Batch Description is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <button mat-raised-button color="primary" class="btm-action-btn">Save</button>
+      </div>
+    </div>
+  </div>
+</form>
+</mat-card>
+</div>
+</div>
+
+
+
+
+
+<!--  -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && updateForm(f))">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title text-primary">Update Batch Code</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Modal body -->
+        <div class="modal-body">
+
+          <div class="form-group">
+            <mat-form-field appearance="standard" class="example-full-width">
+              <input matInput placeholder="Batch Code" aria-label="State" [(ngModel)]="batchCodeu" name="batchCodeu"
+                required autocomplete="off" oninput="this.value = this.value.toUpperCase()">
+              <mat-error *ngIf="(f.submitted && batchCodeu.invalid)">
+                <p *ngIf="batchCodeu.errors.required">Batch Codeu is <strong>required</strong>
+                </p>
+              </mat-error>
+              <p class="mtop6">Batch Code</p>
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <mat-form-field appearance="standard" class="example-full-width">
+                <mat-select placeholder="Category" [(ngModel)]="categoryu" name="categoryu" #qty="ngModel" required>
+                    <mat-option *ngFor="let loc of batchCategoryList" [value]="loc">
+                      {{loc}}
+                    </mat-option>
+                  </mat-select>
+                <mat-error *ngIf="(f.submitted && qty.invalid)">
+                    <p *ngIf="qty.errors.required">Category is <strong>required</strong></p>
+                  </mat-error>
+              <!-- <input matInput placeholder="Category" aria-label="State" [(ngModel)]="categoryu" name="categoryu"
+                required autocomplete="off">
+              <mat-error *ngIf="(f.submitted && categoryu.invalid)">
+                <p *ngIf="categoryu.errors.required">Categoryu is <strong>required</strong>
+                </p>
+              </mat-error> -->
+              <p class="mtop6">Category</p>
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+            <mat-form-field appearance="standard" class="example-full-width">
+              <!-- <input matInput placeholder="Plant Code" aria-label="State" [(ngModel)]="plantCodeu" name="plantCodeu"
+                required autocomplete="off">
+              <mat-error *ngIf="(f.submitted && plantCodeu.invalid)">
+                <p *ngIf="plantCodeu.errors.required">Plant Code is <strong>required</strong>
+                </p>
+              </mat-error> -->
+              <mat-select placeholder="Plant Code" [(ngModel)]="plantCodeu" name="plantCodeu" #qty="ngModel" required>
+                  <mat-option *ngFor="let loc of locationIds" [value]="loc">
+                    {{loc}}
+                  </mat-option>
+                </mat-select>
+              <mat-error *ngIf="(f.submitted && qty.invalid)">
+                  <p *ngIf="qty.errors.required">Plant Code is <strong>required</strong></p>
+                </mat-error>
+              <p class="mtop6">Plant Code</p>
+            </mat-form-field>
+          </div>
+          <div class="form-group">
+              <mat-form-field appearance="standard" class="example-full-width">
+                <input matInput placeholder="Batch Description" aria-label="State" [(ngModel)]="batchDescriptionu" name="batchDescriptionu"
+                  required autocomplete="off">
+                <mat-error *ngIf="(f.submitted && batchDescriptionu.invalid)">
+                  <p *ngIf="batchDescriptionu.errors.required">Batch Description is <strong>required</strong>
+                  </p>
+                </mat-error>
+                <p class="mtop6">Batch Description</p>
+              </mat-form-field>
+            </div>
+        </div>
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <!-- <button type="button" class="btn btn-danger" >Close</button> -->
+          <button type="submit" mat-raised-button color="primary" class="btm-action-btn">Update</button>
+          <button type="button" mat-raised-button class="mat-default" color="default" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<br><br>

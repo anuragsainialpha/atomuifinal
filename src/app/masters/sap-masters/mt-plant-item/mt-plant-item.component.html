@@ -1,0 +1,168 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+    <b> SAP Masters &gt; Plant Item Weight</b>
+    <span class="pull-right refresh-span">
+      <!-- <button class="theme-small-button" (click)="upload()" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+
+
+  
+
+
+  <div class="mt-item-fields" *ngIf="isShow">
+    <div class="col-md-12 row">
+      <div class="col-md-12 padding-right-40">
+        <div class="row">
+          <div class="col-md-6 pd-0">
+            <div class="row">
+             
+                <div class="col-md-4">
+                    <div class="form-group">
+                      <mat-form-field>
+    
+                        <input matInput placeholder="Plant Code" [(ngModel)]="plantCode" name="plantCode">
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                      <div class="form-group">
+                        <mat-form-field>
+                          <input matInput placeholder="Item Id" [(ngModel)]="itemId" name="itemId">
+                        </mat-form-field>
+                      </div>
+                    </div>
+  
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <mat-form-field>
+                        <input matInput [matDatepicker]="createIndentDate" [(ngModel)]="indentDate"
+                          name="indentDate" placeholder="Effective Date" (ngModelChange)="formatDate($event)">
+                        <mat-datepicker-toggle matSuffix [for]="createIndentDate"></mat-datepicker-toggle>
+                        <mat-datepicker #createIndentDate disabled="false"></mat-datepicker>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  
+
+            </div>
+          </div>
+          <div class='col-md-6 pd-0'>
+            <div class="row mg-0">
+
+            
+            
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pull-right">
+        <div class="search-fileds">
+          <button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </button>
+          <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [columnMode]="'force'"
+[rows]='responseItemsList' [externalPaging]="true" (page)="datatablePageData($event)" [scrollbarH]="false"
+[headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count"
+[offset]="page.offset">
+
+<!-- <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table 
+      [rows]='responseItemsList' [scrollbarH]="true" [headerHeight]="50" 
+      [externalPaging]="true" (page)="datatablePageData($event)" 
+      [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count" [offset]="page.offset"> -->
+
+<ngx-datatable-column name="Plant Code" [width]="120" [resizeable]="false" prop="plantCode" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{row.plantCode}}
+  </ng-template>
+</ngx-datatable-column>
+
+<ngx-datatable-column name="Item Id " [width]="120" [resizeable]="false" prop="itemId" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{row.itemId}}
+  </ng-template>
+</ngx-datatable-column>
+<ngx-datatable-column name="Effective Date" [width]="120" [resizeable]="false" prop="effectiveDate" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{trimDate(row.effectiveDate)}}
+  </ng-template>
+</ngx-datatable-column>
+<ngx-datatable-column name="Weight" [width]="120" [resizeable]="false" prop="weight" [sortable]="true"
+  [cellClass]="'text-right'">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{row.weight}}
+  </ng-template>
+</ngx-datatable-column>
+<ngx-datatable-column name="Weight Uom" [width]="100" [resizeable]="false" prop="weightUom" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{row.weightUom}}
+  </ng-template>
+</ngx-datatable-column>
+<!--           
+        <ngx-datatable-column name="Insert User" [width]="140" [resizeable]="false" prop="insertUser" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.insertUser}}
+          </ng-template>
+        </ngx-datatable-column> -->
+<ngx-datatable-column name="Insert Date" [width]="120" [resizeable]="false" prop="insertDate" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{trimDate(row.insertDate)}}
+  </ng-template>
+</ngx-datatable-column>
+
+<!-- <ngx-datatable-column name="Update User" [width]="140" [resizeable]="false" prop="updateUser" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.updateUser}}
+          </ng-template>
+        </ngx-datatable-column> -->
+<ngx-datatable-column name="Update Date" [width]="120" [resizeable]="false" prop="updateDate" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{trimDate(row.updateDate)}}
+  </ng-template>
+</ngx-datatable-column>
+
+   <!-- Footer Template starts -->
+   <ngx-datatable-footer>
+    <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+      let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+      <div class="page-count">
+        <span *ngIf="selectedCount">
+          {{selectedCount.toLocaleString()}} Selected |
+        </span>
+        Showing {{(offset * pageSize)+1}} to {{(rowCount>
+        (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+        {{(rowCount)}} records.
+      </div>
+      <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+        [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+        [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+      </datatable-pager>
+    </ng-template>
+  </ngx-datatable-footer>
+  <!-- Footer Template Ends -->
+
+</ngx-datatable>
+
+
+</div>

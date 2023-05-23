@@ -1,0 +1,96 @@
+.lightgreen-button{
+    width: 80%;
+    padding :3px;   
+   }
+   /* Blink for Webkit and others
+   (Chrome, Safari, Firefox, IE, ...)
+   */
+   
+   @-webkit-keyframes blinker {
+       from {opacity: 1.0;}
+       to {opacity: 0.0;}
+     }
+     .blink{
+           color: #fff;
+           display: block;
+           padding: 4px;
+           background-color: #5a3094;
+           text-align: center;
+           border-radius: 4px;
+           text-decoration: blink;
+         -webkit-animation-name: blinker;
+         -webkit-animation-duration: 0.6s;
+         -webkit-animation-iteration-count:infinite;
+         -webkit-animation-timing-function:ease-in-out;
+         -webkit-animation-direction: alternate;
+     }
+   
+   @import '../../../assets/styles/variables';
+   @import '../../../assets/styles/mixins';
+   
+   .manulal-plan-header{
+       padding: 5px 0px;
+       margin-bottom: 0px;
+       font-weight: 600;
+       span{
+           color: $dark-color-theme;
+           margin-right: 15px;
+           // font-size: 14px;
+           // font-weight: 500;
+       }
+   }
+   .manualplan-fields{
+       background-color: transparent;
+       box-shadow: none;
+       padding: 0px;
+       p > i{
+           cursor: pointer;
+       }
+       .col-md-3{
+           padding: 0px 15px;
+       }
+       .form-group{
+           margin-bottom: 0;
+           .mat-form-field {
+               .mat-form-field-wrapper{
+                   padding-bottom: 0.5em !important;
+               }
+           }
+       }
+   }
+   .show-entries{
+       .mat-form-field-label{
+           display: none !important;
+       }
+   }
+   .manual-plan-table{
+       margin-top: 10px;
+       width:100%;
+       overflow:hidden;
+       overflow-x:auto;
+       table{
+           table-layout: fixed;
+           margin-bottom: 0em;
+           tr{
+               height:30px;
+               th{
+                   width:150px;
+                   padding:0.3rem;
+               }
+               td{
+                   width:150px;
+                   padding:0.25rem;
+               }
+           }
+       }
+   }
+   
+   .ngx-datatable.material{
+       margin-top: 20px;
+   }
+   .margin-top-10{
+       margin-top: 10px;
+   }
+  
+   
+  

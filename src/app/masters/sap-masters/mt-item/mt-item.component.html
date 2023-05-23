@@ -1,0 +1,313 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+    <b> SAP Masters &gt; Item</b>
+    <span class="pull-right refresh-span">
+      <!-- <button class="theme-small-button" (click)="upload()" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button>-->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button> 
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+  <div class="mt-item-fields" *ngIf="isShow">
+    <div class="col-md-12 row">
+      <div class="col-md-12 padding-right-40">
+        <div class="row">
+          <div class="col-md-6 pd-0">
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <div class="form-group">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Item Id" aria-label="State" autocomplete="off" [(ngModel)]="itemId" name="itemId">
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Item Classification" [(ngModel)]="itemClassification" name="itemClassification">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Item Description" [(ngModel)]="itemDescription" name="itemDescription">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Item Type" [(ngModel)]="itemType" name="itemType">
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class='col-md-6 pd-0'>
+            <div class="row mg-0">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Item Group" [(ngModel)]="itemGroup" name="itemGroup">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Item Category" [(ngModel)]="itemCategory" name="itemCategory">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="TTE" [(ngModel)]="tte" name="tte">
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Load Factor" [(ngModel)]="loadFactor" name="loadFactor">
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pull-right">
+        <div class="search-fileds">
+          <button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </button>
+          <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div>
+      <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [rows]='mtItemList' 
+      [scrollbarH]="true" [headerHeight]="50" 
+      [externalPaging]="true" (page)="datatablePageData($event)" 
+      [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count" [offset]="page.offset">
+        
+      <ngx-datatable-column name="Item Id" [width]="120" [resizeable]="false" prop="planId" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.id}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Item Classification" [width]="90" [resizeable]="false" prop="classification" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.classification}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Item Description" [width]="280" [resizeable]="false" prop="description" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.description}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Item Type" [width]="70" [resizeable]="false" prop="type" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.type}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Item Group" [width]="80" [resizeable]="false" prop="group" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.group}}
+          </ng-template>
+        </ngx-datatable-column>
+       
+        <ngx-datatable-column name="Item category" [width]="90" [resizeable]="false" prop="category" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.category}}
+              <!-- <i class="fa fa-pencil" aria-hidden="true"></i> -->
+            </ng-template>
+          </ngx-datatable-column>
+          
+       <ngx-datatable-column name="TTE" [width]="60" [resizeable]="false" prop="tte" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.tte}}
+          </ng-template>
+        </ngx-datatable-column>
+       
+<!--        
+        <ngx-datatable-column name="TTE" [width]="70" [resizeable]="false" prop="tte" [sortable]="true">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-tte'] = true" *ngIf="!editing[rowIndex + '-tte']">
+              <span class="edit-label">{{row.tte}}
+              </span>
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+            </div>
+            
+            <mat-form-field class="example-full-width" *ngIf="editing[rowIndex+ '-tte']">
+              <input matInput (blur)="updateValue(row, $event, 'tte', rowIndex)" [value]="row.tte" autofocus>
+              <!-- <input matInput (blur)="updateValue(row, $event, 'tte', rowIndex)" [value]="row.tte" autofocus> -->
+            <!-- </mat-form-field> -->
+
+
+
+          <!-- </ng-template>
+        </ngx-datatable-column> --> -->
+
+
+
+
+        <ngx-datatable-column name="Load Factor" [width]="80" [resizeable]="false" prop="loadFactor" [sortable]="true">
+          <!-- <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-loadFactor'] = true" *ngIf="!editing[rowIndex + '-loadFactor']">
+              <span class="edit-label">{{row.loadFactor}}
+              </span>
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+            </div>
+            <mat-form-field class="example-full-width" *ngIf="editing[rowIndex+ '-loadFactor']">
+              <input matInput (blur)="updateValue(row, $event, 'loadFactor', rowIndex)" [value]="row.loadFactor" autofocus>
+            </mat-form-field>
+          </ng-template> -->
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Gross Wt" [width]="70" [resizeable]="false" prop="grossWt" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.grossWt}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Gross Wt UOM" [width]="70" [resizeable]="false" prop="grossWtUom" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.grossWtUom}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Net Wt" [width]="70" [resizeable]="false" prop="netWt" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.netWt}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Net Wt UOM" [width]="70" [resizeable]="false" prop="netWtUom" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.netWtUom}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Volume" [width]="90" [resizeable]="false" prop="volume" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.volume}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Volume UOM" [width]="70" [resizeable]="false" prop="volUom" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.volUom}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Length" [width]="65" [resizeable]="false" prop="length" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.length}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Length UOM" [width]="70" [resizeable]="false" prop="planId" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.lenUom}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Width" [width]="60" [resizeable]="false" prop="width" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.width}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Width UOM" [width]="60" [resizeable]="false" prop="wdUom" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.wdUom}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Height" [width]="60" [resizeable]="false" prop="height" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.height}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Height UOM" [width]="70" [resizeable]="false" prop="htUom" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.htUom}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Diameter" [width]="70" [resizeable]="false" prop="diameter" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.diameter}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Diameter UOM" [width]="70" [resizeable]="false" prop="dmUom" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.dmUom}}
+          </ng-template>
+        </ngx-datatable-column>
+       
+
+        <!-- <ngx-datatable-column name="Insert User" [width]="140" [resizeable]="false" prop="insertUser" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.insertUser}}
+            </ng-template>
+          </ngx-datatable-column> -->
+          <ngx-datatable-column name="Insert Date" [width]="100" [resizeable]="false" prop="insertDate" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{trimDate(row.insertDate)}}
+            </ng-template>
+          </ngx-datatable-column>
+  
+          <!-- <ngx-datatable-column name="Update User" [width]="140" [resizeable]="false" prop="updateUser" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.updateUser}}
+            </ng-template>
+          </ngx-datatable-column> -->
+          <ngx-datatable-column name="Update Date" [width]="100" [resizeable]="false" prop="updateDate" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{trimDate(row.updateDate)}}
+            </ng-template>
+          </ngx-datatable-column>
+      
+      
+        <!-- <ngx-datatable-column name="Action" [width]="50" [resizeable]="false" [sortable]="false">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <button class="theme-small-button btn" matTooltip="Modify" (click)="modifyItem(row)" [disabled]="(row.isError)">
+              <i class="fa fa-refresh fa-2x" aria-hidden="true"></i>
+            </button>
+          </ng-template>
+        </ngx-datatable-column> -->
+         <!-- Footer Template starts -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+          let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+          <div class="page-count">
+            <span *ngIf="selectedCount">
+              {{selectedCount.toLocaleString()}} Selected |
+            </span>
+            Showing {{(offset * pageSize)+1}} to {{(rowCount>
+            (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+            {{(rowCount)}} records.
+          </div>
+          <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+            [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+            [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+          </datatable-pager>
+        </ng-template>
+      </ngx-datatable-footer>
+      <!-- Footer Template Ends -->
+
+
+      </ngx-datatable>
+    </div>
+  </div>
+</div>

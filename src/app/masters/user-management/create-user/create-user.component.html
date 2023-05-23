@@ -1,0 +1,150 @@
+
+<app-loader *ngIf="isLoading"></app-loader>
+<h6 class="mt-item-header">
+    <b> User Management &gt; Create User </b>
+    </h6>
+<br><br>
+
+<div class="create-user container-fluid">
+    <form #createUserForm="ngForm" name="createUserForm" (ngSubmit)="createUserForm.form.valid && createUser(createUserForm)"> 
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-7">
+                  <div class="form-group">
+                    <mat-form-field>
+                       <input matInput placeholder="User Id" [(ngModel)]="userId" name="userId" required #qty="ngModel">
+                       <mat-error *ngIf="(createUserForm.submitted && qty.invalid)">
+                           <p *ngIf="qty.errors.required">User Id is <strong>required</strong></p>
+                         </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-7">
+                  <div class="form-group">
+                    <div class="form-group">
+                      <mat-form-field>
+                          <mat-select placeholder="User Role Id" [(ngModel)]="userRoleId" name="userRoleId" #qty="ngModel" required>
+                              <mat-option *ngFor="let loc of userRoleIds" [value]="loc">
+                                {{loc}}
+                              </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="(createUserForm.submitted)">
+                                <p *ngIf="(createUserForm.submitted && qty.invalid)">User Role Id is <strong>required</strong></p>
+                              </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-7">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput placeholder="First Name" [(ngModel)]="firstName"  name="firstName" required oninput="this.value = this.value.toUpperCase()">
+                      <mat-error *ngIf="(createUserForm.submitted && qty.invalid)">First Name is <strong>required</strong></mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-7">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput placeholder="Last Name" aria-label="State" [(ngModel)]="lastName"  name="lastName" required oninput="this.value = this.value.toUpperCase()">
+                      <mat-error *ngIf="(createUserForm.submitted && qty.invalid)">Last Name is <strong>required</strong></mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="row">
+                <div class="col-sm-7">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input type="text" matInput placeholder="Email"  aria-label="State" 
+                      pattern="^(?!\.)(?!.*\.$)(?!.*?\.\.)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~\-.]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" #emailModel="ngModel" [(ngModel)]="email" name="email" required>
+                      
+                      <!-- <div *ngIf="elinebreaker">
+                          <br><p class="mat-error mat-form-field-subscript-wrapper"> {{emailerror}}</p>
+                       </div> -->
+                      <!-- <mat-error *ngIf="(createUserForm.submitted && email.required)">Email is <strong>required</strong></mat-error>
+                      <mat-error *ngIf="(createUserForm.submitted && email.pattern)">Enrter a valid <strong>Email</strong></mat-error> -->
+                      
+                    <mat-error *ngIf="(createUserForm.submitted && emailModel.invalid) || (emailModel.invalid)">
+                      <p *ngIf="emailModel.errors.required"> Email is
+                        <strong>required</strong>
+                      </p>
+                      <p *ngIf="emailModel.errors.pattern">Please enter valid  
+                        <strong>email</strong>
+                      </p>
+                    </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-7">
+                  <div class="form-group">
+                    <mat-form-field>
+                        <mat-select placeholder="Plant Code" [(ngModel)]="plantCode" name="plantCode" #qty="ngModel" required>
+                            <mat-option *ngFor="let loc of locationIds" [value]="loc">
+                              {{loc}}
+                            </mat-option>
+                          </mat-select>
+                          <mat-error *ngIf="(createUserForm.submitted)">
+                              <p *ngIf="(createUserForm.submitted && qty.invalid)">Plant Code is <strong>required</strong></p>
+                            </mat-error>
+                      <!-- <mat-error *ngIf="plantCode.invalid && (createUserForm.submitted ||plantCode.touched)">{{getErrorMessage("plantCode")}}</mat-error> -->
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-7">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput placeholder="Password" aria-label="State" type="password" [(ngModel)]="password" name="password" required>
+                      <mat-error *ngIf="(createUserForm.submitted && qty.invalid)">Password is <strong>required</strong></mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-7">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput placeholder="Confirm Password" aria-label="State"  (keyup)="onKeyUp($event)" [(ngModel)]="confirmPassword" name="confirmPassword" required>
+                      <mat-error *ngIf="(createUserForm.submitted && qty.invalid)">Confirm Password is <strong>required</strong></mat-error>
+                      <div *ngIf="linebreaker">
+                         <br><p class="mat-error mat-form-field-subscript-wrapper"> {{values}}</p>
+                      </div>
+                     </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="row">
+                <div class="col-sm-3">
+                </div>
+                <div class="col-sm-2">
+                  <button mat-raised-button class="btm-action-btn">Create</button>
+                </div>
+              </div>
+            </div>
+          </div>
+     
+        </div>
+      </form>
+</div>

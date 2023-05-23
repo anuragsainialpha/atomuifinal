@@ -1,0 +1,495 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+    <b> PaaS Masters &gt; Truck Type</b>
+    <span class="pull-right refresh-span">
+        <button class="theme-small-button" (click)="displayAddForm()" matTooltip="Add New">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button>
+
+          <!-- <button mat-menu-item [routerLink]="['/admin/paas-masters/location-scan']">Location Scan</button> -->
+      <!-- <button class="theme-small-button" [routerLink]="['/admin/paas-masters/upload-mt-truck-type']" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+<div class="mt-item-fields" *ngIf="isShow">
+  <div class="col-md-12 row">
+    <div class="col-md-12 padding-right-40">
+      <div class="row">
+        <div class="col-md-6 pd-0">
+          <div class="row">
+            <div class="col-md-4">
+                <mat-form-field>
+                  <input matInput placeholder="Truck Type" [(ngModel)]="truckType" name="truckType">
+                  <!-- <input matInput aria-label="Truck Type" placeholder="Truck Type"
+                          (keyup)="getfilterDestination($event,'truckType')" autocomplete="off"
+                          [matAutocomplete]="sourceAutocomplete" [(ngModel)]="truckType" name="truckType">
+                        <mat-autocomplete #sourceAutocomplete="matAutocomplete">
+                          <mat-option *ngFor="let list of destinationList" [value]="list.value">
+                            <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                          </mat-option>
+                        </mat-autocomplete> -->
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field>
+                  <input matInput placeholder="Truck Description" [(ngModel)]="truckDesc" name="truckDesc">
+
+                  <!-- <input matInput aria-label="Truck Desc" placeholder="Truck Desc"
+                          (keyup)="getfilterDestination($event,'truckDescription')" autocomplete="off"
+                          [matAutocomplete]="sourceAutocomplete" [(ngModel)]="truckDesc" name="truckDesc">
+                        <mat-autocomplete #sourceAutocomplete="matAutocomplete">
+                          <mat-option *ngFor="let list of sourceList" [value]="list.value">
+                            <span matTooltip={{list.description}}>{{list.value}} - ({{list.description}})</span>
+                          </mat-option>
+                        </mat-autocomplete> -->
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field>
+                  <input matInput placeholder="Load Factor" [(ngModel)]="loadFactor" name="loadFactor">
+                </mat-form-field>
+            </div>
+          </div>
+        </div>
+        <div class='col-md-6 pd-0'>
+          <div class="row mg-0">
+            <div class="col-md-4">
+                <mat-form-field>
+                  <input matInput placeholder="TTE Capacity" [(ngModel)]="tteCapacity" name="tteCapacity">
+                </mat-form-field>
+            </div>
+            <div class="col-md-4">
+                <mat-form-field>
+                  <input matInput placeholder="Variant1" [(ngModel)]="variant1" name="variant1">
+                </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pull-right">
+      <div class="search-fileds">
+        <button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+          <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+        </button>
+        <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<div class="mt-item-table">
+<div>
+<!-- <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [rows]='responseItemsList' [scrollbarH]="true" [externalPaging]="true"
+  (page)="datatablePageData($event)" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit"
+  [count]="page.count" [offset]="page.offset"> -->
+  <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [columnMode]="'force'"
+  [rows]='responseItemsList' [externalPaging]="true" (page)="datatablePageData($event)" [scrollbarH]="false"
+  [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count"
+  [offset]="page.offset">
+
+  
+  <ngx-datatable-column name="Truck Type" [width]="140" [resizeable]="false" prop="truckType" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.truckType}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="Truck Description" [width]="160" [resizeable]="false" prop="truckDesc" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.truckDesc}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="Load Factor" [width]="60" [resizeable]="false" prop="loadFactor" [cellClass]="'text-right'"
+    [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.loadFactor}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="TTE Capacity" [width]="70" [resizeable]="false" prop="tteCapacity" [cellClass]="'text-right'"
+    [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.tteCapacity}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Gross Wt" [width]="70" [resizeable]="false" prop="grossWt" [cellClass]="'text-right'"
+    [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.grossWt}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Gross Wt Uom" [width]="60" [resizeable]="false" prop="grossWtUom" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.grossWtUom}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Gross Vol" [width]="70" [resizeable]="false" prop="grossVol" [cellClass]="'text-right'"
+    [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.grossVol}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="Gross Vol Uom" [width]="80" [resizeable]="false" prop="grossVolUom" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.grossVolUom}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Variant1" [width]="90" [resizeable]="false" prop="variant1" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.variant1}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Variant2" [width]="90" [resizeable]="false" prop="variant2" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.variant2}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="Insert User" [width]="85" [resizeable]="false" prop="insertUser" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.insertUser}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="Insert Date" [width]="90" [resizeable]="false" prop="insertDate" [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{trimDate(row.insertDate)}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Update User" [width]="85" [resizeable]="false" prop="updateUser" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.updateUser}}
+        </ng-template>
+      </ngx-datatable-column>
+      
+  <ngx-datatable-column name="Update Date" [width]="90" [resizeable]="false" prop="updateDate" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{trimDate(row.updateDate)}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="Action" [width]="60" [resizeable]="false" [sortable]="false">
+    <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+      <button class="theme-small-button btn" matTooltip="Modify Item" (click)="showUpdateModel(row)" [disabled]="(row.isError)">
+        <i class="fa fa-edit fa-2x" aria-hidden="true"></i>
+      </button>
+    </ng-template>
+  </ngx-datatable-column>
+     <!-- Footer Template starts -->
+     <ngx-datatable-footer>
+      <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+        let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+        <div class="page-count">
+          <span *ngIf="selectedCount">
+            {{selectedCount.toLocaleString()}} Selected |
+          </span>
+          Showing {{(offset * pageSize)+1}} to {{(rowCount>
+          (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+          {{(rowCount)}} records.
+        </div>
+        <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+          [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+          [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+        </datatable-pager>
+      </ng-template>
+    </ngx-datatable-footer>
+    <!-- Footer Template Ends -->
+</ngx-datatable>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+<br><br>
+<div class="mt-item-fields" *ngIf="displayForm">
+<div class="col-md-12 padding-right-40">
+<mat-card>
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && saveForm(f))">
+  <h4 class="mt-item-header text-center text-primary">
+    <b> Add New Truck Type</b></h4>
+  <br>
+  <div class="row">
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Truck Type" [(ngModel)]="truckTypef" name="truckTypef" required #qty="ngModel" oninput="this.value = this.value.toUpperCase()">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Truck Type is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Load Factor" [(ngModel)]="loadFactorf" name="loadFactorf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Load Factor is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Truck Desc " [(ngModel)]="truckDescf" name="truckDescf" required #qty="ngModel" oninput="this.value = this.value.toUpperCase()">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Truck Desc is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="TTE Capacity" [(ngModel)]="tteCapacityf" name="tteCapacityf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Tte Capacity is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Gross Wt" [(ngModel)]="grossWtf" name="grossWtf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Gross Wt is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+
+            <mat-select placeholder="Gross Wt Uom" [(ngModel)]="grossWtUomf" name="grossWtUomf" #qty="ngModel"
+                      required>
+                      <mat-option *ngFor="let value of wtuoms" [value]="value">
+                        {{value}}
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="(f.submitted && qty.invalid)">
+                        <p *ngIf="qty.errors.required">Gross Wt Uom is <strong>required</strong>
+                        </p>
+                      </mat-error>
+
+
+          <!-- <input matInput placeholder="Gross Wt Uom" [(ngModel)]="grossWtUomf" name="grossWtUomf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Gross Wt Uom is <strong>required</strong></p>
+          </mat-error> -->
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Gross Vol" [(ngModel)]="grossVolf" name="grossVolf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Gross Vol is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+
+            <mat-select placeholder="Gross Vol Uom" [(ngModel)]="grossVolUomf" name="grossVolUomf" #qty="ngModel"
+            required>
+            <mat-option *ngFor="let value of volumes" [value]="value">
+              {{value}}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+              <p *ngIf="qty.errors.required">Gross Vol Uom is <strong>required</strong>
+              </p>
+            </mat-error>
+          <!-- <input matInput placeholder="Gross Vol Uom" [(ngModel)]="grossVolUomf" name="grossVolUomf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Gross Vol Uom is <strong>required</strong></p>
+          </mat-error> -->
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Variant 1" [(ngModel)]="variant1f" name="variant1f" #qty="ngModel" oninput="this.value = this.value.toUpperCase()">
+        
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Variant 2" [(ngModel)]="variant2f" name="variant2f" #qty="ngModel" oninput="this.value = this.value.toUpperCase()">
+         
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <button mat-raised-button color="primary" class="btm-action-btn">Save</button>
+      </div>
+    </div>
+  </div>
+</form>
+</mat-card>
+</div>
+</div>
+
+
+
+
+
+
+
+
+<!--  -->
+<div class="modal" id="myModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && updateForm(f))">
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title text-primary">Update Truck Type</h4>
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+  </div>
+  <!-- Modal body -->
+  <div class="modal-body">
+
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Truck Description" aria-label="State" [(ngModel)]="truckDescu" name="truckDescu"
+          required autocomplete="off" #truckDescur="ngModel" oninput="this.value = this.value.toUpperCase()">
+        <mat-error *ngIf="(f.submitted && truckDescur.invalid)">
+          <p *ngIf="truckDescur.errors.required">Truck Description is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">Truck Description</p>
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Load Factor" aria-label="State" [(ngModel)]="loadFactoru" name="loadFactoru"
+          required autocomplete="off" #loadFactorur="ngModel">
+        <mat-error *ngIf="(f.submitted && loadFactorur.invalid)">
+          <p *ngIf="loadFactorur.errors.required">Load Factor is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">Load Factor</p>
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="TTE Capacity" aria-label="State" [(ngModel)]="tteCapacityu" name="tteCapacityu"
+          required autocomplete="off" #tteCapacityur="ngModel">
+        <mat-error *ngIf="(f.submitted && tteCapacityur.invalid)">
+          <p *ngIf="tteCapacityur.errors.required">Tte Capacity is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">TTE Capacity</p>
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Gross Wt is " aria-label="State" [(ngModel)]="grossWtu" name="grossWtu"
+          required autocomplete="off" #grossWtur="ngModel">
+        <mat-error *ngIf="(f.submitted && grossWtur.invalid)">
+          <p *ngIf="grossWtur.errors.required">Gross Wt is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">Gross Wt</p>
+      </mat-form-field>
+    </div>
+    <!-- <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Gross Wt UOM" aria-label="State" [(ngModel)]="grossWtUomu" name="grossWtUomu"
+          required autocomplete="off" #grossWtUomur="ngModel">
+        <mat-error *ngIf="(f.submitted && grossWtUomur.invalid)">
+          <p *ngIf="grossWtUomur.errors.required">Gross Wt UOM is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">Gross Wt UOM</p>
+      </mat-form-field>
+    </div> -->
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Gross Volume is " aria-label="State" [(ngModel)]="grossVolu" name="grossVolu"
+          required autocomplete="off" #grossVolur="ngModel">
+        <mat-error *ngIf="(f.submitted && grossVolur.invalid)">
+          <p *ngIf="grossVolur.errors.required">Gross Volume is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">Gross Volume</p>
+      </mat-form-field>
+    </div>
+    <!-- <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Gross Volume" aria-label="State" [(ngModel)]="grossVolUomu" name="grossVolUomu"
+          required autocomplete="off" #grossVolUomur="ngModel">
+        <mat-error *ngIf="(f.submitted && grossVolUomur.invalid)">
+          <p *ngIf="grossVolUomur.errors.required">Gross Volume  is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">Gross Volume</p>
+      </mat-form-field>
+    </div> -->
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Variant 1" aria-label="State" [(ngModel)]="variant1u" name="variant1u"
+           autocomplete="off" #variant1ur="ngModel" oninput="this.value = this.value.toUpperCase()">
+           <p class="mtop6">Variant 1</p>
+      </mat-form-field>
+    </div>
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Variant 2" aria-label="State" [(ngModel)]="variant2u" name="variant2u"
+           autocomplete="off" #variant2ur="ngModel" oninput="this.value = this.value.toUpperCase()">
+           <p class="mtop6">Variant 2</p>
+      </mat-form-field>
+    </div>
+
+  </div>
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <!-- <button type="button" class="btn btn-danger" >Close</button> -->
+    <button type="submit" mat-raised-button color="primary" class="btm-action-btn">Update</button>
+    <button type="button" mat-raised-button class="mat-default" color="default" data-dismiss="modal">Close</button>
+  </div>
+</form>
+</div>
+</div>
+</div>
+<br><br>

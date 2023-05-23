@@ -1,0 +1,975 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header">
+    Loadslip >
+    <span *ngIf="!loadslipID">Create Load Slip</span>
+    <span *ngIf="(loadslipID && !viewType)">Drafted Load Slip
+      <span class="pull-right refresh-span">
+        <button class="theme-small-button" (click)="export()" matTooltip="Export Download">
+          <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+        </button>
+      </span>
+    </span>
+    <span *ngIf="(loadslipID && viewType)">View Load Slip</span>
+  </h6>
+  <div class="clearfix"></div>
+  <div class="loadslip-fields tab-loadslip-fields">
+    <div class="row margin-bottom-5">
+      <div class="col-md-7">
+        <div class="row">
+          <div class="col-md-2">
+            <div class='inputbordered'>
+              <div>Source</div>
+              <div>
+                <b>{{userSource}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 pl-0">
+            <div class="form-group inputbordered">
+              <mat-form-field *ngIf="!isLoadslipIdAvaliable">
+                <mat-select placeholder="Destination" [(ngModel)]="destination" name="destination"
+                  (ngModelChange)="getTrucksList(destination,category,'destinationFilter')" required>
+                  <mat-option *ngFor="let dest of destinationList" [value]="dest.dest_loc">
+                    {{dest.dest_loc | uppercase}}<span *ngIf="dest.dest_desc">&nbsp; -
+                      &nbsp;({{dest.dest_desc | uppercase}})</span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="isLoadslipIdAvaliable">
+                <div>Destination</div>
+                <div>
+                  <b>{{destination?destination:'--' | uppercase}}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 pd-0">
+            <div class="form-group inputbordered">
+              <!-- (isLoadslipIdAvaliable?!isLoadslipIdAvaliable:!shipmentNumber) -->
+
+              <!-- *ngIf="(checkMultiStop())? !checkMultiStop(): !confirmedDate" -->
+              <!-- The above condition logic was  -->
+              <!-- 1) Loadslip truck,variant,actual truck type can editble only in single loadslip in a shipmentNumber
+                2)Not works in Multi pick/Drop  -->
+
+              <mat-form-field *ngIf="(checkMultiStop())? !checkMultiStop(): !confirmedDate">
+                <mat-select placeholder="Truck" [(ngModel)]="truckType" name="truckType"
+                  (ngModelChange)="defaultTruckData();getLoadSlipUtilazations($event)">
+                  <mat-option [value]="">None</mat-option>
+                  <mat-option *ngFor="let truckType of truckTypes;let i=index" [value]="truckType.TRUCK_NUMBER">
+                    {{truckType.TRUCK_NUMBER | uppercase}} <span *ngIf="truckType.ITEM_CATEGORY">&nbsp;
+                      - &nbsp;({{truckType.ITEM_CATEGORY | uppercase}})</span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="(checkMultiStop())? checkMultiStop(): confirmedDate">
+                <div>Truck</div>
+                <div>
+                  <b>{{multistopTruckNumber || '--'}} <span *ngIf="multistopTruckNumber && indentCategory">&nbsp;
+                      - &nbsp;({{indentCategory | uppercase}})</span></b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group inputbordered">
+              <div>Truck Type</div>
+              <div>
+                <b>{{truckT?truckT:'--' }}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 pd-0">
+            <div class="form-group inputbordered">
+              <div>Transporter</div>
+              <div>
+                <b>{{transporter?transporter:'--' }}</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="row">
+          <div class="col-md-3 pr-0">
+            <div class="form-group inputbordered">
+              <mat-form-field>
+                <mat-select placeholder="Ship To" [(ngModel)]="ShipTo" name="shito">
+                  <mat-option *ngFor="let shipPlace of shiptoPlaceList;let i=index" [value]="shipPlace">
+                    {{shipPlace}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="col-md-3 ">
+            <div class="form-group inputbordered">
+              <mat-form-field *ngIf="(checkMultiStop())? !checkMultiStop(): !confirmedDate">
+                <!-- <mat-select [(ngModel)]="actualTruckType" name="actualTruckType" placeholder="Actual Truck Type"
+                  (selectionChange)="getLoadSlipUtilazations(truckType)">
+                  <mat-option selected>None</mat-option>
+                  <mat-option *ngFor="let list of actualTruckTypeList" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-select> -->
+                <mat-select placeholder="Actual Truck Type" [(ngModel)]="actualTruckType" name="actualTruckType"
+                  (selectionChange)="getLoadSlipUtilazations(truckType)">
+                  <mat-option selected>None</mat-option>
+                  <mat-optgroup *ngFor="let group of truckTypeClass" [label]="group.name" [disabled]="group.disabled">
+                    <mat-option *ngFor="let type of group.mtTruckTypeInfos" [value]="type.value"
+                      style="font-weight: normal">
+                      {{type.value}}
+                    </mat-option>
+                  </mat-optgroup>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="(checkMultiStop())? checkMultiStop(): confirmedDate">
+                <div>Actual Truck Type</div>
+                <div>
+                  <b>{{actualTruckType || '--'}}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 pd-0">
+            <div class="form-group inputbordered">
+              <mat-form-field *ngIf="(checkMultiStop())? !checkMultiStop(): !confirmedDate">
+                <mat-select placeholder="Variant 1" [(ngModel)]="variant_ONE" name="variant_ONE"
+                  (selectionChange)="getLoadSlipUtilazations(truckType)">
+                  <mat-option selected>None</mat-option>
+                  <mat-option *ngFor="let item of variant_one_List" [value]="item">
+                    {{item | uppercase}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="(checkMultiStop())? checkMultiStop(): confirmedDate">
+                <div>Variant 1</div>
+                <div>
+                  <b>{{variant_ONE || '--'}}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group inputbordered">
+              <!-- <mat-form-field appearance="standard">
+                <mat-select placeholder="Variant 2" [(ngModel)]="variant_TWO" name="variantvariant_TWO_ONE">
+                  <mat-option *ngFor="let item of variant_two_List" [value]="item">
+                    {{item | uppercase}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field> -->
+
+              <div>Frt Avail</div>
+              <div>
+                <b>{{ freightAvailableflag || '--'}}</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row margin-bottom-5">
+      <div class="col-md-2">
+        <div class='bordered'>
+          <div>Shipment No</div>
+          <div>
+            <b>{{shipmentNumber || '--'}}</b>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 pd-0">
+        <div class="bordered-box">
+          <div class="row text-center h-100">
+            <div class="col-md-4 col-4 text-center bordered-box-left-div">
+              <div>
+                TTE Util
+              </div>
+              <div [ngClass]="(totalTTESeletecd > 100)?'text-danger':'color-green'">
+                <b>{{totalTTESeletecd?(totalTTESeletecd | number : '1.2-2'):0 }}%</b>
+              </div>
+            </div>
+            <div class="col-md-4 col-4 bordered-box-left-div">
+              <div>
+                Wt Util
+              </div>
+              <div [ngClass]="(totalMaterialWeight > 100)?'text-danger':'color-green'">
+                <b>{{totalMaterialWeight?(totalMaterialWeight | number : '1.2-2'):0}}%</b>
+              </div>
+            </div>
+            <div class="col-md-4 col-4">
+              <div>
+                Vol Util
+              </div>
+              <div [ngClass]="(totalTruckVolume > 100)?'text-danger':'color-green'">
+                <b>{{totalTruckVolume?(totalTruckVolume | number : '1.2-2'):0}}%</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="row bg-theme">
+          <div class="col-md-2 col-wid-16p">
+            <div>Tyres</div>
+            <div>
+              {{totalTyres?totalTyres:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Tubes</div>
+            <div>
+              {{totalTubes?totalTubes:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Flaps</div>
+            <div>
+              {{totalFlaps?totalFlaps:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div> Valves</div>
+            <div>
+              {{totalValves?totalValves:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Pctr</div>
+            <div>{{totalPctr?totalPctr:0}} </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Others</div>
+            <div>{{totalOthersCount?totalOthersCount:0}} </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Tot Qty</div>
+            <div>{{totalQuantity?totalQuantity:0}} </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-2 flow-btns MD-MP screenResponsive">
+        <button mat-raised-button color="primary" [disabled]="!isDraftMode" class="tab-mb-10"
+          (click)=loadslipOnSameTruckNavigation()>
+          LS on Same Truck(MD)</button>
+        <button mat-raised-button color="primary" class="ml-5" [disabled]="!isDraftMode"
+          (click)="shareTruckDestinationList()">Share
+          Truck(MP)</button>
+      </div>
+
+    </div>
+    <div class="row margin-bottom-5">
+      <div class="col-md-4">
+        <div class="row">
+          <div class="col-md-6">
+            <div class='bordered'>
+              <div>Load Slip No </div>
+              <div><b>{{loadslipID || '--'}}</b></div>
+            </div>
+          </div>
+          <div class="col-md-3 pd-0">
+            <div class="bordered">
+              <div>LS Category</div>
+              <div>
+                <b>{{loadslipCategory || '--'}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 ">
+            <div class="form-group inputbordered categoryDropdown ">
+              <mat-form-field appearance="standard">
+                <mat-select placeholder="Drop Seq" [(ngModel)]="dropSeq" name="dropSeq">
+                  <mat-option *ngFor="let item of dropSeqList;let i=index" [value]="item">
+                    {{item}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8 pd-0">
+        <div class="flow-btns tab-flow-btns width-12-5">
+          <!-- [disabled]="confirmedDate != null" -->
+          <button *ngIf="(bayArrivedDate == null)" mat-raised-button (click)="eventCall(loadslipID,'ARRIVED_BAY')"
+            class="mat-default">Arrived
+            Bay</button>
+          <button *ngIf="(bayArrivedDate != null)" class="greenButton">Arrived
+            Bay <b>: {{bay}}</b> <span>{{bayArrivedDate
+              | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+        </div>
+        <div class="flow-btns tab-flow-btns width-12-5">
+          <button mat-raised-button color="default" (click)="saveAsDraft_Print_trigger('PRINT')" class="mat-default"
+            *ngIf="(lsPrintDate == null) && (confirmedDate == null)">Print LS</button>
+          <button (click)="saveAsDraft_Print_trigger('PRINT')" class="greenButton"
+            *ngIf="(lsPrintDate != null) && (confirmedDate == null)">Print
+            LS<span> {{lsPrintDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+          <button (click)="downloadLoadslip()" class="greenButton" *ngIf="(confirmedDate != null)">Print
+            Pdf<span> {{lsPrintDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+        </div>
+        <div class="flow-btns tab-flow-btns width-12-5">
+          <button mat-raised-button color="default" (click)="sendForBarcode()" *ngIf="(sendForBarcodeDate == null)">Send
+            Barcode</button>
+          <button class="greenButton" *ngIf="(sendForBarcodeDate != null)" (click)="sendForBarcode()"
+            [disabled]="(confirmedDate)">Send Barcode
+            <span>{{sendForBarcodeDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+        </div>
+        <div class="flow-btns tab-flow-btns width-12-5">
+          <button mat-raised-button color="default" *ngIf="(loadingStartDate == null)"
+            (click)="eventCall(loadslipID,'LOADING_START')">Loading
+            Start</button>
+          <button *ngIf="(loadingStartDate != null)" class="greenButton">Loading Start <span>{{loadingStartDate |
+              customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+        </div>
+        <div class="flow-btns tab-flow-btns width-12-5">
+          <button mat-raised-button color="default" *ngIf="(loadingEndDate == null)"
+            (click)="eventCall(loadslipID,'LOADING_END')">Loading
+            End</button>
+          <button *ngIf="(loadingEndDate != null)" class="greenButton">Loading End <span>{{loadingEndDate |
+              customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+        </div>
+        <div class="flow-btns tab-flow-btns width-12-5">
+          <button mat-raised-button color="default" *ngIf="!sostoNumber"
+            (click)="eventCall(loadslipID,'CONFIRM')">Confirm</button>
+          <button *ngIf="sostoNumber" class="greenButton">Confirm
+            <span>{{confirmedDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+        </div>
+        <div class="flow-btns tab-flow-btns width-12-5">
+
+        
+            
+            <button mat-raised-button color="default"
+              *ngIf="(releasedDate == null)"
+              (click)="eventCall(loadslipID,'RELEASED')" [disabled]="!(sapInvoice)">Release </button>
+
+          <button *ngIf="(releasedDate != null)" class="greenButton">Release <span>{{releasedDate | customDateFormat |
+              date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+        </div>
+        <div class="flow-btns tab-flow-btns width-12-5">
+          <button mat-raised-button color="primary" (click)="stosoDelete(loadslipID)"
+            [disabled]="(sostoNumber && sapInvoice) ||  (!sostoNumber)">STO/SO
+            Delete</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="bordered">
+              <div>STO/SO</div>
+              <div><b>{{STOSONumber || '--'}}</b></div>
+            </div>
+          </div>
+          <div class="col-md-3  pl-0">
+            <div class="bordered">
+              <div>TTE Qty</div>
+              <div><b>{{totalTTEQty?(totalTTEQty | number : '1.2-2'):0}}</b></div>
+            </div>
+          </div>
+          <div class="col-md-3  pd-0">
+            <div class="bordered">
+              <div>
+                Wt (Kg)
+              </div>
+              <div>
+                <b>{{itemLevelTotalWeight?(itemLevelTotalWeight | number : '1.2-2'):0}}</b>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="row">
+          <div class="col-md-2  pr-0">
+            <div class="form-group inputbordered categoryDropdown" *ngIf="!confirmedDate">
+              <mat-form-field appearance="standard">
+                <mat-select placeholder="LS Category" [(ngModel)]="category" name="cat" #categorySelect
+                  (openedChange)="openedChange($event,destination,category,'categoryFilter')" multiple>
+                  <mat-option *ngFor="let item of categoryList" [value]="item">
+                    {{item | uppercase}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div *ngIf="confirmedDate">
+              <div class="bordered">
+                <div>Category</div>
+                <div>
+                  <b>{{(selectedCategories.length>0)?(selectedCategories.toString() | uppercase):'--' }}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class=" col-md-1 flow-btns tab-flow-btns" *ngIf="elrFlag">
+            <!-- class="greenButton" -->
+            <button (click)="generateLrNum()" mat-raised-button color="default" *ngIf="generateLr">Generate LR</button>
+            <button (click)="downloadLoadReceipt()" class="greenButton" *ngIf="printLr">Print
+              LR<span>{{lrNum}}</span></button>
+          </div>
+          <div class="col-md-1">
+            <div class="bordered">
+              <div>Indt Cat</div>
+              <div>
+                <b>{{indentCategory?(indentCategory | uppercase):'--' }}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 pd-0">
+            <div class="form-group bordered">
+              <mat-form-field *ngIf="!isLoadslipIdAvaliable" appearance="standard" class="padding-top-5">
+                <mat-select placeholder="Dest Description" [(ngModel)]="description" name="description"
+                  (ngModelChange)="getTrucksList(description,category,'destinationFilter')">
+                  <mat-option *ngFor="let dest of descriptionList" [value]="dest.dest_desc">
+                    {{dest.dest_desc | uppercase}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="isLoadslipIdAvaliable">
+                <div>Dest Desc</div>
+                <div [title]="description" [ngClass]="{'cursor-pointer':description?.length>14}">
+                  <!-- <b>{{description?description:'--' | uppercase}}</b> -->
+                  <b>{{description ? (((description?.length>14)? (description | slice:0:14)+'..':(description)) |
+                    uppercase) : '--'}}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="bordered">
+              <div>City</div>
+              <div>
+                <!-- <b>{{city?city:'--' | uppercase}}</b> -->
+                <div [title]="city" [ngClass]="{'cursor-pointer':city?.length>20}">
+                  <b>{{city ? (city?.length>20) ? (city | slice:0:20)+'..':(city) : '--'}}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-1">
+            <div class="bordered">
+              <div>Consent Status</div>
+              <div>
+                <b>{{trackingConsentStatus?(trackingConsentStatus):'--' }}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-1">
+            <div class="bordered">
+              <div>Telecom Provider</div>
+              <div>
+                <b>{{consentPhoneTelecom?(consentPhoneTelecom | uppercase):'--' }}</b>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-sm-2">
+            
+            <div class="row">
+              <div class="col-sm-6 col-md-7 col-7">
+                <div class="flow-btns tab-flow-btns">
+                  <button mat-raised-button color="primary"
+                    *ngIf="(trackingConsentStatus!='Success' || row.trackingConsentStatus!=null)"
+                    [disabled]="trackingConsentStatus == 'Success'" (click)="checkConsentLoadSlip(loadslipID,'RETRY')"
+                    class="table-btn mr-10">Check Consent
+                  </button>
+                </div>
+              </div>
+              <div class="col-sm-6 col-md-5 col-5">
+                <div class="flow-btns tab-flow-btns">
+                  
+                  <button mat-raised-button color="primary" type="button" (click)="fileInput.click()" class="table-btn mr-10">
+                    <span>Upload</span>
+                    <input #fileInput type="file" (change)="onFileInput($event)" style="display:none;" accept=".png, .jpg, .jpeg, .pdf" />
+                  </button>
+             
+                </div>
+              </div>
+              
+            </div>
+            <div class="row" *ngIf="totalMaterialWeight < 95">
+              <div class="col-sm-12">
+                <div class="form-group inputbordered width-6-5">
+                  <mat-form-field>
+                    <mat-select placeholder="Approval Reason" [(ngModel)]="goApprovalReason" name="goApprovalReason"
+                    >
+                    <mat-option [value]=""></mat-option>
+                     
+                     <mat-option *ngFor="let goApprovalReason of goApprovalReasonList;" [value]="goApprovalReason">
+                      {{goApprovalReason}}
+                    </mat-option>
+
+                  
+                   
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="col-sm-1">
+            <div class="bordered">
+              <div>Truck Capacity</div>
+              <div>
+                <b>{{truckCapacity}}</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="datatable">
+      <ngx-datatable class='material no-scroll-table' [rows]='loadSlipData' [columnMode]="'force'" [headerHeight]="50"
+        [limit]="200" [footerHeight]="30" [rowHeight]="'auto'" [rowClass]="getRowClass" [scrollbarH]="true">
+        <ngx-datatable-column name="Material Code" [width]="120" [resizeable]="false" [sortable]="false" prop="ITEM_ID">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.ITEM_ID || "--"}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Material Description" [width]="250" [resizeable]="false" [sortable]="false"
+          prop="ITEM_DESCRIPTION">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.ITEM_DESCRIPTION || "--"}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Cat" [width]="100" [resizeable]="false" [sortable]="false" prop="ITEM_CATEGORY">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.ITEM_CATEGORY || "--"}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Batch" [width]="120" [resizeable]="false" [sortable]="false" prop="BATCH_CODE">
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+            <!-- Batch Code can editble only for RDC , not for FGS -->
+            <!-- FGS ROLES -->
+            <ng-container *ngIf="!is_Role_RDC()">
+              <span> {{row.BATCH_CODE}} </span>
+            </ng-container>
+            <!-- RDC ROLE -->
+            <ng-container *ngIf="is_Role_RDC()">
+              <div *ngIf="!sostoNumber">
+                <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-BATCH_CODE'] = true"
+                  *ngIf="!editing[rowIndex + '-BATCH_CODE']">
+                  <span class="edit-label"> {{row.BATCH_CODE}} </span>
+                  <i class="fa fa-pencil" aria-hidden="true"></i>
+                </div>
+                <div *ngIf="editing[rowIndex + '-BATCH_CODE']">
+                  <input class="input-field" (keyup)="updateValue($event, 'BATCH_CODE', rowIndex,row)"
+                    autocomplete="off" *ngIf="editing[rowIndex+ '-BATCH_CODE']" type="text" [value]="row.BATCH_CODE"
+                    oninput="this.value = this.value.toUpperCase()" />
+                </div>
+              </div>
+              <div *ngIf="sostoNumber">
+                <span class="edit-label"> {{row.BATCH_CODE}} </span>
+              </div>
+            </ng-container>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Priority" [width]="70" [resizeable]="false" [sortable]="false" prop="MIN_PRIORITY">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.MIN_PRIORITY || "--"}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Available Qty" [width]="100" [resizeable]="false" [sortable]="false" prop="SUM_QTY">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.SUM_QTY || "0"}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Qty" [width]="80" [resizeable]="false" [sortable]="false" prop="qty">
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value"
+            let-row="row">
+            <div *ngIf="!sostoNumber">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-qty'] = true"
+                *ngIf="!editing[rowIndex + '-qty']">
+                <span class="edit-label">{{row.qty || "--"}} </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <mat-form-field *ngIf="editing[rowIndex + '-qty']">
+                <input matInput (keyup)="updateValue($event, 'qty', rowIndex,row)" (blur)="calculateMaterialWeight(row)"
+                  (keypress)="service.numberOnly($event)" autocomplete="off" *ngIf="editing[rowIndex+ '-qty']"
+                  type="text" [value]="row.qty?row.qty:''" />
+              </mat-form-field>
+            </div>
+            <span *ngIf="sostoNumber">{{row.qty || "--"}} </span>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Scannable" [width]="70" [resizeable]="false" [sortable]="false" prop="scanQty">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.isScannable || "--"}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Scan Qty" [width]="70" [resizeable]="false" [sortable]="false" prop="scannedQty">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.scannedQty || "0"}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Tube Code" [width]="90" [resizeable]="false" [sortable]="false" prop="TUBE_CODE">
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+            <div *ngIf="!sostoNumber">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-TUBE_CODE'] = true"
+                *ngIf="!editing[rowIndex + '-TUBE_CODE']">
+                <span class="edit-label"> {{row.TUBE_CODE}} </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <div *ngIf="editing[rowIndex + '-TUBE_CODE']">
+                <input class="input-field" (keyup)="updateValue($event, 'TUBE_CODE', rowIndex,row)" autocomplete="off"
+                  type="text" [value]="row.TUBE_CODE" oninput="this.value = this.value.toUpperCase()" />
+              </div>
+            </div>
+            <div *ngIf="sostoNumber">
+              <span class="edit-label"> {{row.TUBE_CODE}} </span>
+            </div>
+
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Tube Batch" [width]="90" [resizeable]="false" [sortable]="false" prop="tubeBatch">
+
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+            <div *ngIf="!sostoNumber">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-tubeBatch'] = true"
+                *ngIf="!editing[rowIndex + '-tubeBatch']">
+                <span class="edit-label"> {{row.tubeBatch}} </span>
+                <i class="fa fa-pencil" aria-hidden="true"
+                  *ngIf="((row.tubeBatch) || (row.tubeBatch == undefined) )"></i>
+              </div>
+              <mat-form-field *ngIf="editing[rowIndex + '-tubeBatch']">
+                <input matInput (keyup)="updateValue($event, 'tubeBatch', rowIndex,row)" autocomplete="off"
+                  *ngIf="editing[rowIndex+ '-tubeBatch']" type="text" [value]="row.tubeBatch"
+                  oninput="this.value = this.value.toUpperCase()" />
+              </mat-form-field>
+            </div>
+            <span *ngIf="sostoNumber">{{row.tubeBatch}} </span>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Tube Qty" [width]="80" [resizeable]="false" [sortable]="false" prop="totalTubeQty">
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+            <div *ngIf="!sostoNumber">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-totalTubeQty'] = true"
+                *ngIf="!editing[rowIndex + '-totalTubeQty']">
+                <span class="edit-label"> {{row.totalTubeQty}} </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <div *ngIf="editing[rowIndex + '-totalTubeQty']">
+                <input class="input-field" (keyup)="updateValue($event, 'totalTubeQty', rowIndex,row)"
+                  autocomplete="off" type="text" [value]="row.totalTubeQty" />
+              </div>
+            </div>
+            <div *ngIf="sostoNumber">
+              <span class="edit-label"> {{row.totalTubeQty}} </span>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Flap Code" [width]="100" [resizeable]="false" [sortable]="false" prop="FLAP_CODE">
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+            <div *ngIf="!sostoNumber">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-FLAP_CODE'] = true"
+                *ngIf="!editing[rowIndex + '-FLAP_CODE']">
+                <span class="edit-label"> {{row.FLAP_CODE}} </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <div *ngIf="editing[rowIndex + '-FLAP_CODE']">
+                <input class="input-field" (keyup)="updateValue($event, 'FLAP_CODE', rowIndex,row)" autocomplete="off"
+                  type="text" [value]="row.FLAP_CODE" oninput="this.value = this.value.toUpperCase()" />
+              </div>
+            </div>
+            <div *ngIf="sostoNumber">
+              <span class="edit-label"> {{row.FLAP_CODE}} </span>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Flap Batch" [width]="90" [resizeable]="false" [sortable]="false" prop="flapBatch">
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+            <div *ngIf="!sostoNumber">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-flapBatch'] = true"
+                *ngIf="!editing[rowIndex + '-flapBatch']">
+                <span class="edit-label"> {{row.flapBatch}} </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <mat-form-field *ngIf="editing[rowIndex + '-flapBatch']">
+                <input matInput (keyup)="updateValue($event, 'flapBatch', rowIndex,row)" autocomplete="off"
+                  *ngIf="editing[rowIndex+ '-flapBatch']" type="text" [value]="row.flapBatch"
+                  oninput="this.value = this.value.toUpperCase()" />
+              </mat-form-field>
+            </div>
+            <span *ngIf="sostoNumber">{{row.flapBatch}} </span>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Flap Qty" [width]="70" [resizeable]="false" [sortable]="false" prop="totalFlapQty">
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+            <div *ngIf="!sostoNumber">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-totalFlapQty'] = true"
+                *ngIf="!editing[rowIndex + '-totalFlapQty']">
+                <span class="edit-label"> {{row.totalFlapQty}} </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <div *ngIf="editing[rowIndex + '-totalFlapQty']">
+                <input class="input-field" (keyup)="updateValue($event, 'totalFlapQty', rowIndex,row)"
+                  autocomplete="off" type="text" [value]="row.totalFlapQty" />
+              </div>
+            </div>
+            <div *ngIf="sostoNumber">
+              <span class="edit-label"> {{row.totalFlapQty}} </span>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Valve Code" [width]="100" [resizeable]="false" [sortable]="false" prop="VALVE_CODE">
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+            <div *ngIf="!sostoNumber">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-VALVE_CODE'] = true"
+                *ngIf="!editing[rowIndex + '-VALVE_CODE']">
+                <span class="edit-label"> {{row.VALVE_CODE}} </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <div *ngIf="editing[rowIndex + '-VALVE_CODE']">
+                <input class="input-field" (keyup)="updateValue($event, 'VALVE_CODE', rowIndex,row)" autocomplete="off"
+                  type="text" [value]="row.VALVE_CODE" oninput="this.value = this.value.toUpperCase()" />
+              </div>
+            </div>
+            <div *ngIf="sostoNumber">
+              <span class="edit-label"> {{row.VALVE_CODE}} </span>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Valve Batch" [width]="100" [resizeable]="false" [sortable]="false"
+          prop="VALVE_DESC">
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+            <div *ngIf="!sostoNumber">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-valveBatch'] = true"
+                *ngIf="!editing[rowIndex + '-valveBatch']">
+                <span class="edit-label"> {{row.valveBatch}} </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <div *ngIf="editing[rowIndex + '-valveBatch']">
+                <input class="input-field" (keyup)="updateValue($event, 'valveBatch', rowIndex,row)" autocomplete="off"
+                  type="text" [value]="row.valveBatch" oninput="this.value = this.value.toUpperCase()" />
+              </div>
+            </div>
+            <div *ngIf="sostoNumber">
+              <span class="edit-label"> {{row.valveBatch}} </span>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Valve Qty" [width]="70" [resizeable]="false" [sortable]="false"
+          prop="totalValueQty">
+          <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+            <div *ngIf="!sostoNumber">
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-totalValueQty'] = true"
+                *ngIf="!editing[rowIndex + '-totalValueQty']">
+                <span class="edit-label"> {{row.totalValueQty}} </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <div *ngIf="editing[rowIndex + '-totalValueQty']">
+                <input class="input-field" (keyup)="updateValue($event, 'totalValueQty', rowIndex,row)"
+                  autocomplete="off" type="text" [value]="row.totalValueQty" />
+              </div>
+            </div>
+            <div *ngIf="sostoNumber">
+              <span class="edit-label"> {{row.totalValueQty}} </span>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+        <!-- Colums enable only if the STO/SO Number is available -->
+        <div *ngIf="!sostoNumber">
+          <ngx-datatable-column name="Actions" [width]="120" [resizeable]="false" [sortable]="false"
+            prop="totalValueQty">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <!-- Split only visible for RDC role and if loadslip created  -->
+              <button class="theme-small-button" (click)="split(row)"
+                *ngIf="(service.checkRole() == roles.rdc_PLN) && (isLoadslipIdAvaliable) && ((row.isSplit != 'Y') || (row.isSplit == ''))">
+                <i class="fa fa-code-fork fa-2x" aria-hidden="true"></i>
+              </button>
+              <!--  Delete Button only visible if the loadslip is created -->
+              <button class="theme-delete-button" (click)="deleteRow(row)"
+                *ngIf="isLoadslipIdAvaliable && ((row.canLSItemDeleted) || (row.destinationItem))">
+                <i class="fa fa-trash fa-2x" aria-hidden="true"></i>
+              </button>
+            </ng-template>
+          </ngx-datatable-column>
+        </div>
+
+
+      </ngx-datatable>
+    </div>
+  </div>
+  <div align="center" *ngIf="loadSlipData.length > 0">
+    <button mat-stroked-button color="primary" class="mr-3" (click)="cancelLoadslipCreation()"
+      *ngIf="!(loadslipID)">Cancel</button>
+
+    <button mat-raised-button color="primary" type="button" class="btm-action-btn"
+      (click)="saveAsDraft_Print_trigger('DRAFT')" [disabled]="isScanItemCheck" *ngIf="!sostoNumber">Save
+      as Draft</button>
+  </div>
+  <div class="mb-3" *ngIf="(destinationWisePlans.length > 0) && (loadslipID) && !sostoNumber">
+    <ngx-datatable class='material no-scroll-table destination-table ' [rows]='destinationWisePlans'
+      [columnMode]="'force'" [headerHeight]="50" [limit]="200" [footerHeight]="50" [rowHeight]="'auto'"
+      [scrollbarH]="true">
+      <ngx-datatable-column name="Material Code" [width]="120" [resizeable]="false" [sortable]="false" prop="ITEM_ID">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ITEM_ID || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Material Description" [width]="250" [resizeable]="false" [sortable]="false"
+        prop="ITEM_DESCRIPTION">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ITEM_DESCRIPTION || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Cat" [width]="100" [resizeable]="false" [sortable]="false" prop="ITEM_CATEGORY">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ITEM_CATEGORY || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Batch" [width]="70" [resizeable]="false" [sortable]="false" prop="BATCH_CODE">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.BATCH_CODE || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Priority" [width]="70" [resizeable]="false" [sortable]="false" prop="MIN_PRIORITY">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.MIN_PRIORITY || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Available Qty" [width]="100" [resizeable]="false" [sortable]="false" prop="SUM_QTY">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.SUM_QTY || "0"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Qty" [width]="80" [resizeable]="false" [sortable]="false" prop="qty">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row">
+          <span>{{row.qty || "--"}} </span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Scannable" [width]="70" [resizeable]="false" [sortable]="false" prop="scanQty">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.isScannable || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Scan Qty" [width]="70" [resizeable]="false" [sortable]="false" prop="scanQty">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.scanQty || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tube Code" [width]="90" [resizeable]="false" [sortable]="false" prop="TUBE_CODE">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.TUBE_CODE || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tube Batch" [width]="90" [resizeable]="false" [sortable]="false" prop="tubeBatch">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+          <span>{{row.tubeBatch}} </span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tube Qty" [width]="80" [resizeable]="false" [sortable]="false" prop="totalTubeQty">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totalTubeQty?row.totalTubeQty:''}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Flap Code" [width]="90" [resizeable]="false" [sortable]="false" prop="FLAP_CODE">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.FLAP_CODE || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Flap Batch" [width]="90" [resizeable]="false" [sortable]="false" prop="flapBatch">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+          <span>{{row.flapBatch}} </span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Flap Qty" [width]="70" [resizeable]="false" [sortable]="false" prop="totalFlapQty">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totalFlapQty?row.totalFlapQty:''}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Valve Code" [width]="70" [resizeable]="false" [sortable]="false" prop="VALVE_CODE">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.VALVE_CODE || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Valve Batch" [width]="70" [resizeable]="false" [sortable]="false" prop="VALVE_DESC">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.valveBatch || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Valve Qty" [width]="70" [resizeable]="false" [sortable]="false" prop="totalValueQty">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totalValueQty?row.totalValueQty:''}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Actions" [width]="70" [resizeable]="false" [sortable]="false" prop="totalValueQty">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+          <button class="theme-small-button" (click)="add(row,rowIndex)">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button>
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+
+</div>
+
+
+
+<!-- The Modal -->
+<div class="modal" id="myModal" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Select Pickup Location</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        <mat-form-field>
+          <mat-select [(ngModel)]="shareTruckLocation" name="shareTruckLocation" placeholder="Select Pickup Location">
+            <mat-option *ngFor="let sharebledestination of shareTrcukDestinations" [value]="sharebledestination">
+              {{sharebledestination}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" (click)="shareTruck()">Confirm</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal" id="confirmeeventresposeModal" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">
+          Message !!!
+        </h4>
+        <button type="button" data-dismiss="modal" class="close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">{{confirmeventmessage}}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

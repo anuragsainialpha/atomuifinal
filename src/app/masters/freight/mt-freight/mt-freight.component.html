@@ -1,0 +1,687 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+    <b> Freight &gt; MT Freight</b>
+    <span class="pull-right refresh-span">
+      <!-- <button class="theme-small-button" (click)="upload()" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+
+  <div class="mt-item-fields" *ngIf="isShow">
+      <div class="col-md-12 row">
+        <div class="col-md-12 padding-right-40">
+          <div class="row">
+
+              <div class="col-md-1">
+                  <mat-form-field>
+                    <input matInput placeholder="Servprov" [(ngModel)]="servprov" name="servprov">
+                  </mat-form-field>
+              </div>
+              <div class="col-md-1">
+                  <mat-form-field>
+                    <input matInput placeholder="Source Code" [(ngModel)]="sourceLoc" name="sourceLoc">
+                  </mat-form-field>
+              </div>
+              <div class="col-md-1">
+                  <mat-form-field>
+                    <input matInput placeholder="Dest Code" [(ngModel)]="destLoc" name="destLoc">
+                  </mat-form-field>
+              </div>
+              <div class="col-md-1">
+                  <mat-form-field>
+                    <input matInput placeholder="TruckType" [(ngModel)]="truckType" name="truckType">
+                  </mat-form-field>
+              </div>
+              <div class="col-md-1">
+                  <mat-form-field>
+                    <input matInput placeholder="Variant" [(ngModel)]="condition1" name="condition1">
+                  </mat-form-field>
+              </div>
+              <div class="col-md-1">
+                  <mat-form-field>
+                    <mat-select name="status" [(value)]="status" placeholder="Status">
+                      <mat-option *ngFor="let stat of statusList" [value]="stat.val">
+                        {{stat.val}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+              </div>
+              <div class="col-md-1">
+                  <mat-form-field>
+                    <input matInput placeholder="%" [(ngModel)]="percentile" name="percentile">
+                  </mat-form-field>
+              </div>
+              <div class="col-md-1">
+                      <mat-form-field>
+                        <input matInput [matDatepicker]="createIndentDate" [(ngModel)]="indentDate"
+                          name="indentDate" placeholder="Eff Date" (ngModelChange)="formateDate($event)">
+                        <mat-datepicker-toggle matSuffix [for]="createIndentDate"></mat-datepicker-toggle>
+                        <mat-datepicker #createIndentDate disabled="false"></mat-datepicker>
+                      </mat-form-field>
+              </div>
+              <div class="col-md-1">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Sap Code" aria-label="State" autocomplete="off" [(ngModel)]="transporterSapCode" name="iransporterSapCode">
+                    </mat-form-field>
+              </div>
+              <div class="col-md-1">
+                  <mat-form-field>
+                    <input matInput placeholder="Src Desc" [(ngModel)]="sourceDesc" name="sourceDesc">
+                  </mat-form-field>
+              </div>
+              <div class="col-md-1">
+                  <mat-form-field>
+                    <input matInput placeholder="Dest Desc" [(ngModel)]="destDesc" name="destDesc">
+                  </mat-form-field>
+              </div>
+
+          </div>
+          <!-- (ngModelChange)="formateDateFromInsert($event)"  -->
+          <div class="row">
+            <div class="col-md-1 pr-0">
+              <div class="form-group">
+                <mat-form-field>
+                  <input matInput disabled [matDatepicker]="formPicker" placeholder="From Insert Date" [(ngModel)]="fromInsertDate"
+                    name="fromInsertDate"   (dateChange)="addEvent('fromInsertDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="formPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #formPicker disabled="false"></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+            <!-- (ngModelChange)="formateDateToInsert($event)" -->
+            <div class="col-md-1 pr-0">
+              <div class="form-group">
+                <mat-form-field>
+                  <input matInput disabled [matDatepicker]="toPicker" [min]="fromInsertDate" placeholder="To Insert Date"
+                    [(ngModel)]="toInsertDate" name="toInsertDate" >
+                  <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #toPicker [disabled]="!fromInsertDate"></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+            <!-- <div class="col-md-1 pr-0">
+              <div class="form-group">
+                <mat-form-field>
+                  <input matInput disabled [matDatepicker]="expiryPicker" placeholder="Expiry Date" [(ngModel)]="expiryDate"
+                    name="expiryDate"   (dateChange)="addEvent('expiryDate', $event)">
+                  <mat-datepicker-toggle matSuffix [for]="expiryPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #expiryPicker disabled="false"></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div> -->
+            <div class="col-md-1 ">
+              <div class="form-group">
+                <mat-form-field>
+                  <mat-select placeholder="Expiry Date" [(ngModel)]="filterExpiryDate" name="filterExpiryDate" >
+                    <!-- <mat-option [value]="">None</mat-option> -->
+                    <mat-option *ngFor="let item of expiryDateFilterList" [value]="item.key" >
+                      {{item.value}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="col-md-2 pr-0" *ngIf = "showExpiryDate()">
+              <div class="row">
+                <div class="col-md-6 pr-0">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput disabled [matDatepicker]="fromExpiryPicker" placeholder="From Expiry Date" [(ngModel)]="fromExpiryDate"
+                        name="fromExpiryDate"   (dateChange)="addEventExpDate('fromExpiryDate', $event)">
+                      <mat-datepicker-toggle matSuffix [for]="fromExpiryPicker"></mat-datepicker-toggle>
+                      <mat-datepicker #fromExpiryPicker disabled="false"></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-6 pr-0">
+                  <div class="form-group">
+                    <mat-form-field>
+                      <input matInput disabled [matDatepicker]="toExpiryPicker" [min]="fromExpiryDate" placeholder="To Expiry Date" [(ngModel)]="toExpiryDate"
+                        name="toExpiryDate"   >
+                      <mat-datepicker-toggle matSuffix [for]="toExpiryPicker"></mat-datepicker-toggle>
+                      <mat-datepicker #toExpiryPicker [disabled]="!fromExpiryDate"></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="pull-right">
+        <div class="search-fileds">
+          <button class="theme-small-button" (click)="doSearchFilter()" matTooltip="Search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </button>
+          <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- <div *ngIf="displayBtn">
+&nbsp;<button [disabled]="isDisable" class="makebig btn btn-sm light-red-color" (click)="approveStatusSubmit(buttonLable)">
+    {{buttonLable}}
+  </button>
+</div>  -->
+
+<div *ngIf="isL1Manager && displayBtn">
+    &nbsp;<button [disabled]="isDisable" *ngIf="displayBtn" class="makebig btn btn-sm light-red-color" (click)="approveStatusSubmit(buttonLable)">
+        {{buttonLable}}
+      </button>
+    </div>
+
+<div *ngIf="isL2Manager && displayBtn">
+  &nbsp;<button [disabled]="isDisable" *ngIf="displayBtn" class="makebig btn btn-sm light-red-color" (click)="approveStatusSubmit(buttonLable)">
+      {{buttonLable}}
+    </button>
+  </div>
+
+
+
+  <div class="mt-freight-table">
+      <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll'  [externalPaging]="true"
+      #table [rows]='mtFreightList' [scrollbarH]="true" [headerHeight]="20" [footerHeight]="50" [rowHeight]="'auto'" 
+      (page)="datatablePageData($event)" [limit]="page.limit" [count]="page.count"  [offset]="page.offset"
+      [selected]="selected" [selectionType]="'checkbox'" [selectAllRowsOnPage]="false">
+        
+      
+      
+      <!-- name="Select All" prop="SelectAll" -->
+      <!-- <ngx-datatable-column [frozenLeft]="true" [width]="30" [sortable]="false" [canAutoResize]="false" [draggable]="false" [resizeable]="false">
+          <ng-template ngx-datatable-header-template let-value="value" let-allRowsSelected="allRowsSelected" let-selectFn="selectFn">
+            <input type="checkbox" [class.circle]="fewChecked"  (change)="selectAllRows($event)" [checked]="isCheckedAll"/>
+          </ng-template>
+          <ng-template let-row="row" ngx-datatable-cell-template let-value="value" let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+            
+            <input type="checkbox" [class.circle]="fewChecked" (change)="modifyFreightItem(row,$event)" [checked]="isCheckedAll"/>
+          </ng-template>
+      </ngx-datatable-column> -->
+
+      <ngx-datatable-column [frozenLeft]="true" [width]="30" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+        [resizeable]="false">
+        <ng-template ngx-datatable-header-template let-value="value" let-allRowsSelected="allRowsSelected"
+          let-selectFn="selectFn" let-row="row" let-rowIndex="rowIndex">
+          <input type="checkbox" [checked]="allRowsSelected"
+            (change)="selectFn(!allRowsSelected);onSelectAll($event)" />
+        </ng-template>
+        <ng-template ngx-datatable-cell-template let-value="value" let-isSelected="isSelected" let-row="row"
+          let-rowIndex="rowIndex" let-onCheckboxChangeFn="onCheckboxChangeFn">
+          <input type="checkbox" [checked]="isSelected" (change)="onCheckboxChangeFn($event);onSelect($event,row)" />
+        </ng-template>
+      </ngx-datatable-column>
+
+
+
+      <!-- FREEZED CLOUMNS -->
+
+       
+
+        <ngx-datatable-column [frozenLeft]="true" name="Servprov" [width]="110" [resizeable]="false" prop="servprov" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.servprov ? row.servprov : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [frozenLeft]="true" name="Source Code" [width]="90" [resizeable]="false" prop="sourceLoc" [sortable]="true" class="text-right">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.sourceLoc ? row.sourceLoc : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [frozenLeft]="true"  name="Dest Code" [width]="90" [resizeable]="false" prop="destLoc" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.destLoc ? row.destLoc : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [frozenLeft]="true"  name="Truck Type" [width]="130" [resizeable]="false" prop="truckType" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.truckType ? row.truckType : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [frozenLeft]="true"  name="Variant 1" [width]="70" [resizeable]="false" prop="condition1" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.variant1 ? row.variant1 : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+       <!-- MOVABLE CLOUMNS -->
+
+       <ngx-datatable-column name="Freight" [width]="80" [resizeable]="false" prop="baseFreight" [sortable]="true" class="text-right"  [cellClass]="'text-right'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.baseFreight ? row.baseFreight : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Curr" [width]="50" [resizeable]="false" prop="baseFreightUom" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.baseFreightUom ? row.baseFreightUom : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Basis" [width]="110" [resizeable]="false" prop="basis" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.basis ? row.basis : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Status" [width]='120' [resizeable]="false" [sortable]="true" prop="appStatus">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          <!-- <button class="btn btn-sm lightgreen-button" (click)="modifyItem(row)" [ngClass]="(row.status=='Level1 Approved' || row.status=='Level2 Approved'||row.status=='L1 Approved' || row.status=='L2 Approved')?'lightgreen-button':'light-red-color'"> -->
+            {{row.status?row.status:'Unapproved'}}
+          <!-- </button> -->
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Prev Rate" [width]="80" [resizeable]="false" prop="previousRate" [sortable]="true" [cellClass]="'text-right'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.previousRate ? row.previousRate : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Diff " [width]="80" [resizeable]="false" prop="diff" [sortable]="true" class="text-right" [cellClass]="'text-right'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.diff ? row.diff : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="%" [width]="60" [resizeable]="false" prop="percentile" [sortable]="true" class="text-right" [cellClass]="'text-right'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.percentile ? row.percentile : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Eff Date" [width]="90" [resizeable]="false" prop="effectiveDate" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.effectiveDate ? trimDate(row.effectiveDate) : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+      <!-- <ngx-datatable-column name="Exp Date" [width]="90" [resizeable]="false" prop="expiryDate" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+       {{row.expiryDate ? trimDate(row.expiryDate) : ''}}
+        </ng-template>
+      </ngx-datatable-column> -->
+      <!-- Dispatch plan column -->
+      <ngx-datatable-column [frozenLeft]="false" name="Exp Date" [width]="110" [resizeable]="false" [sortable]="true"
+        prop="expiryDate">
+        <!-- <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+          <ng-container *ngIf="(row.expiryDate == null || row.expiryDate == '')" >
+            
+            <mat-form-field>
+              <input matInput [matDatepicker]="expiryDatePicker" [min] = "formatEffectiveDate(row.effectiveDate)" [(ngModel)]="row.selectedExpiryDate" autofocus name ="selectedExpiryDate"
+              (dateChange)="updateExpiryDateAtRow(row, rowIndex)">
+              <mat-datepicker-toggle matSuffix [for]="expiryDatePicker" ></mat-datepicker-toggle>
+              <mat-datepicker #expiryDatePicker></mat-datepicker>
+            </mat-form-field>
+          </ng-container>
+          <ng-container *ngIf="row.expiryDate">
+            {{row.expiryDate ? trimDate(row.expiryDate) : ''}}
+          </ng-container>
+        </ng-template> -->
+        <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+          <ng-container>
+            <div >
+              <div class="edit-field" title="Double click to edit"
+                (click)="editing[rowIndex + '-dispatchDate'] = true" *ngIf="!editing[rowIndex + '-dispatchDate']">
+                <span class="edit-label">{{row.expiryDate ? trimDate(row.expiryDate) : ''}}
+                </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <mat-form-field *ngIf="editing[rowIndex+ '-dispatchDate']">
+                <input matInput [matDatepicker]="rowIndexPicker" [value]="row.selectedExpiryDate" autofocus
+                  (dateChange)="updateExpiryDateAtRow(row, $event, rowIndex)">
+                <mat-datepicker-toggle matSuffix [for]="rowIndexPicker"></mat-datepicker-toggle>
+                <mat-datepicker #rowIndexPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </ng-container>
+        </ng-template>
+      </ngx-datatable-column>
+      <!-- <ngx-datatable-column name="TT" [width]="50" [resizeable]="false" prop="ttDays" [sortable]="true" [cellClass]="'text-right'">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ttDays ? row.ttDays : ''}}
+        </ng-template>
+      </ngx-datatable-column> -->
+      <ngx-datatable-column name="TT Days" [width]="60" [resizeable]="false" [sortable]="true" prop="ttDays">
+        <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+          <ng-container>
+            <div >
+              <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-ttDays'] = true"
+                *ngIf="!editing[rowIndex + '-ttDays']">
+                <span class="edit-label">{{row.ttDays ? row.ttDays : ''}}
+                </span>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <ng-container *ngIf="editing[rowIndex+ '-ttDays']">
+                <input class="table-input" autofocus (blur)="updateValue(row,$event, 'ttDays', rowIndex)"
+                  [value]="row.ttDays" (keypress)="service.numberOnly($event)" (keyup)="showSaveButton($event, row)">
+              </ng-container>
+            </div>
+          </ng-container>
+        </ng-template>
+      </ngx-datatable-column>
+
+      <!-- <ngx-datatable-column name="Distance" [width]="65" [resizeable]="false" prop="distance" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.distance ? row.distance : ''}}
+          </ng-template>
+        </ngx-datatable-column> -->
+        <ngx-datatable-column name="Distance" [width]="60" [resizeable]="false" [sortable]="true" prop="distance">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <ng-container>
+              <div >
+                <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-distance'] = true"
+                  *ngIf="!editing[rowIndex + '-distance']">
+                  <span class="edit-label">{{row.distance ? row.distance : ''}}
+                  </span>
+                  <i class="fa fa-pencil" aria-hidden="true"></i>
+                </div>
+                <ng-container *ngIf="editing[rowIndex+ '-distance']">
+                  <input class="table-input" autofocus (blur)="updateValue(row,$event, 'distance', rowIndex)"
+                    [value]="row.distance" (keypress)="service.numberOnly($event)" (keyup)="showSaveButton($event, row)">
+                </ng-container>
+              </div>
+            </ng-container>
+          </ng-template>
+        </ngx-datatable-column>
+
+      <ngx-datatable-column name="Variant 2" [width]="75" [resizeable]="false" prop="condition2" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.variant2 ? row.variant2 : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+
+
+      
+      <ngx-datatable-column name="Rate Type" [width]="70" [resizeable]="false" prop="rateType" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.rateType ? row.rateType : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Loading" [width]="70" [resizeable]="false" prop="loading" [cellClass]="'text-right'" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.loading ? row.loading : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Un Loading" [width]="80" [resizeable]="false" prop="unloading" [cellClass]="'text-right'" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.unloading ? row.unloading : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+
+
+
+      <ngx-datatable-column name="Sap Code" [width]="90" [resizeable]="false" prop="transporterSapCode" [sortable]="true" [cellClass]="'text-right'">
+        <!-- <input type="checkbox" [class.circle]="fewChecked" (change)="modifyItem(row,$event)" [checked]="isCheckedAll"/>&nbsp; 
+        <br> -->
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.transporterSapCode ? row.transporterSapCode : ''}}
+        </ng-template>
+      </ngx-datatable-column>
+        <ngx-datatable-column name="Source Desc" [width]="170" [resizeable]="false" prop="sourceDesc" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.sourceDesc ? row.sourceDesc : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Dest Desc" [width]="180" [resizeable]="false" prop="destDesc" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.destDesc ? row.destDesc : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Min Value" [width]="70" [resizeable]="false" prop="minValue" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.minValue ? row.minValue : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Min Val Uom" [width]="90" [resizeable]="false" prop="minValueUom" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.minValueUom ? row.minValueUom : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Mode" [width]="60" [resizeable]="false" prop="transportMode" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.transportMode ? row.transportMode :''}}
+          </ng-template>
+        </ngx-datatable-column>
+        
+        <ngx-datatable-column name="Src Type" [width]="60" [resizeable]="false" prop="sourceType" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.sourceType ? row.sourceType : ''}}
+            </ng-template>
+          </ngx-datatable-column>
+          
+        <ngx-datatable-column name="Others1" [width]="60" [resizeable]="false" prop="Others1" [cellClass]="'text-right'" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.others1 ? row.others1 : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Tot Expense" [width]="90" [resizeable]="false" prop="totExpense" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.totExpense ? row.totExpense : ''}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Pay Transporter" [width]="100" [resizeable]="false" prop="payTransporter" [sortable]="true">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.payTransporter ? row.payTransporter : ''}}
+              </ng-template>
+            </ngx-datatable-column>
+
+        <ngx-datatable-column name="Others1 Code	" [width]="100" [resizeable]="false" prop="others1Code" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.others1Code	? row.others1Code : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Others2" [width]="60" [resizeable]="false" prop="others2" [cellClass]="'text-right'" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.others2 ? row.others2 : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Others2 Code" [width]="100" [resizeable]="false" prop="others2 Code" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.others2Code ? row.others2Code : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Others3" [width]="60" [resizeable]="false" prop="others3" [cellClass]="'text-right'" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.others3 ? row.others3 : '' }}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Others3 Code" [width]="100" [resizeable]="false" prop="others3Code" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.others3Code ? row.others3Code : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Insert User" [width]="60" [resizeable]="false" prop="insertUser" [cellClass]="'text-right'" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.insertUser ? row.insertUser : '' }}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Insert Date" [width]="150" [resizeable]="false" prop="insertDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.insertDate ? trimDate(row.insertDate) : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Approval L1 Date" [width]="150" [resizeable]="false" prop="l1ApprovedDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.approval1Date ? trimDate(row.approval1Date) : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Approval L2 Date" [width]="150" [resizeable]="false" prop="l2ApprovedDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.approval2Date ? trimDate(row.approval2Date) : ''}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Remarks" [width]="150" [resizeable]="false" prop="remarks" [sortable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div class="edit-field" [title]="row.remarks"
+            [ngClass]="{'cursor-pointer':row.remarks?.length>9}"
+            (click)="showIntegrationMessage(row)" *ngIf="(row.remarks)">
+            {{(row.remarks?.length>9)?(row.remarks | slice:0:9)+'..':(row.remarks)}}
+          </div>
+            <!-- {{row.remarks}} -->
+          </ng-template>
+        </ngx-datatable-column>
+        <!-- Actions -->
+      <ngx-datatable-column name="Action" [width]="100" [resizeable]="false" [sortable]="false" *ngIf = 'isActionVisible()'>
+        <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <button *ngIf= "row.showSaveButton" class="theme-small-button btn" matTooltip="Modify Freight" (click)="rowLevelModifyFreight(row)">
+            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+          </button>
+         
+          <span *ngIf="(isShowDeleteFreight(row))">
+            <button class="theme-delete-button btn" matTooltip="Delete plan" (click)="confirmDeleteAction(row)">
+              <i class="fa fa-trash-o fa-2x" aria-hidden="true"></i>
+            </button>
+          </span>
+        </ng-template>
+      </ngx-datatable-column>
+
+         <!-- Footer Template starts -->
+         <ngx-datatable-footer>
+          <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+            let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+            <div class="page-count">
+              <span *ngIf="selectedCount">
+                {{selectedCount.toLocaleString()}} Selected |
+              </span>
+              Showing {{(offset * pageSize)+1}} to {{(rowCount>
+              (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+              {{(rowCount)}} records.
+            </div>
+            <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+              [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+              [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+            </datatable-pager>
+          </ng-template>
+        </ngx-datatable-footer>
+        <!-- Footer Template Ends -->
+
+      </ngx-datatable>
+  </div>
+</div>
+
+<!-- Confirm Delete modal -->
+<div class="modal" id="confirmDelete">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form name="form" #f="ngForm">
+        <div class="modal-header">
+          <h4 class="modal-title text-primary">Are you sure you want to delete</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" mat-raised-button color="error" class="btm-action-btn"
+            (click)="rowlevelDeleteFreight(selectedRow)">Delete</button>
+          <button type="button" mat-raised-button class="mat-default" color="default"
+            data-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<!-- <ngx-datatable-column name="Base Freight Uom" [width]="120" [resizeable]="false" prop="baseFreightUom" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{row.baseFreightUom}}
+  </ng-template>
+</ngx-datatable-column>
+
+<ngx-datatable-column name="Approval1 User" [width]="80" [resizeable]="false" prop="approval1User" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{row.approval1User}}
+  </ng-template>
+</ngx-datatable-column>
+<ngx-datatable-column name="Approval1 Date" [width]="80" [resizeable]="false" prop="Approval1Date" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{row.Approval1Date}}
+  </ng-template>
+</ngx-datatable-column>
+<ngx-datatable-column name="Approval2 User" [width]="80" [resizeable]="false" prop="Approval2User" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{row.Approval2User}}
+  </ng-template>
+</ngx-datatable-column>
+
+<ngx-datatable-column name="Approval2 Date" [width]="80" [resizeable]="false" prop="Approval2Date" [sortable]="true">
+  <ng-template let-row="row" ngx-datatable-cell-template>
+    {{row.Approval2Date}}
+  </ng-template>
+</ngx-datatable-column> -->
+
+
+
+
+ <!--  -->
+
+        <!-- <ngx-datatable-column name="Status" [width]="70" [resizeable]="false" prop="Status" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.Status}}
+          </ng-template>
+        </ngx-datatable-column> -->
+       
+        <!-- <ngx-datatable-column name="Status" [width]="50" [resizeable]="false" [sortable]="false">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <button class="theme-small-button btn" matTooltip="Modify Item" (click)="modifyItem(row)" [disabled]="(row.isError)">
+              <i class="fa fa-refresh fa-2x" aria-hidden="true"></i>
+            </button>
+          </ng-template>
+        </ngx-datatable-column> -->
+
+
+ <!-- <ngx-datatable-column name="Dest Desc" [width]="70" [resizeable]="false" prop="destDesc" [sortable]="true">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <div class="edit-field" title="Double click to edit" (click)="editing[rowIndex + '-tte'] = true" *ngIf="!editing[rowIndex + '-tte']">
+              <span class="edit-label">{{row.destDesc}}
+              </span>
+              <i class="fa fa-pencil" aria-hidden="true"></i>
+            </div>
+            <mat-form-field class="example-full-width" *ngIf="editing[rowIndex+ '-tte']">
+              <input matInput (blur)="updateValue(row, $event, 'tte', rowIndex)" [value]="row.tte" autofocus>
+            </mat-form-field>
+          </ng-template>
+        </ngx-datatable-column> -->
+
+        <!-- Modal -->
+<div class="modal fade" id="integrationMsgModal" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" >Remarks</h4>
+      </div>
+      <div class="modal-body">
+        <p >{{remarks}}</p>
+      </div>
+      <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-default" (click)="saveComments()">Save</button> -->
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,330 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header">
+    <b>View Plan</b>
+    <span class="pull-right refresh-span">
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refresh()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="Filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+  <div class="manualplan-fields" *ngIf="isShow">
+    <div class="col-md-12 row">
+      <div class="col-md-12 padding-right-40">
+        <div class="row">
+          <div class="col-md-5 pd-0">
+            <div class="row">
+              <div class="col-md-2 pr-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput disabled [matDatepicker]="formPicker" placeholder="From Date" [(ngModel)]="fromDate"
+                      name="fromDate">
+                    <mat-datepicker-toggle matSuffix [for]="formPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #formPicker disabled="false"></mat-datepicker>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-2 pr-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput disabled [matDatepicker]="toPicker" [min]="fromDate" placeholder="To Date"
+                      [(ngModel)]="toDate" name="toDate">
+                    <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #toPicker [disabled]="!fromDate"></mat-datepicker>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-2  pr-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <input matInput placeholder="Plan Id" [(ngModel)]="planId" name="planId">
+                  </mat-form-field>
+                </div>
+              </div>
+              <!-- <div class="col-md-3 pr-0">
+                <div class="form-group">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Destination" aria-label="State" [matAutocomplete]="statesAutocomplete"
+                      [(ngModel)]="destination" name="destination" (keyup)="getUserSearchData($event)">
+                    <mat-autocomplete #statesAutocomplete="matAutocomplete">
+                      <mat-option *ngFor="let list of destinationList" [value]="list.value">
+                        <span>{{list.value}} - ({{list.description}})</span>
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+              </div> -->
+              
+              <div class="col-md-2 pr-0">
+                  <div class="form-group">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Destination" aria-label="State" [matAutocomplete]="statesAutocomplete"
+                        [(ngModel)]="destination" name="destination" (keyup)="getUserSearchData($event)">
+                      <mat-autocomplete #statesAutocomplete="matAutocomplete">
+                        <mat-option *ngFor="let list of destinationList" [value]="list.value"
+                        (click)="setDestDescription(list.description)"
+                        (onSelectionChange)="setDestDescription(list.description)">
+                          <span>{{list.value}}</span>
+                        </mat-option>
+                      </mat-autocomplete>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div class="col-md-2 pr-0">
+                  <div class="form-group">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Destination Description" aria-label="State" [matAutocomplete]="destDisAutocomplete"
+                        [(ngModel)]="destinationDesc" name="destination" (keyup)="getUserDestinationList($event)">
+                      <mat-autocomplete #destDisAutocomplete="matAutocomplete">
+                        <mat-option *ngFor="let list of descriptionList" [value]="list.description"
+                        (click)="setDestination(list.value)"
+                        (onSelectionChange)="setDestination(list.value)">
+                          <span>({{list.description}})</span>
+                        </mat-option>
+                      </mat-autocomplete>
+                    </mat-form-field>
+                  </div>
+                </div>
+
+
+              <div class="col-md-2">
+                <div class="form-group">
+                  <mat-form-field>
+                    <mat-select placeholder="MKT Segment" [(ngModel)]="mktsegment" name="mktsegment">
+                      <mat-option *ngFor="let mktsegment of mktsegmentList" [value]="mktsegment">
+                        {{mktsegment}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class='col-md-7 pd-0'>
+            <div class="row mg-0">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Material Code" aria-label="Material Code" [matAutocomplete]="materialCodeAutocomplete"
+                      [(ngModel)]="materialCode" name="materialCode" (keyup)="filterMaterialCode($event)">
+                    <mat-autocomplete #materialCodeAutocomplete="matAutocomplete">
+                      <mat-option *ngFor="let list of materilcodelist" [value]="list.value" (click)="setMaterialDescription(list.description)"
+                        (onSelectionChange)="setMaterialDescription(list.description)">
+                        <span>{{list.value}}</span>
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-3  pl-0">
+                <div class="form-group">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Material Description" aria-label="Material Description"
+                      [matAutocomplete]="materialDescAutocomplete" [(ngModel)]="materialDescription" name="materialDescription"
+                      (keyup)="filterMaterialDescription($event)">
+                    <mat-autocomplete #materialDescAutocomplete="matAutocomplete">
+                      <mat-option *ngFor="let list of materilaldesclist" [value]="list.description" (click)="setMaterialCode(list.value)"
+                        (onSelectionChange)="setMaterialCode(list.value)">
+                        <span>{{list.description}}</span>
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-2  pl-0">
+                <mat-form-field class="example-full-width">
+                  <mat-select placeholder="Category" [(ngModel)]="materialGroup" name="materialGroup" multiple>
+                    <mat-option *ngFor="let category of categoryList" [value]="category">{{category}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="col-md-2 pl-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <mat-select placeholder="Plan Status" [(ngModel)]="planStatus" name="planStatus">
+                      <mat-option *ngFor="let item of planStatusList" [value]="item.value">
+                        {{item.key}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="col-md-2 pl-0">
+                <div class="form-group">
+                  <mat-form-field>
+                    <mat-select placeholder="Status" [(ngModel)]="status" name="status">
+                      <mat-option *ngFor="let data of statuses" [value]="data.value">{{data.key}}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pull-right">
+        <div class="search-fileds">
+          <button class="theme-small-button" (click)="fgsPlansFilter()" matTooltip="Search">
+            <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+          </button>
+          <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ngx-datatable #table class='material ngx-table-custom-scroll ngx-table-tr-custom-scroll' #table [rows]='fgsViewPlansList'
+    [columnMode]="'force'" [headerHeight]="50" [footerHeight]="30" [rowHeight]="'auto'" [scrollbarH]="true"
+    [scrollbarV]="false" [externalPaging]="true" [limit]="page.limit" [count]="page.count" [offset]="page.offset"
+    (page)="datatablePageData($event)">
+    <ngx-datatable-column name="Plan Id" [width]="70" [resizeable]="false" prop="planId" [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.planId}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Disp Date" [width]="90" [resizeable]="false" [sortable]="true" prop="dispatchDate">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.dispatchDate | customDateFormat | date:'dd-MMM-yyyy'}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Source" [width]="70" [resizeable]="false" [sortable]="true" prop="sourceLocation">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.sourceLocation}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Dest" [width]="70" [resizeable]="false" [sortable]="true" prop="destinationLocation">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.destinationLocation}}
+      </ng-template>
+    </ngx-datatable-column>
+    <!-- <ngx-datatable-column name="Description" [width]="60" [resizeable]="false" >
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.destinationLocation}}
+          </ng-template>
+        </ngx-datatable-column> -->
+    <ngx-datatable-column name="Dest Description" [width]="150" [resizeable]="false" [sortable]="true" prop="destinationDescription">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.destinationDescription}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Material Code" [width]="120" [resizeable]="false" [sortable]="true" prop="itemId">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.itemId}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Material Description" [width]="210" [resizeable]="false" [sortable]="true" prop='itemDescription'>
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.itemDescription}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Cat" [width]="70" [resizeable]="false" [sortable]="true" prop='category'>
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.category}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="TTE" [width]="70" [resizeable]="false" [sortable]="true" prop='tte'>
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.tte}}
+      </ng-template>
+    </ngx-datatable-column>
+    <!-- <ngx-datatable-column name="Load factor" [width]="70" [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            sample load factor
+          </ng-template>
+        </ngx-datatable-column> -->
+    <ngx-datatable-column name="Batch" [width]="70" [resizeable]="false" [sortable]="true" prop='batchCode'>
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.batchCode}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="MKT Seg" [width]="70" [resizeable]="false" [sortable]="true" prop='marketSegment'>
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.marketSegment}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Pr" [width]="30" [resizeable]="false" [sortable]="true" prop="priority">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.priority}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Plan Qty" [width]="60" [resizeable]="false" [sortable]="true" prop="quantity">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.quantity?row.quantity:0}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="App Qty" [width]="60" [resizeable]="false" [sortable]="true" prop="approvedQuantity">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.approvedQuantity?row.approvedQuantity:0}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Un Appr Qty" [width]="50" [resizeable]="false" [sortable]="true" prop="deletedQuantity">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.unapprovedQuantity?row.unapprovedQuantity:0}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Appr Del" [width]="70" [resizeable]="false" [sortable]="false" prop="deletedApprQuantity">
+      <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+        <div>
+          {{row.deletedApprQuantity}}
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Un Appr Del" [width]="70" [resizeable]="false" [sortable]="false" prop="deletedUnApprQuantity">
+      <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+        <div>
+          {{row.deletedUnApprQuantity}}
+        </div>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Reserved" [width]="65" [resizeable]="false" [sortable]="true" prop="reservedQuantity">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.reservedQuantity?row.reservedQuantity:0}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Loaded" [width]="60" [resizeable]="false" [sortable]="true" prop="loaded">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.loaded?row.loaded:0}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Disp" [width]="60" [resizeable]="false" [sortable]="true" prop="dispatchedQuantity">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.dispatchedQuantity?row.dispatchedQuantity:0}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Available" [width]="65" [resizeable]="false" [sortable]="true" prop="availableQuantity">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.availableQuantity?row.availableQuantity:0}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Total Avail Qty" [width]="65" [resizeable]="false" [sortable]="true" prop="availableQuantity">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.totalAvailableQuantity?row.totalAvailableQuantity:0}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Avail TTE" [width]="70" [resizeable]="false">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{((row.availableQuantity?row.availableQuantity:0) * (row.tte?row.tte:0)) | number : '1.2-2' }}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Plan Status" [width]='100' [resizeable]="false" [sortable]="false" prop="appStatus">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{row.status}}
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Status" [width]='140' [resizeable]="false" [sortable]="true" prop="appStatus">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <button class="btn btn-sm lightgreen-button" [ngClass]="(row.appStatus=='APPROVED')?'lightgreen-button':'light-red-color'">
+          {{row.appStatus}}
+        </button>
+      </ng-template>
+    </ngx-datatable-column>
+  </ngx-datatable>
+</div>

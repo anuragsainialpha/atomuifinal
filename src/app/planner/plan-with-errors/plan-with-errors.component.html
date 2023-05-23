@@ -1,0 +1,578 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid plan-with-errors">
+  <h4 class="plan-text">
+    Plan Id : {{plan?.planId}}
+  </h4>
+  <!-- Plan Stactitics section on Particular Id-->
+  <div class="row">
+    <!-- Left card -->
+    <div class="col-md-4 left-card">
+      <div class="row">
+        <div class="col-md-4">
+          <h4 class="no-error">{{plan?.totalRecords}}</h4>
+          <p>Total Records</p>
+        </div>
+        <div class="col-md-4">
+          <h4 class="no-error">{{plan?.totalTyreCount}}</h4>
+          <p>Total Tyre Count</p>
+        </div>
+
+        <div class="col-md-4 no-padding">
+          <h4 class="text-danger">{{plan?.totalErrorRecords}}</h4>
+          <p>Total Records Errored</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- right card -->
+    <div class="col-md-8 right-card">
+      <div class="row">
+        <div class="col-md-2">
+          <h4 [ngClass]="(plan?.c6Count > 0 )?'text-danger':'theme-color'">{{plan?.c6Count}}</h4>
+          <p>Duplicate Records</p>
+        </div>
+        <div class="col-md-2">
+          <h4 [ngClass]="(plan?.c2Count > 0 )?'text-danger':'theme-color'">{{plan?.c2Count}}</h4>
+          <p>No SKU in master</p>
+        </div>
+        <div class="col-md-2">
+          <h4 [ngClass]="(plan?.c5Count > 0 )?'text-danger':'theme-color'">{{plan?.c5Count}}</h4>
+          <p>Wrong batch code</p>
+        </div>
+        <div class="col-md-2">
+          <h4 [ngClass]="(plan?.c3Count > 0 )?'text-danger':'theme-color'">{{plan?.c3Count}}</h4>
+          <p>TTE Not Available</p>
+        </div>
+        <div class="col-md-2">
+          <h4 [ngClass]="(plan?.c1Count > 0 )?'text-danger':'theme-color'">{{plan?.c1Count}}</h4>
+          <p>Location Codes</p>
+        </div>
+        <div class="col-md-2">
+          <h4 [ngClass]="(plan?.c4Count > 0 )?'text-danger':'theme-color'">{{plan?.c4Count}}</h4>
+          <p>Item Category</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan with error plans-->
+  <div class="tabs-section" *ngIf="(plan?.status=='PLAN_PENDING') && (plan?.totalErrorRecords != 0)">
+    <mat-tab-group (selectedTabChange)="tabsChange($event)">
+      <mat-tab label="Duplicate Records">
+        <div class="datatable">
+          <ngx-datatable class='material' [rows]='duplicateRecords' [scrollbarH]="true" [columnMode]="'force'"
+            [headerHeight]="50" [limit]="200" [footerHeight]="30" [rowHeight]="'auto'">
+            <ngx-datatable-column name="Dispatch Date" [resizeable]="false" [sortable]="false" prop="dispatchDate">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.dispatchDate}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Source" [resizeable]="false" [sortable]="false" prop="sourceLocation">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.sourceLocation}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Destination" [resizeable]="false" [sortable]="false" prop="destinationLocation">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.destinationLocation}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Material Code" [resizeable]="false" [sortable]="false" prop="materialCode"
+              [width]="250">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.materialCode}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Material Description" [resizeable]="false" [sortable]="false" prop="materialDescription"
+              [width]="350">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.materialDescription}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Category" [resizeable]="false" [sortable]="false" prop="category">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.category}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="TTE" [resizeable]="false" [sortable]="false" prop="tte">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.tte}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Batch Code" [resizeable]="false" [sortable]="false" prop="batchCode">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.batchCode}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Quantity" [resizeable]="false" [sortable]="false" prop="quantity">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.quantity}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Priority" [resizeable]="false" [sortable]="false" prop="priority">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.priority}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="MKT Segment" [resizeable]="false" [sortable]="false" prop="marketSegment">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row.marketSegment}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Action" [resizeable]="false" [sortable]="false">
+              <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+                <button class="theme-small-button" (click)="allowDuplicate(row,plan.codesInfo.DUPLICATE_RECORD_CODE,rowIndex)">
+                  <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                </button>
+                <button class="theme-delete-button" (click)="errorPlandDelete(row,plan.codesInfo.DUPLICATE_RECORD_CODE,rowIndex,status)">
+                  <i class="fa fa-trash-o" aria-hidden="true"></i>
+                </button>
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+        </div>
+      </mat-tab>
+      <mat-tab label="No SKU in Master">
+        <ngx-datatable class='material' [rows]='materialCodeRecords' [scrollbarH]="true" [columnMode]="'force'"
+          [headerHeight]="50" [limit]="200" [footerHeight]="30" [rowHeight]="'auto'">
+          <ngx-datatable-column name="Dispatch Date" [resizeable]="false" [sortable]="false" prop="dispatchDate">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.dispatchDate | customDateFormat | date:'dd-MMM-yyyy'}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Source" [resizeable]="false" [sortable]="false" prop="sourceLocation">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.sourceLocation}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Destination" [resizeable]="false" [sortable]="false" prop="destinationLocation">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.destinationLocation}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Material Code" [width]="250" [resizeable]="false" [sortable]="false" prop="materialCode">
+            <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row" let-value="value">
+              <div class="edit-field" title="Double click to edit" (click)="NoSKUediting[rowIndex + '-materialCode'] = true"
+                *ngIf="!NoSKUediting[rowIndex + '-materialCode']">
+                {{row.materialCode}}
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <!-- <mat-form-field class="example-full-width" *ngIf="NoSKUediting[rowIndex+ '-materialCode']">
+                <input matInput (blur)="updateNoSKU($event, 'materialCode', rowIndex)" [value]="value" autofocus>
+              </mat-form-field> -->
+              <mat-form-field class="example-full-width" *ngIf="NoSKUediting[rowIndex+ '-materialCode']">
+                <input matInput [matAutocomplete]="materialCodeAutocomplete" (keyup)="filterMaterialCodeDatatables($event,rowIndex)"
+                  (blur)="updateNoSKU($event, 'materialCode', rowIndex)" [value]="row.materialCode" oninput="this.value = this.value.toUpperCase()" autofocus>
+                <mat-autocomplete #materialCodeAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of materilcodelist" [value]="list.value" (click)="setMaterialDesDatatable(list.description,rowIndex)">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Material Description" [width]="350" [resizeable]="false" [sortable]="false" prop="materialDescription">
+            <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row" let-value="value">
+              {{row.materialDescription}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Category" [resizeable]="false" [sortable]="false" prop="category">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.category}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="TTE" [resizeable]="false" [sortable]="false" prop="tte">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.tte}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Batch Code" [resizeable]="false" [sortable]="false" prop="batchCode">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.batchCode}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Quantity" [resizeable]="false" [sortable]="false" prop="quantity">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.quantity}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Priority" [resizeable]="false" [sortable]="false" prop="priority">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.priority}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="MKT Segment" [resizeable]="false" [sortable]="false" prop="marketSegment">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.marketSegment}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Action">
+            <ng-template let-row="row" ngx-datatable-cell-template -let-row="row" let-rowIndex="rowIndex">
+              <button class="theme-small-button" (click)="updateNoSKUMaster(row,plan.codesInfo.MATERIAL_CODE,rowIndex)">
+                <i class="fa fa-floppy-o fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-small-button" (click)='errorPlandDelete(row,plan.codesInfo.MATERIAL_CODE,rowIndex,status)'>
+
+                <i class="fa fa-trash-o fa-2x" aria-hidden="true"></i>
+              </button>
+
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </mat-tab>
+      <mat-tab label="Wrong Batch Code">
+        <ngx-datatable class='material' [rows]='batchCodeRecords' [scrollbarH]="true" [columnMode]="'force'"
+          [headerHeight]="50" [limit]="200" [footerHeight]="30" [rowHeight]="'auto'">
+          <ngx-datatable-column name="Dispatch Date" [resizeable]="false" [sortable]="false" prop="dispatchDate">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.dispatchDate}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Source" [resizeable]="false" [sortable]="false" prop="sourceLocation">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.sourceLocation}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Destination" [resizeable]="false" [sortable]="false" prop="destinationLocation">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.destinationLocation}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Material Code" [resizeable]="false" [sortable]="false" prop="materialCode"
+            [width]="250">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.materialCode}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Material Description" [resizeable]="false" [sortable]="false" prop="materialDescription"
+            [width]="350">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.materialDescription}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Category" [resizeable]="false" [sortable]="false" prop="category">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.category}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="TTE" [resizeable]="false" [sortable]="false" prop="tte">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.tte}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Batch Code" [resizeable]="false" [sortable]="false" prop="batchCode">
+            <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+              <div class="edit-field" (click)="batchCodeEditing[rowIndex + '-batchCode'] = true" *ngIf="!batchCodeEditing[rowIndex + '-batchCode']">
+                {{row.batchCode}}
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <mat-form-field class="example-full-width" *ngIf="batchCodeEditing[rowIndex+ '-batchCode']">
+                <input matInput [matAutocomplete]="statesAutocomplete" (blur)="batchCodeEditvalues($event, 'batchCode', rowIndex)"
+                  [value]="row.batchCode" oninput="this.value = this.value.toUpperCase()" autofocus (keyup)="datatablesBatchcode($event)">
+                <mat-autocomplete #statesAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of datatablesBatchcodeList" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Quantity" [resizeable]="false" [sortable]="false" prop="quantity">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.quantity}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Priority" [resizeable]="false" [sortable]="false" prop="priority">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.priority}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="MKT Segment" [resizeable]="false" [sortable]="false" prop="marketSegment">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.marketSegment}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Action" [resizeable]="false" [sortable]="false" prop="">
+            <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+              <button class="theme-small-button" (click)="updateBatchCode(row,plan.codesInfo.BATCH_CODE,rowIndex)">
+                <i class="fa fa-floppy-o fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)='errorPlandDelete(row,plan.codesInfo.BATCH_CODE,rowIndex,status)'>
+                <!-- <button class="theme-delete-button" (click)="openDialog(row,plan.codesInfo.DUPLICATE_RECORD_CODE,rowIndex)"> -->
+
+                <i class="fa fa-trash-o fa-2x" aria-hidden="true"></i>
+              </button>
+
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </mat-tab>
+      <mat-tab label="TTE Not Available">
+        <ngx-datatable class='material' [rows]='itemTtecodeRecords' [scrollbarH]="true" [columnMode]="'force'"
+          [headerHeight]="50" [limit]="200" [footerHeight]="30" [rowHeight]="'auto'">
+          <ngx-datatable-column name="Dispatch Date" [resizeable]="false" [sortable]="false" prop="dispatchDate">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.dispatchDate}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Source" [resizeable]="false" [sortable]="false" prop="sourceLocation">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.sourceLocation}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Destination" [resizeable]="false" [sortable]="false" prop="destinationLocation">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.destinationLocation}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Material Code" [resizeable]="false" [sortable]="false" prop="materialCode"
+            [width]="250">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.materialCode}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Material Description" [resizeable]="false" [sortable]="false" prop="materialDescription"
+            [width]="350">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.materialDescription}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Category" [resizeable]="false" [sortable]="false" prop="category">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.category}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="TTE" [resizeable]="false" [sortable]="false" prop="tte">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.tte}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Batch Code" [resizeable]="false" [sortable]="false" prop="batchCode">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.batchCode}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Quantity" [resizeable]="false" [sortable]="false" prop="quantity">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.quantity}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Priority" [resizeable]="false" [sortable]="false" prop="priority">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.priority}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="MKT Segment" [resizeable]="false" [sortable]="false" prop="marketSegment">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.marketSegment}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Action" [resizeable]="false" [sortable]="false">
+            <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+              <button class="theme-small-button" (click)="updateTTENotavailable(row,plan.codesInfo.ITEM_TTE_CODE,rowIndex)">
+                <i class="fa fa-floppy-o fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)='errorPlandDelete(row,plan.codesInfo.ITEM_TTE_CODE,rowIndex,status)'>
+                <i class="fa fa-trash-o fa-2x" aria-hidden="true"></i>
+              </button>
+
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </mat-tab>
+      <mat-tab label="Location Codes">
+        <ngx-datatable class='material' [rows]='locationRecords' [scrollbarH]="true" [columnMode]="'force'"
+          [headerHeight]="50" [limit]="200" [footerHeight]="30" [rowHeight]="'auto'">
+          <ngx-datatable-column name="Dispatch Date" [resizeable]="false" [sortable]="false" prop="dispatchDate">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.dispatchDate}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Source" [resizeable]="false" [sortable]="false" prop="">
+            <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+              <div class="edit-field" (click)="locationRecordsEditing[rowIndex + '-sourceLocation'] = true" *ngIf="!locationRecordsEditing[rowIndex + '-sourceLocation']">
+                {{row.sourceLocation}}
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <mat-form-field class="example-full-width" *ngIf="locationRecordsEditing[rowIndex+ '-sourceLocation']">
+                <input matInput [matAutocomplete]="statesAutocomplete" (blur)="updateValue($event, 'sourceLocation', rowIndex)"
+                  [value]="row.sourceLocation" autofocus (keyup)="datatableSoureceLocation($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #statesAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of datatablesSourceList" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </ng-template>
+          </ngx-datatable-column>
+
+
+          <ngx-datatable-column name="Destination" [resizeable]="false" [sortable]="false" prop="destinationLocation">
+            <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+              <div class="edit-field" (click)="locationRecordsEditing[rowIndex + '-destinationLocation'] = true"
+                *ngIf="!locationRecordsEditing[rowIndex + '-destinationLocation']">
+                {{row.destinationLocation}}
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              </div>
+              <mat-form-field class="example-full-width" *ngIf="locationRecordsEditing[rowIndex+ '-destinationLocation']">
+                <input matInput [matAutocomplete]="statesAutocomplete" (blur)="updateValue($event, 'destinationLocation', rowIndex)"
+                  [value]="row.destinationLocation" autofocus (keyup)="datatableDestinationLocation($event)" oninput="this.value = this.value.toUpperCase()">
+                <mat-autocomplete #statesAutocomplete="matAutocomplete">
+                  <mat-option *ngFor="let list of datatablesDestinationList" [value]="list.value">
+                    <span>{{list.value}}</span>
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Material Code" [resizeable]="false" [sortable]="false" prop="materialCode"
+            [width]="250">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.materialCode}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Material Description" [resizeable]="false" [sortable]="false" prop="materialDescription"
+            [width]="350">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.materialDescription}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Category" [resizeable]="false" [sortable]="false" prop="category">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.category}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="TTE" [resizeable]="false" [sortable]="false" prop="tte">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.tte}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Batch Code" [resizeable]="false" [sortable]="false" prop="batchCode">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.batchCode}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Quantity" [resizeable]="false" [sortable]="false" prop="quantity">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.quantity}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Priority" [resizeable]="false" [sortable]="false" prop="priority">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.priority}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="MKT Segment" [resizeable]="false" [sortable]="false" prop="marketSegment">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.marketSegment}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Action" [resizeable]="false" [sortable]="false">
+            <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+              <button class="theme-small-button" (click)="locationRecordsUpdate(row,plan.codesInfo.LOCATION_CODE,rowIndex)">
+                <i class="fa fa-floppy-o fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)='errorPlandDelete(row,plan.codesInfo.LOCATION_CODE,rowIndex,status)'>
+                <i class="fa fa-trash-o fa-2x" aria-hidden="true"></i>
+              </button>
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </mat-tab>
+      <mat-tab label="Item Category">
+        <ngx-datatable class='material' [rows]='itemCategoryCodeRecords' [scrollbarH]="true" [columnMode]="'force'"
+          [headerHeight]="50" [limit]="200" [footerHeight]="30" [rowHeight]="'auto'">
+          <ngx-datatable-column name="Dispatch Date" [resizeable]="false" [sortable]="false" prop="dispatchDate">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.dispatchDate}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Source" [resizeable]="false" [sortable]="false" prop="sourceLocation">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.sourceLocation}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Destination" [resizeable]="false" [sortable]="false" prop="destinationLocation">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.destinationLocation}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Material Code" [resizeable]="false" [sortable]="false" prop="materialCode"
+            [width]="250">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.materialCode}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Material Description" [resizeable]="false" [sortable]="false" prop="materialDescription"
+            [width]="350">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.materialDescription}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Category" [resizeable]="false" [sortable]="false" prop="category">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.category}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="TTE" [resizeable]="false" [sortable]="false" prop="tte">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.tte}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Batch Code" [resizeable]="false" [sortable]="false" prop="batchCode">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.batchCode}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Quantity" [resizeable]="false" [sortable]="false" prop="quantity">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.quantity}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Priority" [resizeable]="false" [sortable]="false" prop="priority">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.priority}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="MKT Segment" [resizeable]="false" [sortable]="false" prop="marketSegment">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.marketSegment}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Action" [resizeable]="false" [sortable]="false">
+            <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex">
+              <button class="theme-small-button" (click)="updateItemCategory(row,plan.codesInfo.ITEM_CATEGORY_CODE,rowIndex)">
+                <i class="fa fa-floppy-o fa-2x" aria-hidden="true"></i>
+              </button>
+              <button class="theme-delete-button" (click)='errorPlandDelete(row,plan.codesInfo.ITEM_CATEGORY_CODE,rowIndex,status)'>
+                <i class="fa fa-trash-o fa-2x" aria-hidden="true"></i>
+              </button>
+
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <div class="text-center" *ngIf="(plan?.totalErrorRecords == 0) && (plan?.status=='PLAN_PENDING')">
+    <button mat-raised-button color="primary" class="margin-top-50" (click)="createManualPlan()">Create Plan</button>
+  </div>
+  <div *ngIf="(plan?.totalErrorRecords == 0) && (plan?.status=='PLAN_SUCCESS')" class="planwith-success">
+    <h4 class="text-center">"Plan is created successfully! :
+      <!-- FGS PLANNER -->
+      <a [routerLink]="['/dispatch-plan/approve-plans',planId]" *ngIf="(service.checkRole() == userRoles.planner1) || (service.checkRole() == userRoles.planner2) 
+      || (service.checkRole() == userRoles.planner3) || (service.checkRole() == userRoles.L1MGR) || (service.checkRole() == userRoles.L2MGR) ">
+        <span>{{planId}}</span>
+      </a>
+      <!-- FGS OPERATION -->
+      <a [routerLink]="['/fgs/approve-plans',planId]" *ngIf="(service.checkRole() == userRoles.fgsOperations1) || (service.checkRole() == userRoles.fgsOperations2) || 
+      (service.checkRole() == userRoles.fgsOperations3) || (service.checkRole() == userRoles.fgsOperations4)">
+        <span>{{planId}}</span>
+      </a>
+      <!-- RDC PLAN / OPERATION -->
+      <a [routerLink]="['/rdc/approve-plans',planId]" *ngIf="(service.checkRole() == userRoles.rdc_PLN)">
+        <span>{{planId}}</span>
+      </a>
+    </h4>
+  </div>
+</div>

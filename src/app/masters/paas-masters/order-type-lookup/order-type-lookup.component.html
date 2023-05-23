@@ -1,0 +1,324 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+      <b> PaaS Masters &gt; Order Type Lookup</b>
+    <span class="pull-right refresh-span">
+        <!-- <button class="theme-small-button" (click)="displayAddForm()" matTooltip="Add New Order Type Lookup">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button> -->
+      <!-- <button class="theme-small-button" (click)="upload()" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+
+
+<div class="mt-item-fields" *ngIf="isShow">
+  <div class="col-md-12 row">
+    <div class="col-md-12 padding-right-40">
+      <div class="row">
+        <div class="col-md-2">
+            <mat-form-field>
+              <input matInput placeholder="Order Type" [(ngModel)]="orderType" name="orderType">
+            </mat-form-field>
+        </div>
+        <div class="col-md-2">
+            <mat-form-field>
+              <input matInput placeholder="Movement Type" [(ngModel)]="movementType" name="movementType">
+            </mat-form-field>
+        </div>
+        <div class="col-md-2">
+            <mat-form-field>
+              <input matInput placeholder="Market Segment" [(ngModel)]="marketSegment" name="marketSegment">
+            </mat-form-field>
+        </div>
+        <div class="col-md-2">
+            <mat-form-field>
+              <input matInput placeholder="SAP Order Type" [(ngModel)]="sapOrderType" name="sapOrderType">
+            </mat-form-field>
+        </div>
+        <div class="col-md-2">
+            <mat-form-field>
+              <input matInput placeholder="SAP Doc Type" [(ngModel)]="sapDocType" name="sapDocType">
+            </mat-form-field>
+        </div>
+        <div class="col-md-2">
+            <mat-form-field>
+              <input matInput placeholder="BOM Type" [(ngModel)]="bomType" name="bomType">
+            </mat-form-field>
+        </div>
+      </div>
+    </div>
+    <div class="pull-right">
+      <div class="search-fileds">
+        <button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+          <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+        </button>
+        <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  <div class="mt-item-table">
+    <div>
+      <!-- <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [rows]='responseItemsList' [scrollbarH]="true" 
+      [externalPaging]="true" (page)="datatablePageData($event)" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count" [offset]="page.offset">
+         -->
+      <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [columnMode]="'force'"
+      [rows]='responseItemsList' [externalPaging]="true" (page)="datatablePageData($event)" [scrollbarH]="false"
+      [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count"
+      [offset]="page.offset">
+
+      <ngx-datatable-column name="Order Type" [width]="140" [resizeable]="false" prop="orderType" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.orderType}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Movement Type" [width]="120" [resizeable]="false" prop="movementType" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.movementType}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Market Segment" [width]="120" [resizeable]="false" prop="marketSegment" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.marketSegment}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="SAP Order Type" [width]="100" [resizeable]="false" prop="sapOrderType" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.sapOrderType}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="SAP Doc Type" [width]="130" [resizeable]="false" prop="sapDocType" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            {{row.sapDocType}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="BOM Type" [width]="100" [resizeable]="false" prop="bomType" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.bomType}}
+            </ng-template>
+          </ngx-datatable-column>
+
+        <ngx-datatable-column name="Insert User" [width]="130" [resizeable]="false" prop="insertUser" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.insertUser}}
+            </ng-template>
+          </ngx-datatable-column>
+
+        <ngx-datatable-column name="Insert Date" [width]="120" [resizeable]="false" prop="insertDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+             {{trimDate(row.insertDate)}} 
+            <!-- {{row.insertDate}} -->
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Update User" [width]="130" [resizeable]="false" prop="updateUser" [sortable]="true">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              {{row.updateUser}}
+            </ng-template>
+          </ngx-datatable-column>
+
+        <ngx-datatable-column name="Update Date" [width]="120" [resizeable]="false" prop="updateDate" [sortable]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+             {{trimDate(row.updateDate)}}
+            <!-- {{row.updateDate}} -->
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- <ngx-datatable-column name="Action" [width]="100" [resizeable]="false" [sortable]="false">
+          <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+            <button class="theme-small-button btn" matTooltip="Modify" (click)="showUpdateModel(row)" [disabled]="(row.isError)">
+              <i class="fa fa-edit fa-2x" aria-hidden="true"></i>
+            </button>
+          </ng-template>
+        </ngx-datatable-column> -->
+           <!-- Footer Template starts -->
+      <ngx-datatable-footer>
+        <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+          let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+          <div class="page-count">
+            <span *ngIf="selectedCount">
+              {{selectedCount.toLocaleString()}} Selected |
+            </span>
+            Showing {{(offset * pageSize)+1}} to {{(rowCount>
+            (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+            {{(rowCount)}} records.
+          </div>
+          <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+            [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+            [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+          </datatable-pager>
+        </ng-template>
+      </ngx-datatable-footer>
+      <!-- Footer Template Ends -->
+     
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+
+
+<!--  -->
+<div class="modal" id="myModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && updateForm(f))">
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h4 class="modal-title text-primary">Update Order Type Lookup</h4>
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+  </div>
+  <!-- Modal body -->
+  <div class="modal-body">
+
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Ops Truck Type" aria-label="State" [(ngModel)]="movementTypeu" name="movementTypeu"
+          required autocomplete="off">
+        <mat-error *ngIf="(f.submitted && movementTypeu.invalid)">
+          <p *ngIf="movementTypeu.errors.required">Movement Type is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">Movement Type</p>
+      </mat-form-field>
+    </div>
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="Market Segment" aria-label="State" [(ngModel)]="marketSegmentu" name="marketSegmentu"
+          required autocomplete="off">
+        <mat-error *ngIf="(f.submitted && marketSegmentu.invalid)">
+          <p *ngIf="marketSegmentu.errors.required">Market Segment is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">Market Segment</p>
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="SAP Order Type" aria-label="State" [(ngModel)]="sapOrderTypeu" name="sapOrderTypeu"
+          required autocomplete="off">
+        <mat-error *ngIf="(f.submitted && sapOrderTypeu.invalid)">
+          <p *ngIf="sapOrderTypeu.errors.required">Sap Order Type is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">Sap Order Type</p>
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="SAP Doc Type" aria-label="State" [(ngModel)]="sapDocTypeu" name="sapDocTypeu"
+          required autocomplete="off">
+        <mat-error *ngIf="(f.submitted && sapDocTypeu.invalid)">
+          <p *ngIf="sapDocTypeu.errors.required">Sap Doc Type is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">Sap Doc Type</p>
+      </mat-form-field>
+    </div>
+  </div>
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <!-- <button type="button" class="btn btn-danger" >Close</button> -->
+    <button type="submit" mat-raised-button color="primary" class="btm-action-btn" (click)="updateLocationScan(f)">Update</button>
+    <button type="button" mat-raised-button class="mat-default" color="default" data-dismiss="modal">Close</button>
+  </div>
+</form>
+</div>
+</div>
+</div>
+<br><br>
+
+
+
+
+<br><br>
+<div class="mt-item-fields" *ngIf="displayForm">
+<div class="col-md-12 text-center padding-right-40">
+<mat-card>
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && saveForm(f))">
+  <h4 class="mt-item-header text-center text-primary">
+    <b> Add Order Type Lookup </b></h4>
+  <br>
+  <div class="row">
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Order Type" [(ngModel)]="orderTypef" name="orderTypef" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Order Type is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Movement Type" [(ngModel)]="movementTypef" name="movementTypef" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Movement Type is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="Market Segment" [(ngModel)]="marketSegmentf" name="marketSegmentf" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Market Segment is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="SAP Order Type" [(ngModel)]="sapOrderTypef" name="sapOrderTypef" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Sap Order Type is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <mat-form-field>
+          <input matInput placeholder="SAP Doc Type" [(ngModel)]="sapDocTypef" name="sapDocTypef" required #qty="ngModel">
+          <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">Sap Doc Type is <strong>required</strong></p>
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="form-group">
+        <button mat-raised-button color="primary" class="btm-action-btn">Save</button>
+      </div>
+    </div>
+  </div>
+</form>
+</mat-card>
+</div>
+</div>
+

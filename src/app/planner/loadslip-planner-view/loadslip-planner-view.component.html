@@ -1,0 +1,432 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="manulal-plan-header">
+    Loadslip > <span>View Load Slip</span>
+    <span class="pull-right refresh-span">
+      <button class="theme-small-button" *ngIf="(confirmedDate != null || isDPREPRole())" (click)="export()" matTooltip="Export Download">
+            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="locationBack()" matTooltip="Back">
+        <i class="fa fa-reply" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+  <div class="clearfix"></div>
+  <div class="loadslip-fields tab-loadslip-fields">
+    <div class="row margin-bottom-5">
+      <div class="col-md-7">
+        <div class="row">
+          <div class="col-md-2">
+            <div class='inputbordered'>
+              <div>Source</div>
+              <div>
+                <b>{{userSource || '--'}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 pd-0 ">
+            <div class="form-group inputbordered">
+              <div>Destination</div>
+              <div>
+                <b>{{destination?destination:'--' | uppercase}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 pr-0 ">
+            <div class="form-group inputbordered">
+              <div>
+                Truck
+              </div>
+              <div [title]="truckType" [ngClass]="{'cursor-pointer':truckType?.length>18}">
+                <b>{{truckType ? (((truckType?.length>18)? (truckType | slice:0:18)+'..':(truckType)) | uppercase) : '--'}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group inputbordered">
+              <div>Truck Type</div>
+              <!-- <div>
+                <b>{{truckT?truckT:'--' }}</b>
+              </div> -->
+              <div [title]="truckT" [ngClass]="{'cursor-pointer':truckT?.length>20}">
+                <b>{{truckT ? (((truckT?.length>18)? (truckT | slice:0:18)+'..':(truckT)) | uppercase) : '--'}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2 pd-0">
+            <div class="form-group inputbordered">
+              <div>Transporter</div>
+              <!-- <div>
+                <b>{{transporter?transporter:'--' }}</b>
+              </div> -->
+              <div [title]="transporter" [ngClass]="{'cursor-pointer':transporter?.length>11}">
+                <b>{{transporter ? (((transporter?.length>11)? (transporter | slice:0:11)+'..':(transporter)) | uppercase) : '--'}}</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="row">
+          <div class="col-md-3 pr-0">
+            <div class="form-group inputbordered">
+              <div>
+                Ship To
+              </div>
+              <div>
+                <b>{{ShipTo?ShipTo:'--'}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group inputbordered">
+              <div>Actual Truck Type</div>
+                <div [title]="actualTruckType" [ngClass]="{'cursor-pointer':actualTruckType?.length>11}">
+                  <b>{{actualTruckType ? (((actualTruckType?.length>11)? (actualTruckType | slice:0:11)+'..':(actualTruckType)) | uppercase) : '--'}}</b>
+                </div>
+            </div>
+          </div>
+          <div class="col-md-3 pd-0">
+            <div class="form-group inputbordered">
+              <div>Variant 1</div>
+              <div>
+                <b>{{variant_ONE || '--'}}</b>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group inputbordered">
+              <div>Frt Avail</div>
+              <div>
+                <b>{{ freightAvailableflag || '--'}}</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row margin-bottom-5">
+      <div class="col-md-2">
+        <div class='bordered'>
+          <div>Shipment No</div>
+          <div>
+            <b>{{shipmentNumber || '--'}}</b>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 pd-0">
+        <div class="bordered-box">
+          <div class="row text-center h-100">
+              <div class="col-md-4 text-center bordered-box-left-div">
+                  <div>
+                    TTE Util
+                  </div>
+                  <div [ngClass]="(totalTTESeletecd > 100)?'text-danger':'color-green'">
+                    <b>{{totalTTESeletecd?(totalTTESeletecd | number : '1.2-2'):0 }}%</b>
+                  </div>
+                </div>
+              <div class="col-md-4  bordered-box-left-div">
+              <div>
+                Wt Util
+              </div>
+              <div [ngClass]="(totalMaterialWeight > 100)?'text-danger':'color-green'">
+                <b>{{totalMaterialWeight?(totalMaterialWeight | number : '1.2-2'):0}}%</b>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div>
+                Vol Util
+              </div>
+              <div [ngClass]="(totalTruckVolume > 100)?'text-danger':'color-green'">
+                <b>{{totalTruckVolume?(totalTruckVolume | number : '1.2-2'):0}}%</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="row bg-theme h-100">
+          <div class="col-md-2 col-wid-16p">
+            <div>Tyres</div>
+            <div>
+              {{totalTyres?totalTyres:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Tubes</div>
+            <div>
+              {{totalTubes?totalTubes:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Flaps</div>
+            <div>
+              {{totalFlaps?totalFlaps:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div> Valves</div>
+            <div>
+              {{totalValves?totalValves:0}}
+            </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Pctr</div>
+            <div>{{totalPctr?totalPctr:0}} </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Others</div>
+            <div>{{totalOthersCount?totalOthersCount:0}} </div>
+          </div>
+          <div class="col-md-2 col-wid-16p">
+            <div>Tot Qty</div>
+            <div>{{totalQuantity?totalQuantity:0}} </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 flow-btns MD-MP customResponsive">
+        <button mat-raised-button color="primary" class="tab-mb-10">LS on Same Truck(MD)</button>
+        <button mat-raised-button color="primary" class="ml-5">Share Truck(MP)</button>
+
+      </div>
+    <!--  <div class="col-md-1 flow-btns MD-MP">
+        <button mat-raised-button color="primary" class="tab-mb-10">LS on Same Truck(MD)</button>
+      </div>
+      <div class="col-md-1 flow-btns">
+        <button mat-raised-button color="primary">Share Truck(MP)</button>
+      </div>-->
+    </div>
+    <div class="row margin-bottom-5">
+      <div class="col-md-2">
+        <div class='bordered'>
+          <div>Load Slip No </div>
+          <div><b>{{loadslipID || '--'}}</b></div>
+        </div>
+      </div>
+      <div class="col-md-1  pd-0">
+        <div class="bordered">
+          <div>LS Category</div>
+          <div>
+            <b>{{loadslipCategory || '--'}}</b>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-1">
+        <div class="bordered">
+          <div>
+            Drop Seq
+          </div>
+          <div>
+            <b>{{dropSeq?dropSeq:'--'}}</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-1 flow-btns tab-flow-btns width-7-5">
+        <button *ngIf="(bayArrivedDate == null)" mat-raised-button class="mat-default">Arrived Bay</button>
+        <button *ngIf="(bayArrivedDate != null)" class="greenButton">Arrived Bay <b>: {{bay}}</b> <span>{{bayArrivedDate
+            | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+      <div class="col-md-1 flow-btns tab-flow-btns width-7-5">
+        <button mat-raised-button color="default" class="mat-default"
+          *ngIf="(lsPrintDate == null) && (confirmedDate == null)">Print
+          LS</button>
+        <button class="greenButton" *ngIf="(lsPrintDate != null) && (confirmedDate == null)">Print LS<span>
+            ({{lsPrintDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}})</span></button>
+        <button class="greenButton" *ngIf="(confirmedDate != null)" (click)="downloadLoadslip()">Print Pdf<span> {{(lsPrintDate) | customDateFormat
+            | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+      <div class="col-md-1 flow-btns tab-flow-btns width-7-5">
+        <button mat-raised-button color="default" *ngIf="(sendForBarcodeDate == null)">Send Barcode</button>
+        <button class="greenButton" *ngIf="(sendForBarcodeDate != null)">Send Barcode
+          <span>{{sendForBarcodeDate | customDateFormat | date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+      <div class="col-md-1 flow-btns tab-flow-btns width-7-5">
+        <button mat-raised-button color="default" *ngIf="(loadingStartDate == null)">Loading Start</button>
+        <button *ngIf="(loadingStartDate != null)" class="greenButton">Loading Start <span>{{loadingStartDate |
+            customDateFormat |
+            date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+      <div class="col-md-1 flow-btns tab-flow-btns width-7-5">
+        <button mat-raised-button color="default" *ngIf="(loadingEndDate == null)">Loading
+          End</button>
+        <button *ngIf="(loadingEndDate != null)" class="greenButton">Loading End <span>{{loadingEndDate |
+            customDateFormat |
+            date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+      <div class="col-md-1 flow-btns tab-flow-btns width-7-5">
+        <button mat-raised-button color="default" *ngIf="(confirmedDate == null)">Confirm</button>
+        <button *ngIf="(confirmedDate != null)" class="greenButton">Confirm <span>{{confirmedDate | customDateFormat |
+            date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+      <div class="col-md-1 flow-btns tab-flow-btns width-7-5">
+        <button mat-raised-button color="default" *ngIf="(releasedDate == null)">Release</button>
+        <button *ngIf="(releasedDate != null)" class="greenButton">Release <span>{{releasedDate | customDateFormat |
+            date:'dd-MMM-yyyy,HH:mm'}}</span></button>
+      </div>
+      <div class="col-md-1 flow-btns tab-flow-btns width-7-5">
+        <button mat-raised-button color="primary">SO/STO Delete</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-2">
+        <div class="bordered">
+          <div>STO/SO</div>
+          <div><b>{{STOSONumber || '--'}}</b></div>
+        </div>
+      </div>
+      <div class="col-md-1 pd-0">
+        <div class="bordered">
+          <div>TTE Qty</div>
+          <div><b>{{totalTTEQty?(totalTTEQty | number : '1.2-2'):0}}</b></div>
+        </div>
+      </div>
+      <div class="col-md-1 pr-0">
+          <div class="bordered">
+          <div>
+              Wt (Kg)
+          </div>
+          <div >
+            <b>{{itemLevelTotalWeight?(itemLevelTotalWeight | number : '1.2-2'):0 }}</b>
+          </div>
+          </div>
+        </div>
+      <div class="col-md-1">
+        <div class="bordered">
+          <div>Category</div>
+          <div>
+            <b>{{(selectedCategories.length>0)?(selectedCategories.toString() | uppercase):'--' }}</b>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-1 pl-0">
+        <div class="bordered">
+          <div>Indt Cat</div>
+          <div [title]="indentCategory" [ngClass]="{'cursor-pointer':indentCategory?.length>15}">
+            <b>{{indentCategory ? (((indentCategory?.length>15)? (indentCategory | slice:0:15)+'..':(indentCategory)) | uppercase) : '--'}}</b>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-1 pd-0 ">
+        <div class="form-group bordered">
+          <div>Dest Desc</div>
+          <div [title]="description" [ngClass]="{'cursor-pointer':description?.length>11}">
+            <b>{{description ? (((description?.length>11)? (description | slice:0:11)+'..':(description)) | uppercase) : '--'}}</b>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2  ">
+        <div class="bordered">
+          <div>City</div>
+            <!-- <b>{{city ? (city | uppercase) : '--'}}</b> -->
+            <div [title]="city" [ngClass]="{'cursor-pointer':city?.length>15}">
+              <b>{{city ? ((city?.length>15) ? (city | slice:0:15)+'..':(city)| uppercase) : '--'}}</b>
+            </div>
+        </div>
+      </div>
+      <div class=" col-md-1 flow-btns" *ngIf="elrFlag">
+        <!-- (click)="generateLrNum()" -->
+        <button class="greenButton" *ngIf="generateLr">Generate LR</button>
+        <button (click)="downloadLoadReceipt()" class="greenButton" *ngIf="printLr">Print
+          LR<span>{{lrNum}}</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="mb-3">
+    <ngx-datatable class='material no-scroll-table' [rows]='loadSlipData' [columnMode]="'force'" [headerHeight]="50"
+       [footerHeight]="30" [rowHeight]="'auto'" [scrollbarH]="true">
+      <ngx-datatable-column name="Material Code" [width]="120" [resizeable]="false" [sortable]="false" prop="ITEM_ID">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ITEM_ID || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Material Description" [width]="250" [resizeable]="false" [sortable]="false"
+        prop="ITEM_DESCRIPTION">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ITEM_DESCRIPTION || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Cat" [width]="100" [resizeable]="false" [sortable]="false" prop="ITEM_CATEGORY">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.ITEM_CATEGORY || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+
+      <ngx-datatable-column name="Batch" [width]="70" [resizeable]="false" [sortable]="false" prop="BATCH_CODE">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.BATCH_CODE || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Priority" [width]="70" [resizeable]="false" [sortable]="false" prop="MIN_PRIORITY">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.MIN_PRIORITY || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Available Qty" [width]="100" [resizeable]="false" [sortable]="false" prop="SUM_QTY">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.SUM_QTY || "0"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Qty" [width]="80" [resizeable]="false" [sortable]="false" prop="qty">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row">
+          <span>{{row.QTY || "--"}} </span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Scannable" [width]="70" [resizeable]="false" [sortable]="false" prop="isScannable">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.isScannable || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Scan Qty" [width]="70" [resizeable]="false" [sortable]="false" prop="scannedQty">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.scannedQty}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tube Code" [width]="90" [resizeable]="false" [sortable]="false" prop="TUBE_CODE">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.TUBE_CODE || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tube Batch" [width]="90" [resizeable]="false" [sortable]="false" prop="tubeBatch">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+          <span *ngIf="(confirmedDate != null)  && (confirmedDate != '')">{{row.tubeBatch}} </span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Tube Qty" [width]="80" [resizeable]="false" [sortable]="false" prop="totalTubeQty">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totalTubeQty}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Flap Code" [width]="90" [resizeable]="false" [sortable]="false" prop="FLAP_CODE">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.FLAP_CODE || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Flap Batch" [width]="90" [resizeable]="false" [sortable]="false" prop="flapBatch">
+        <ng-template let-row="row" ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value">
+          <span *ngIf="(confirmedDate != null)  && (confirmedDate != '')">{{row.flapBatch}} </span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Flap Qty" [width]="70" [resizeable]="false" [sortable]="false" prop="totalFlapQty">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totalFlapQty}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Valve Code" [width]="70" [resizeable]="false" [sortable]="false" prop="VALVE_CODE">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.VALVE_CODE || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Valve Batch" [width]="70" [resizeable]="false" [sortable]="false" prop="VALVE_DESC">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.VALVE_DESC || "--"}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Valve Qty" [width]="70" [resizeable]="false" [sortable]="false" prop="totalValueQty">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.totalValueQty}}
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
+  </div>
+</div>

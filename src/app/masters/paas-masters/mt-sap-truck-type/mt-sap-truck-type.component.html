@@ -1,0 +1,310 @@
+<app-loader *ngIf="isLoading"></app-loader>
+<div class="container-fluid">
+  <h6 class="mt-item-header">
+    <b> PaaS Masters &gt; SAP Truck Type</b>
+    <span class="pull-right refresh-span">
+        <button class="theme-small-button" (click)="displayAddForm()" matTooltip="Add New">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button>
+      <!-- <button class="theme-small-button" [routerLink]="['/admin/paas-masters/upload-mt-sap-truck-type']" matTooltip="Upload excel">
+        <i class="fa fa-upload" aria-hidden="true"></i>
+      </button> -->
+      <button class="theme-small-button" (click)="export()" matTooltip="Export to excel">
+        <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="refreshData()" matTooltip="Refresh">
+        <i class="fa fa-repeat fa-2x" aria-hidden="true"></i>
+      </button>
+      <button class="theme-small-button" (click)="showFilter()" matTooltip="filter">
+        <i class="fa fa-filter fa-2x" aria-hidden="true"></i>
+      </button>
+    </span>
+  </h6>
+
+
+
+
+<div class="mt-item-fields" *ngIf="isShow">
+  <div class="col-md-12 row">
+    <div class="col-md-12 padding-right-40">
+      <div class="row">
+        <div class="col-md-6 pd-0">
+          <div class="row">
+                <div class="col-md-4">
+                    <mat-form-field>
+                        <input matInput placeholder="SAP Truck Type" [(ngModel)]="sapTruckType" name="sapTruckType">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                    <mat-form-field>
+                        <input matInput placeholder="SAP Truck Type Desc" [(ngModel)]="sapTruckTypeDesc" name="sapTruckTypeDesc">
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                        <mat-form-field>
+                            <input matInput placeholder="PaaS Truck Type" [(ngModel)]="opsTruckType" name="opsTruckType">
+                        </mat-form-field>
+                  </div>
+          </div>
+        </div>
+        <!-- <div class='col-md-6 pd-0'>
+          <div class="row mg-0">
+              <div class="col-md-4">
+                      <mat-form-field>
+                          <input matInput placeholder="PaaS Variant1" [(ngModel)]="opsVariant1" name="opsVariant1">
+                      </mat-form-field>
+                </div>
+          </div>
+        </div> -->
+      </div>
+    </div>
+    <div class="pull-right">
+      <div class="search-fileds">
+        <button class="theme-small-button" (click)="doSubmitSearch()" matTooltip="Search">
+          <i class="fa fa-search fa-2x" aria-hidden="true"></i>
+        </button>
+        <button class="theme-delete-button" (click)="clearAll()" matTooltip="Clear All">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="mt-item-table">
+<div>
+<!-- <ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [rows]='responseItemsList' [scrollbarH]="true" 
+[externalPaging]="true" (page)="datatablePageData($event)" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count" [offset]="page.offset">
+  -->
+<ngx-datatable class='material ngx-table-custom-scroll  ngx-table-tr-custom-scroll' #table [columnMode]="'force'"
+[rows]='responseItemsList' [externalPaging]="true" (page)="datatablePageData($event)" [scrollbarH]="false"
+[headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="page.limit" [count]="page.count"
+[offset]="page.offset">
+
+
+<ngx-datatable-column name="SAP Truck Type" [width]="140" [resizeable]="false" prop="sapTruckType" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.sapTruckType}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="SAP Truck Type Desc" [width]="230" [resizeable]="false" prop="sapTruckTypeDesc" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.sapTruckTypeDesc}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="PaaS Truck Type" [width]="190" [resizeable]="false" prop="opsTruckType" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.opsTruckType}}
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="PaaS Variant1" [width]="150" [resizeable]="false" prop="opsVariant1" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.opsVariant1}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="Insert User" [width]="130" [resizeable]="false" prop="insertUser" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{row.insertUser}}
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="Insert Date" [width]="130" [resizeable]="false" prop="insertDate" [sortable]="true">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        {{trimDate(row.insertDate)}}
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Update User" [width]="130" [resizeable]="false" prop="updateUser" [sortable]="true">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+          {{row.updateUser}}
+        </ng-template>
+      </ngx-datatable-column>
+      
+  <ngx-datatable-column name="Update Date" [width]="130" [resizeable]="false" prop="updateDate" [sortable]="true">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      {{trimDate(row.updateDate)}}
+    </ng-template>
+  </ngx-datatable-column>
+
+
+  <ngx-datatable-column name="Action" [width]="100" [resizeable]="false" [sortable]="false">
+    <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-row="row">
+      <button class="theme-small-button btn" matTooltip="Modify" (click)="showUpdateModel(row)" [disabled]="(row.isError)">
+        <i class="fa fa-edit fa-2x" aria-hidden="true"></i>
+      </button>
+    </ng-template>
+  </ngx-datatable-column>
+     <!-- Footer Template starts -->
+     <ngx-datatable-footer>
+      <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+        let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset" let-isVisible="isVisible">
+        <div class="page-count">
+          <span *ngIf="selectedCount">
+            {{selectedCount.toLocaleString()}} Selected |
+          </span>
+          Showing {{(offset * pageSize)+1}} to {{(rowCount>
+          (curPage*pageSize))?(curPage*pageSize):(rowCount)}} of
+          {{(rowCount)}} records.
+        </div>
+        <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+          [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="curPage" [size]="pageSize"
+          [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)" (change)="table.onFooterPage($event)">
+        </datatable-pager>
+      </ng-template>
+    </ngx-datatable-footer>
+    <!-- Footer Template Ends -->
+</ngx-datatable>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+<br><br>
+<div class="mt-item-fields" *ngIf="displayForm">
+<div class="col-md-12 padding-right-40">
+<mat-card>
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && saveForm(f))">
+  <h4 class="mt-item-header text-center text-primary">
+    <b> Add New SAP Truck Type</b></h4>
+  <br>
+  <div class="row">
+    <div class="col-md-6 pd-0">
+      <div class="row">
+        <div class="col-md-1">
+        </div>
+        <div class="col-md-5">
+          <div class="form-group">
+            <mat-form-field>
+              <input matInput placeholder="SAP Truck Type" [(ngModel)]="sapTruckTypef" name="sapTruckTypef" required #qty="ngModel" oninput="this.value = this.value.toUpperCase()">
+              <mat-error *ngIf="(f.submitted && qty.invalid)">
+                <p *ngIf="qty.errors.required">SAP Truck Type is <strong>required</strong></p>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="form-group">
+            <mat-form-field>
+              <input matInput placeholder="SAP Truck Type Desc" [(ngModel)]="sapTruckTypeDescf" name="sapTruckTypeDescf" required #qty="ngModel" oninput="this.value = this.value.toUpperCase()"> 
+              <mat-error *ngIf="(f.submitted && qty.invalid)">
+                <p *ngIf="qty.errors.required">SAP Truck Type Desc is <strong>required</strong></p>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='col-md-6 pd-0'>
+      <div class="row mg-0">
+        <div class="col-md-5">
+          <div class="form-group">
+            <mat-form-field>
+              <!-- <input matInput placeholder="PaaS Truck Type" [(ngModel)]="opsTruckTypef" name="opsTruckTypef" required #qty="ngModel">
+              <mat-error *ngIf="(f.submitted && qty.invalid)">
+                <p *ngIf="qty.errors.required">PaaS Truck Type is <strong>required</strong></p>
+              </mat-error> -->
+
+              <mat-select placeholder="PaaS Truck Type" [(ngModel)]="opsTruckTypef" name="opsTruckTypef" #qty="ngModel" required>
+                  <mat-option *ngFor="let loc of paasTruckTypeList" [value]="loc">
+                    {{loc}}
+                  </mat-option>
+                </mat-select>
+              <mat-error *ngIf="(f.submitted && qty.invalid)">
+                  <p *ngIf="qty.errors.required">PaaS Truck Type is <strong>required</strong></p>
+                </mat-error>
+
+            </mat-form-field>
+          </div>
+        </div>
+
+
+        <!-- <div class="col-md-5">
+          <div class="form-group">
+            <mat-form-field>
+              <mat-select placeholder="PaaS Variant 1" [(ngModel)]="opsVariant1f" name="opsVariant1f" #qty="ngModel" required>
+                  <mat-option *ngFor="let loc of variantsList" [value]="loc">
+                    {{loc}}
+                  </mat-option>
+                </mat-select>
+              <mat-error *ngIf="(f.submitted && qty.invalid)">
+                  <p *ngIf="qty.errors.required">PaaS Variant 1 is <strong>required</strong></p>
+                </mat-error>
+            </mat-form-field>
+          </div>
+        </div> -->
+
+
+        <div class="col-md-2">
+          <div class="form-group">
+            <button mat-raised-button color="primary" class="btm-action-btn">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+</mat-card>
+</div>
+</div>
+
+
+
+<div class="modal" id="myModal">
+<div class="modal-dialog">
+<div class="modal-content">
+<form name="form" #f="ngForm" (ngSubmit)="(f.form.valid && updateMtSapTruckType(f))">
+  <div class="modal-header">
+    <h4 class="modal-title text-primary">Update SAP Truck Type</h4>
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+        <mat-form-field appearance="standard" class="example-full-width">
+        
+          <mat-select placeholder="PaaS Truck Type" [(ngModel)]="opsTruckTypeu" name="opsTruckTypeu" #qty="ngModel" required>
+            <mat-option *ngFor="let loc of paasTruckTypeList" [value]="loc">
+              {{loc}}
+            </mat-option>
+          </mat-select>
+        <mat-error *ngIf="(f.submitted && qty.invalid)">
+            <p *ngIf="qty.errors.required">PaaS Truck Type is <strong>required</strong></p>
+          </mat-error>
+
+     
+        <!-- <input matInput placeholder="PaaS Truck Type" aria-label="State" [(ngModel)]="opsTruckTypeu" name="opsTruckTypeu"
+          required autocomplete="off">
+        <mat-error *ngIf="(f.submitted && opsTruckTypeu.invalid)">
+          <p *ngIf="opsTruckTypeu.errors.required">PaaS Truck Type is <strong>required</strong>
+          </p>
+        </mat-error> -->
+        <p class="mtop6">PaaS Truck Type</p>
+      </mat-form-field>
+    </div>
+    <!-- <div class="form-group">
+      <mat-form-field appearance="standard" class="example-full-width">
+        <input matInput placeholder="PaaS Variant 1" aria-label="State" [(ngModel)]="opsVariant1u" name="opsVariant1u"
+          autocomplete="off">
+        <mat-error *ngIf="(f.submitted && opsVariant1u.invalid)">
+          <p *ngIf="opsVariant1u.errors.required">PaaS Variant 1 is <strong>required</strong>
+          </p>
+        </mat-error>
+        <p class="mtop6">PaaS Variant 1</p>
+      </mat-form-field>
+    </div> -->
+  </div>
+  <div class="modal-footer">
+    <button type="submit" mat-raised-button color="primary" class="btm-action-btn">Update</button>
+    <button type="button" mat-raised-button class="mat-default" color="default" data-dismiss="modal">Close</button>
+  </div>
+</form>
+</div>
+</div>
+</div>
+<br><br>
