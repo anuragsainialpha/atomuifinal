@@ -151,7 +151,7 @@ export class CreateLoadSlipComponent implements OnInit {
     }
     // get variants 
     this.getvariants();
-    this.goApprovalReasonList = ['Lesser Dimension Truck','Unavailability of a sufficient plan','Plan for SXL truck but loaded the MXL truck : SXL Truck not Available','The required truck type is not available','OE Dispatch: Load as per OE Standards','Truck loaded with fewer tyres because of safety reasons'];
+    this.goApprovalReasonList = ['Volume fully utilized weight less','Lesser Dimension Truck','Unavailability of a sufficient plan','Plan for SXL truck but loaded the MXL truck : SXL Truck not Available','The required truck type is not available','OE Dispatch: Load as per OE Standards','Truck loaded with fewer tyres because of safety reasons'];
  
   }
 
@@ -1834,7 +1834,7 @@ export class CreateLoadSlipComponent implements OnInit {
 
 this.files= event.target.files[0];
 console.log(this.files);
-let url = 'https://otmgtm-test-a563219.otm.em2.oraclecloud.com/logisticsRestApi/resources-int/v2/documents';
+let url = 'https://otmgtm-a563219.otm.em2.oraclecloud.com/logisticsRestApi/resources-int/v2/documents';
 //let url = 'https://otmgtm-test-a563219.otm.em2.oraclecloud.com/GC3/glog.integration.servlet.WMServlet';
 let formData = new FormData();
 formData.append("myfile", this.files);

@@ -478,7 +478,8 @@ export class GatesecurityTruckInventoryShippingComponent implements OnInit, DoCh
 
       let canGateOut = true;
       //if (row.inWeightStatus) {
-        if (row.outWeightStatus) {
+        // if (row.outWeightStatus) {
+          if (row.outWeightStatus || (this.userRoles.rdc_GAT || this.userRoles.JIT_GATE_SECURITY || this.userRoles.rdc_PLN || this.userRoles.JIT_PLN || this.userRoles.JIT_OPERATION)) {
           canGateOut = true;
         } else {
           canGateOut = false
