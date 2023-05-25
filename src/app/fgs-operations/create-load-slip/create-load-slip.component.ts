@@ -151,7 +151,7 @@ export class CreateLoadSlipComponent implements OnInit {
     }
     // get variants 
     this.getvariants();
-    this.goApprovalReasonList = ['Volume fully utilized weight less','Lesser Dimension Truck','Unavailability of a sufficient plan','Plan for SXL truck but loaded the MXL truck : SXL Truck not Available','The required truck type is not available','OE Dispatch: Load as per OE Standards','Truck loaded with fewer tyres because of safety reasons'];
+    this.goApprovalReasonList = ['Mix Load','SKU Weight Not OK','Volume fully utilized weight less','Lesser Dimension Truck','Unavailability of a sufficient plan','Plan for SXL truck but loaded the MXL truck : SXL Truck not Available','The required truck type is not available','OE Dispatch: Load as per OE Standards','Truck loaded with fewer tyres because of safety reasons'];
  
   }
 

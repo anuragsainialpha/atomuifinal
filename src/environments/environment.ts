@@ -14,10 +14,10 @@ export const environment = {
 
 
   //Gen-2 Cloud URL Test----
-  // baseUrl: 'https://atomcloud-test.apollotyres.com:9074/v11/api/v1/'
+  baseUrl: 'https://atomcloud-test.apollotyres.com:9074/v11/api/v1/'
 
   // PROD URL
-    baseUrl : 'https://atomcloudjcs-prod.apollotyres.com/v11/api/v1/'
+    // baseUrl : 'https://atomcloudjcs-prod.apollotyres.com/v11/api/v1/'
 
   //Gen-2 Cloud URL Prod with IP Address----
     //baseUrl: 'https://152.67.29.38:9074/v7/api/v1/'
