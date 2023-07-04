@@ -345,7 +345,7 @@
               *ngIf="(releasedDate == null)"
               (click)="eventCall(loadslipID,'RELEASED')" [disabled]="!(sapInvoice)">Release </button>
 
-          <button *ngIf="(releasedDate != null)" class="greenButton">Release <span>{{releasedDate | customDateFormat |
+          <button *ngIf="(releasedDate != null)"  class="greenButton">Release <span>{{releasedDate | customDateFormat |
               date:'dd-MMM-yyyy,HH:mm'}}</span></button>
         </div>
         <div class="flow-btns tab-flow-btns width-12-5">

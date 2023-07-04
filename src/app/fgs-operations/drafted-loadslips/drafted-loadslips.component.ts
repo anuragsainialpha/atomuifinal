@@ -579,9 +579,11 @@ export class DraftedLoadslipsComponent implements OnInit, DoCheck {
   viewDraftLoadSlipData(loadSlipData) {
     let loadSlipId = loadSlipData.loadslipId;
     let type = loadSlipData.type;
-    // For DP_REP View loadslip data can't be edit only view , that why we are navigating view only pages 
+    // For DP_REP View loadslip data can't be edit only view , that why we are navigating 
+    // view only pages 
     // Else condition we are navigating to 
-    if (this.check_Role_DP_REP == 'DP_REP' || this.check_Role_DP_REP == 'L1_MGR' || this.check_Role_DP_REP == 'L2_MGR' ) {
+    if (this.check_Role_DP_REP == 'DP_REP' || this.check_Role_DP_REP == 'L1_MGR' || 
+    this.check_Role_DP_REP == 'L2_MGR' ) {
       if (loadSlipId != null) {
         if (type == 'FGS_EXP') {
           this.router.navigateByUrl('/load-slip-view-for-export/' + loadSlipId);

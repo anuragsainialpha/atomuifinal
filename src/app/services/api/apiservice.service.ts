@@ -487,7 +487,8 @@ maxPageLengthForExcel = 10000;
     }
   }
   isDPREPRole(){
-    if(this.checkRole() == this.roles.planner3 || this.checkRole() == this.roles.L1MGR || this.checkRole() == this.roles.L2MGR ){
+    if(this.checkRole() == this.roles.planner3 || this.checkRole() == this.roles.L1MGR 
+    || this.checkRole() == this.roles.L2MGR ){
       return true;
     }else{
       return false;

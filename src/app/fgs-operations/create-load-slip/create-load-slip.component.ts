@@ -999,11 +999,83 @@ export class CreateLoadSlipComponent implements OnInit {
       console.log(eventType + "," + this.loadslipID);
       console.log(eventType,this.totalMaterialWeight, this.goApprovalReason );
       console.log(this.service.checkRole());
-      if ((eventType == 'RELEASED' && (this.totalMaterialWeight < 95 && this.goApprovalReason == null) &&
+      
+      if ((eventType == 'RELEASED' && (this.totalMaterialWeight < 95 && this.goApprovalReason == null) 
+      &&
       (this.service.checkRole() == this.roles.fgsOperations1 || 
-      this.service.checkRole() == this.roles.fgsOperations2 ))) {
+      this.service.checkRole() == this.roles.fgsOperations2 || this.service.checkRole() == this.roles.planner3 ))) 
+      {
         this.toastr.info("Could not release the shipment. Please select Approval Reason for lesser utilization!");
-      }
+             
+      }   
+
+
+
+
+
+      
+      // else if (eventType == 'RELEASED')
+      // {
+      //   let sendbleTTEUtil = 0;
+      //   let sendableWEIGHTUtil = 0;
+      //   let sendableVOLUMEUtil = 0;
+      //   let newDraftableDataArray = []; let index = 1;
+      
+
+      //   let saveasDraftData = {
+      //     source: this.userSource,
+      //     destination: this.destination,
+      //     truckNumber: this.truckType,
+      //     loadslipDraftDataDtos: newDraftableDataArray,
+      //     action: eventType,
+      //     loadSlipId: this.loadslipID,
+      //     tteUtil: sendbleTTEUtil,
+      //     weightUtil: sendableWEIGHTUtil,
+      //     volumeUtil: sendableVOLUMEUtil,
+      //     totalTyres: this.totalTyres,
+        
+      //     totalTubes: this.totalTubes,
+      //     totalFlaps: this.totalFlaps,
+      //     totalValves: this.totalValves,
+      //     totPctr: this.totalPctr,
+      //     otherQty: this.totalOthersCount,
+      //     totalLoadedQty: this.totalLoadedQty,
+      //     totalTTE: this.itemLevelTotalTTE,
+      //     totalWeight: this.itemLevelTotalWeight,
+      //     totalVolume: this.itemLevelTotalVolume,
+      //     shipTo: this.ShipTo,
+      //     shipmentID: this.shipmentNumber,
+      //     actualTruckType: this.actualTruckType,
+      //     variant1: this.variant_ONE,
+      //     variant2: this.variant_TWO,
+      //     dropSeq: this.dropSeq,
+                 
+      //     goApprovalReason: this.goApprovalReason
+      //   }
+
+      //   if (this.loadslipID) {
+      //     this.IsUpdate = true
+      //   } else {
+      //     this.IsUpdate = false;
+      //   }
+      //   let HTTPAPI = ApiserviceService.apisList.loadslidSaveasDraft;
+      //   this.loadslipsave(saveasDraftData, HTTPAPI);
+    
+        
+        
+
+
+      // }
+      
+
+
+           
+
+
+
+
+
+      
       // If is event type confirm and there is not truck should validated  
       else if ((eventType == 'CONFIRM') && !this.truckType) {
         this.toastr.error("Please select truck before confirm event", "! Error");
@@ -1012,7 +1084,8 @@ export class CreateLoadSlipComponent implements OnInit {
         console.log("Else is True:" + eventType + "," + this.loadslipID);
         let data = {
           loadslipID: loadSlipID,
-          eventType: eventType
+          eventType: eventType,
+          goApprovalReason: this.goApprovalReason
         };
         console.log("Reached Trigger API:" + data['loadslipID']);
         //this.toastr.info("Reached Trigger API:");

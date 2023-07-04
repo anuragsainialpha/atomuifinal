@@ -14,7 +14,7 @@ export const environment = {
 
 
   //Gen-2 Cloud URL Test----
-  baseUrl: 'https://atomcloud-test.apollotyres.com:9074/v11/api/v1/'
+  baseUrl: 'https://atomcloud-test.apollotyres.com:9074/v12/api/v1/'
 
   // PROD URL
     // baseUrl : 'https://atomcloudjcs-prod.apollotyres.com/v11/api/v1/'
